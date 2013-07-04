@@ -4,69 +4,56 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joda.time.DateTime;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+
+@Entity
+@Table(name="report")
 public class Report implements Serializable {
-	
 	private static final long serialVersionUID = 188607911440560306L;
 	
 	private String id;
 	private Order order;
+	
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="report")
+	@ElementCollection(targetClass=HistoryItem.class)
 	private List<HistoryItem> history;
 	
 	public Report(Order order){
 		this.id = order.getId();
 		this.order = order;
-		history = new LinkedList<Report.HistoryItem>();
+		history = new LinkedList<HistoryItem>();
 	}
-	
-	public enum ReportStatus{
-		ACCEPTED, REJECTED, REFUSED, FAILURE
-	}
-	
-	public static class HistoryItem implements Serializable{
-		private static final long serialVersionUID = -4490123034598037678L;
-		
-		private ReportStatus reportStatus;
-		private String reason;
-		private String taxiId;
-		private DateTime dateTime;
-		
-		public HistoryItem(ReportStatus reportStatus, String reason,
-				String taxiId) {
-			super();
-			this.reportStatus = reportStatus;
-			this.reason = reason;
-			this.taxiId = taxiId;
-			this.dateTime = new DateTime();
-		}
-		public ReportStatus getReportStatus() {
-			return reportStatus;
-		}
-		public String getTaxiId() {
-			return taxiId;
-		}
-		public DateTime getDateTime() {
-			return dateTime;
-		}
-		public String getReason() {
-			return reason;
-		}
-	}
-
 	
 	public void addHistoryItem(HistoryItem item){
 		history.add(item);
 	}
 	
+	@Id
+	@Column(name="id")
 	public String getId() {
 		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public List<HistoryItem> getHistory() {
 		return history;
 	}
+	
+	public void setHistory(List<HistoryItem> history) {
+		this.history = history;
+	}
 
+	@Column(name="order")
 	public Order getOrder() {
 		return order;
 	}
@@ -74,7 +61,7 @@ public class Report implements Serializable {
 	public void setOrder(Order order) {
 		this.order = order;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

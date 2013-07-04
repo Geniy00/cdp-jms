@@ -7,10 +7,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.epam.cdp.core.entity.Customer;
+import com.epam.cdp.core.entity.HistoryItem;
+import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.Report;
-import com.epam.cdp.core.entity.Report.HistoryItem;
-import com.epam.cdp.core.entity.Report.ReportStatus;
 import com.epam.cdp.library.bean.OrderBlockingList;
 import com.epam.cdp.library.service.JmsService;
 

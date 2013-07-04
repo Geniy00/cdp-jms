@@ -2,6 +2,12 @@ package com.epam.cdp.core.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 public class Order implements Serializable {
@@ -39,6 +45,8 @@ public class Order implements Serializable {
 		this.price = Math.abs((double)startPosition - finishPosition);
 	}
 	
+	@Id
+	@Column(name="id")
 	public String getId() {
 		return id;
 	}
@@ -47,6 +55,7 @@ public class Order implements Serializable {
 		this.id = id;
 	}
 
+	@Column(name="customer")
 	public Customer getCustomer() {
 		return customer;
 	}
@@ -55,6 +64,7 @@ public class Order implements Serializable {
 		this.customer = customer;
 	}
 
+	@Column(name="startPosition")
 	public Integer getStartPosition() {
 		return startPosition;
 	}
@@ -63,6 +73,7 @@ public class Order implements Serializable {
 		this.startPosition = startPosition;
 	}
 
+	@Column(name="finishPosition")
 	public Integer getFinishPosition() {
 		return finishPosition;
 	}
@@ -71,6 +82,8 @@ public class Order implements Serializable {
 		this.finishPosition = finishPosition;
 	}
 
+	@Column(name="dateTime")
+	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
 	public DateTime getDateTime() {
 		return dateTime;
 	}
@@ -79,6 +92,8 @@ public class Order implements Serializable {
 		this.dateTime = dateTime;
 	}
 
+	@Enumerated(EnumType.STRING)
+	@Column(name="orderType")
 	public OrderType getOrderType() {
 		return orderType;
 	}
@@ -87,6 +102,7 @@ public class Order implements Serializable {
 		this.orderType = orderType;
 	}
 
+	@Column(name="price")
 	public Double getPrice() {
 		return price;
 	}

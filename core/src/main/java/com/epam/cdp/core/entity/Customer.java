@@ -2,13 +2,21 @@ package com.epam.cdp.core.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="customer")
 public class Customer implements Serializable {
-	
 	private static final long serialVersionUID = -8888243225759654214L;
 
-	private String phone;
-
+	private long id;
 	private String name;
+	private String phone;
 
 	public Customer() { }
 	
@@ -18,14 +26,18 @@ public class Customer implements Serializable {
 		this.name = name;
 	}
 
-	public String getPhone() {
-		return phone;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	public long getId() {
+		return id;
 	}
 
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setId(long id) {
+		this.id = id;
 	}
 
+	@Column(name="name")
 	public String getName() {
 		return name;
 	}
@@ -34,12 +46,20 @@ public class Customer implements Serializable {
 		this.name = name;
 	}
 
+	@Column(name="phone")
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
 		return result;
 	}
 
@@ -52,17 +72,8 @@ public class Customer implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Customer other = (Customer) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (phone == null) {
-			if (other.phone != null)
-				return false;
-		} else if (!phone.equals(other.phone))
+		if (id != other.id)
 			return false;
 		return true;
 	}
-	
 }
