@@ -54,12 +54,12 @@
 		<c:if test="${item.status == 'REFUSED'}">
 			<c:set var="color" value="#8984B3" />
 		</c:if>
-		<div style='background-color:${color}; border: solid 1px black; margin: 15px;' >
+		<div style='background-color:${color}; border: solid 1px black; display:inline-block; margin: 8px;' >
 			<table>
 				<tr>
-					<td width="5%">${i}.</td>
-					<td width="50%">id: ${item.id}</td>
-					<td width="35%">from ${item.order.startPosition} to ${item.order.finishPosition}</td>
+					<td width="50px">${i}.</td>
+					<td width="400px">id: ${item.id}</td>
+					<td width="400px">from ${item.order.startPosition} to ${item.order.finishPosition}</td>
 				</tr>
 				<tr>
 					<td></td>
@@ -67,7 +67,12 @@
 					<td>status: ${item.status}</td>
 				</tr>
 				<tr>
-					<td></td><td></td>
+					<td></td>
+					<td>
+						<c:if test="${item.status == 'REFUSED'}">
+							<font color="yellow">Reason: ${item.reason}</font>
+						</c:if>
+					</td>
 					<td>
 					
 						<form action="order/${item.id}/refuse" method="post" <c:if test="${item.status != 'ACCEPTED'}">style="visibility:hidden;" </c:if> ><input type="checkbox" onchange="handleClick(this, ${i})"> Refuse

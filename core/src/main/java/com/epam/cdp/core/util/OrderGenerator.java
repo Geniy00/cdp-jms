@@ -31,7 +31,7 @@ public class OrderGenerator {
 		order.setCustomer(generateRandomCustomer());
 		order.setStartPosition(random.nextInt(100));
 		order.setFinishPosition(random.nextInt(100));
-		order.setDateTime(new DateTime());
+		order.setDateTime(new DateTime().plusDays(1));
 		OrderType orderType =  OrderType.values()[random.nextInt(OrderType.values().length)];
 		order.setOrderType(orderType);
 		order.calculatePrice();

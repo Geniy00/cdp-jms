@@ -3,6 +3,7 @@
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/jms" xmlns:amq="http://activemq.apache.org/schema/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -22,14 +23,21 @@
 		<property name="brokerURL" value="${jms.url}"/>
 	</bean>
 	
-	<bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">
+	<jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
+		<jms:listener destination="${jms.reportQueue.name}" 
+			ref="reportListener" method="onMessage" />
+			
+		<!-- <jms:listener destination="${jms.errorQueue.name}" 
+			ref="errorListener" method="onMessage" /> -->
+	</jms:listener-container>
+	
+	<!-- <bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg value="${jms.orderQueue.name}"/>
-	</bean>
+	</bean> -->
 	
 	<bean id="jmsTemplate" 
 		class="org.springframework.jms.core.JmsTemplate">
 		<property name="connectionFactory" ref="connectionFactory"/>
-		<property name="defaultDestination" ref="orderQueue" />
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

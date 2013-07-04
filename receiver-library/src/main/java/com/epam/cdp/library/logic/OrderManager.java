@@ -12,12 +12,15 @@ import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.core.entity.Report.HistoryItem;
 import com.epam.cdp.core.entity.Report.ReportStatus;
 import com.epam.cdp.library.bean.OrderBlockingList;
-import com.epam.cdp.library.service.ReportService;
+import com.epam.cdp.library.service.JmsService;
 
 public final class OrderManager {
 
 	private static final Logger LOG = Logger.getLogger(OrderManager.class);
 
+	/**
+	 * Load library context when a classloader loads this class
+	 */
 	private static ApplicationContext context = load();
 	private static ApplicationContext load(){
 		ApplicationContext ctx = null;
@@ -31,14 +34,18 @@ public final class OrderManager {
 	}
 
 	OrderBlockingList orderBlockingList;	
-	ReportService reportService;
+	JmsService jmsService;
 	
+	/**
+	 * Taxi service id, for distinguish taxi services
+	 */
 	private String taxiId;
 	
 	public OrderManager(String taxiId) {
 		this.taxiId = taxiId;
+		//load beans from library spring context
 		orderBlockingList = context.getBean(OrderBlockingList.class);
-		reportService = context.getBean(ReportService.class);
+		jmsService = context.getBean(JmsService.class);
 	}
 	
 	/**
@@ -46,7 +53,7 @@ public final class OrderManager {
 	 * @return
 	 */
 	public Order peekOrder(){
-		Order order = orderBlockingList.peekOrder();
+		Order order = orderBlockingList.peek();
 		if(order == null) return null;
 		
 		//hide customer information
@@ -61,6 +68,11 @@ public final class OrderManager {
 		return clonedOrder;
 	}
 	
+	/**
+	 * When taxi service accept an order, it will got customer information like phone number
+	 * @param id
+	 * @return an order with extra information about customer
+	 */
 	public Order acceptOrder(String id){
 		Order order = orderBlockingList.remove(id);
 		
@@ -68,7 +80,7 @@ public final class OrderManager {
 		Report report = new Report(order);
 		report.addHistoryItem(new HistoryItem(ReportStatus.ACCEPTED, "order accepted", taxiId));
 		
-		reportService.sendReport(report);
+		jmsService.sendReport(report);
 		
 		return order;
 	}
@@ -80,11 +92,11 @@ public final class OrderManager {
 		Report report = new Report(order);
 		report.addHistoryItem(new HistoryItem(ReportStatus.REJECTED, "order rejected", taxiId));
 		
-		reportService.sendReport(report);
+		//Send messages
+		jmsService.sendReport(report);		
+		jmsService.sendOrderBack(order);
 		
-		//!!!send to queue again
-		
-		//return clonned order
+		//return cloned order
 		Order clonedOrder = new Order(
 				order.getId(), 
 				new Customer("hidden", "hidden"), 
@@ -95,12 +107,18 @@ public final class OrderManager {
 		return clonedOrder;
 	}
 	
+	/**
+	 * Order could be refused, when one was accepted
+	 * For example: A client refused the order, when taxi-service called to him
+	 * @param order
+	 * @param reason
+	 */
 	public void refuseOrder(Order order, String reason){
 		
 		Report report = new Report(order);
 		report.addHistoryItem(new HistoryItem(ReportStatus.REFUSED, reason, taxiId));
 		
-		reportService.sendReport(report);
+		jmsService.sendReport(report);
 		
 	}
 	

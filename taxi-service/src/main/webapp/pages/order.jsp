@@ -10,7 +10,9 @@
 	<br/><br/>
 	
 	<c:if test="${order != null}">
+	
 		<p>Order information:</p> <br/>
+		<div style="border: solid 1px green; margin: 15px; display:inline-block;">
 		<table>
 			<tr>
 				<td>id:</td>
@@ -41,15 +43,27 @@
 				<td>${order.price}</td>
 			</tr>
 		</table>
+		</div>
 		<br/>
 		<c:if test="${order.customer.name == 'hidden'}">
-			<div>Resolution:</div>
-			<form action="order/${order.id}/accept" method="post">
-				<input type="submit" value="Accept"/>
-			</form>
-			<form action="order/${order.id}/reject" method="post">
-				<input type="submit" value="Reject"/>
-			</form>
+			<div style="border: solid 1px green; margin: 15px; display:inline-block;">Resolution:
+				<table>
+					<tr>
+						<td width="100px">
+							<form action="order/${order.id}/accept" method="post">
+								<input type="submit" value="Accept"/>
+							</form>
+						</td>
+						<td width="100px">
+							<form action="order/${order.id}/reject" method="post">
+								<input type="submit" value="Reject"/>
+							</form>
+						</td>
+					</tr>
+				</table>
+				
+				
+			</div>
 		</c:if>
 	</c:if>
 	<c:if test="${order == null}">

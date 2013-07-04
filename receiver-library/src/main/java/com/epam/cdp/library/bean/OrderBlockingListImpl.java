@@ -23,7 +23,7 @@ public class OrderBlockingListImpl implements OrderBlockingList {
 	private static final Logger LOG = Logger.getLogger(OrderBlockingListImpl.class);
 	
 	private static final int CAPACITY = 5;
-	private static final int TRY_LOCK_TIME = 5;//seconds
+	private static final int TRY_LOCK_TIMEOUT = 5;//seconds
 	private LinkedList<Order> orderList;
 	private Lock lock;
 	private Condition isFull;
@@ -36,7 +36,7 @@ public class OrderBlockingListImpl implements OrderBlockingList {
 	
 	public void add(Order order){
 		try {
-			if(lock.tryLock(TRY_LOCK_TIME, TimeUnit.SECONDS)){
+			if(lock.tryLock(TRY_LOCK_TIMEOUT, TimeUnit.SECONDS)){
 				try {
 					while(orderList.size() == CAPACITY){
 						isFull.await();
@@ -55,10 +55,10 @@ public class OrderBlockingListImpl implements OrderBlockingList {
 		
 	}
 	
-	public Order peekOrder(){
+	public Order peek(){
 		Order order = null;
 		try {
-			if(lock.tryLock(TRY_LOCK_TIME, TimeUnit.SECONDS)){
+			if(lock.tryLock(TRY_LOCK_TIMEOUT, TimeUnit.SECONDS)){
 				try{
 					if(orderList.size() == 0){
 						return null;
@@ -86,7 +86,7 @@ public class OrderBlockingListImpl implements OrderBlockingList {
 		
 		Order fullOrder = null;
 		try {
-			if(lock.tryLock(TRY_LOCK_TIME, TimeUnit.SECONDS)){
+			if(lock.tryLock(TRY_LOCK_TIMEOUT, TimeUnit.SECONDS)){
 				try{
 					//remove order from list
 					int index = orderList.indexOf(order);
@@ -114,7 +114,7 @@ public class OrderBlockingListImpl implements OrderBlockingList {
 	public int size(){
 		int size = 0;
 		try{
-			if(lock.tryLock(TRY_LOCK_TIME, TimeUnit.SECONDS)){
+			if(lock.tryLock(TRY_LOCK_TIMEOUT, TimeUnit.SECONDS)){
 				try{
 					size = orderList.size();
 				} finally {
