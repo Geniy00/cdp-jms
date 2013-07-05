@@ -6,23 +6,25 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 
 @Entity
 @Table(name="report")
 public class Report implements Serializable {
 	private static final long serialVersionUID = 188607911440560306L;
-	
+
+	@Id
+	@Column(name="id")
 	private String id;
+
+	@OneToOne(cascade=CascadeType.ALL)
 	private Order order;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="report")
-	@ElementCollection(targetClass=HistoryItem.class)
 	private List<HistoryItem> history;
 	
 	public Report(Order order){
@@ -35,8 +37,6 @@ public class Report implements Serializable {
 		history.add(item);
 	}
 	
-	@Id
-	@Column(name="id")
 	public String getId() {
 		return id;
 	}
@@ -53,7 +53,6 @@ public class Report implements Serializable {
 		this.history = history;
 	}
 
-	@Column(name="order")
 	public Order getOrder() {
 		return order;
 	}

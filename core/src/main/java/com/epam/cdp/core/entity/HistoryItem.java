@@ -21,14 +21,27 @@ import org.joda.time.DateTime;
 public class HistoryItem implements Serializable{
 	private static final long serialVersionUID = -4490123034598037678L;
 	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
 	private long id;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name="reportStatus")
 	private ReportStatus reportStatus;
+
+	@Column(name="reason")
 	private String reason;
+	
+	@Column(name="taxiId")
 	private String taxiId;
+
+//	@Column(name="dateTime")
+//	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
 	private DateTime dateTime;
 	
-	@ManyToOne
-	@JoinColumn(name="reportId")
+//	@ManyToOne
+//	@JoinColumn(name="reportId")
 	private Report report;
 	
 	public enum ReportStatus{
@@ -46,9 +59,6 @@ public class HistoryItem implements Serializable{
 		this.dateTime = new DateTime();
 	}
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
 	public long getId() {
 		return id;
 	}
@@ -57,8 +67,6 @@ public class HistoryItem implements Serializable{
 		this.id = id;
 	}
 
-	@Enumerated(EnumType.STRING)
-	@Column(name="reportStatus")
 	public ReportStatus getReportStatus() {
 		return reportStatus;
 	}
@@ -67,7 +75,6 @@ public class HistoryItem implements Serializable{
 		this.reportStatus = reportStatus;
 	}
 
-	@Column(name="reason")
 	public String getReason() {
 		return reason;
 	}
@@ -76,7 +83,6 @@ public class HistoryItem implements Serializable{
 		this.reason = reason;
 	}
 
-	@Column(name="taxiId")
 	public String getTaxiId() {
 		return taxiId;
 	}
@@ -85,8 +91,6 @@ public class HistoryItem implements Serializable{
 		this.taxiId = taxiId;
 	}
 
-	@Column(name="dateTime")
-	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
 	public DateTime getDateTime() {
 		return dateTime;
 	}

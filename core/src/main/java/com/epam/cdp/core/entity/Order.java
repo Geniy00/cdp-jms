@@ -2,14 +2,20 @@ package com.epam.cdp.core.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+@Entity
+@Table(name="order")
 public class Order implements Serializable {
 
 	private static final long serialVersionUID = 1820235678421505291L;
@@ -55,8 +61,8 @@ public class Order implements Serializable {
 		this.id = id;
 	}
 
-	@Column(name="customer")
-	public Customer getCustomer() {
+	@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	public Customer getCustomer() { 
 		return customer;
 	}
 
@@ -105,6 +111,10 @@ public class Order implements Serializable {
 	@Column(name="price")
 	public Double getPrice() {
 		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
 	}
 
 	@Override
