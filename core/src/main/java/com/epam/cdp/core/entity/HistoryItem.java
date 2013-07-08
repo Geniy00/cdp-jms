@@ -36,12 +36,12 @@ public class HistoryItem implements Serializable{
 	@Column(name="taxiId")
 	private String taxiId;
 
-//	@Column(name="dateTime")
-//	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+	@Column(name="dateTime")
+	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
 	private DateTime dateTime;
 	
-//	@ManyToOne
-//	@JoinColumn(name="reportId")
+	@ManyToOne
+	@JoinColumn(name="reportId")
 	private Report report;
 	
 	public enum ReportStatus{

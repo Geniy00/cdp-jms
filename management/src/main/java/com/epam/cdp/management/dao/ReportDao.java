@@ -1,7 +1,10 @@
 package com.epam.cdp.management.dao;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +30,11 @@ public class ReportDao {
 	
 	public Report find(String id){
 		return em.find(Report.class, id);
+	}
+	
+	public List<Report> findAll(){
+		TypedQuery<Report> query = 
+				em.createQuery("SELECT r FROM Report r", Report.class);
+		return query.getResultList();
 	}
 }

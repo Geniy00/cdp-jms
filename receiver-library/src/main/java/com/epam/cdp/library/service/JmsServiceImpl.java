@@ -50,14 +50,14 @@ public class JmsServiceImpl implements JmsService {
 		LOG.info("Order with id: " + order.getId() + " was returned back");
 	}
 
-	public void sendFailureOrder(final Order order) {
+	public void sendFailureReport(final Report report) {
 		jmsTemplate.send(ERROR_DESTINATION, new MessageCreator() {
 			
 			public Message createMessage(Session session) throws JMSException {
-				return session.createObjectMessage(order);
+				return session.createObjectMessage(report);
 			}
 		});
-		LOG.info("Order with id: " + order.getId() + " was sent to the error queue");
+		LOG.info("Report with id: " + report.getId() + " was sent to the error queue");
 		
 	}
 

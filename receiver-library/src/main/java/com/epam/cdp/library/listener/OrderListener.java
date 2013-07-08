@@ -5,7 +5,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.epam.cdp.core.entity.HistoryItem;
+import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Order;
+import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.library.bean.OrderBlockingList;
 import com.epam.cdp.library.service.JmsService;
 
@@ -25,7 +28,10 @@ public class OrderListener {
 		
 		if(isCorrect(order) == false){
 			LOG.warn("The order with id: " + order.getId() + " is uncorrect");
-			jmsService.sendFailureOrder(order);
+			Report report = new Report(order);
+			new HistoryItem(ReportStatus.FAILURE, "The order can't pass validation", taxiId)
+			report.addHistoryItem()
+			jmsService.sendFailureReport(order);
 		}
 		
 		orderBlockingList.add(order);

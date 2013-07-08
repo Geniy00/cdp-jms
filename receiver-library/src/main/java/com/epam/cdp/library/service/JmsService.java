@@ -23,10 +23,10 @@ public interface JmsService {
 	void sendOrderBack(Order order);
 	
 	/**
-	 * Send an order that can't be processed
+	 * Send an order that can't be processed, in the report with status FAILURE
 	 * For example: the time is over, or order is broken
 	 * @param order
 	 */
-	void sendFailureOrder(Order order);
+	void sendFailureReport(Report report);
 	
 }

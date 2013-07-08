@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.epam.cdp.core.entity.Order;
+import com.epam.cdp.core.entity.Report;
 
 @Component
 public class ErrorListener {
@@ -12,6 +13,8 @@ public class ErrorListener {
 	
 	public void onMessage(Order order){
 		LOG.info("Error order with id " + order.getId() + " received");		
-		//send to DB
+		
+		Report report = new Report(order);
+		report.addHistoryItem(new )
 	}
 }

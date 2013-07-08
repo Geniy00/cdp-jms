@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+
 @Entity
 @Table(name="report")
 public class Report implements Serializable {
@@ -21,10 +23,10 @@ public class Report implements Serializable {
 	@Column(name="id")
 	private String id;
 
-	@OneToOne(cascade=CascadeType.ALL)
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
 	private Order order;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy="report")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="report", orphanRemoval=true)
 	private List<HistoryItem> history;
 	
 	public Report(Order order){
@@ -35,6 +37,10 @@ public class Report implements Serializable {
 	
 	public void addHistoryItem(HistoryItem item){
 		history.add(item);
+	}
+	
+	public void addAllHistoryItems(List<HistoryItem> historyItems){
+		history.addAll(historyItems);
 	}
 	
 	public String getId() {
