@@ -39,10 +39,10 @@ public final class OrderManager {
 	/**
 	 * Taxi service id, for distinguish taxi services
 	 */
-	private String taxiId;
+	private static String taxiId;
 	
 	public OrderManager(String taxiId) {
-		this.taxiId = taxiId;
+		OrderManager.taxiId = taxiId;
 		//load beans from library spring context
 		orderBlockingList = context.getBean(OrderBlockingList.class);
 		jmsService = context.getBean(JmsService.class);
@@ -126,7 +126,7 @@ public final class OrderManager {
 		return orderBlockingList.size();
 	}
 
-	public String getTaxiId() {
+	public static String getTaxiId() {
 		return taxiId;
 	}
 	

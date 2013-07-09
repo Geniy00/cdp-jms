@@ -8,6 +8,7 @@ import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
+import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Report;
 
 @Repository
@@ -36,5 +37,22 @@ public class ReportDao {
 		TypedQuery<Report> query = 
 				em.createQuery("SELECT r FROM Report r", Report.class);
 		return query.getResultList();
+	}
+	
+	//TODO: fix this method!!!
+	public List<Report> findFromInterval(int startIndex, int count){
+		TypedQuery<Report> query =
+				em.createQuery("SELECT r FROM Report r LIMIT :startIndex, :coun", Report.class)
+				.setParameter("startIndex", startIndex)
+				.setParameter("coun", count);
+		return query.getResultList();
+	}
+	
+	//TODO: fix this method!!!
+	public List<Report> findReportWithStatus(ReportStatus reportStatus){
+//		TypedQuery<Report> query = 
+//				em.createQuery("SELECT r FROM Report r WHERE r.", Report.class);
+//		return query.getResultList();
+			throw new RuntimeException();	
 	}
 }

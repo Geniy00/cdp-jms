@@ -12,7 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cascade;
+import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 
 @Entity
 @Table(name="report")
@@ -41,6 +41,11 @@ public class Report implements Serializable {
 	
 	public void addAllHistoryItems(List<HistoryItem> historyItems){
 		history.addAll(historyItems);
+	}
+	
+	public ReportStatus getReportStatus(){
+		HistoryItem historyItem = history.get(history.size() - 1);
+		return historyItem.getReportStatus();
 	}
 	
 	public String getId() {

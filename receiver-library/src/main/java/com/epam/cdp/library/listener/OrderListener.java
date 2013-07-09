@@ -10,6 +10,7 @@ import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.library.bean.OrderBlockingList;
+import com.epam.cdp.library.logic.OrderManager;
 import com.epam.cdp.library.service.JmsService;
 
 @Component
@@ -29,9 +30,11 @@ public class OrderListener {
 		if(isCorrect(order) == false){
 			LOG.warn("The order with id: " + order.getId() + " is uncorrect");
 			Report report = new Report(order);
-			new HistoryItem(ReportStatus.FAILURE, "The order can't pass validation", taxiId)
-			report.addHistoryItem()
-			jmsService.sendFailureReport(order);
+			HistoryItem historyItem = new HistoryItem(
+					ReportStatus.FAILURE, "The order can't pass validation", 
+					OrderManager.getTaxiId());
+			report.addHistoryItem(historyItem);
+			jmsService.sendFailureReport(report);
 		}
 		
 		orderBlockingList.add(order);

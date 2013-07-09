@@ -20,6 +20,8 @@
 	<mvc:annotation-driven/>
 	<context:annotation-config/>
 	<context:component-scan base-package="com.epam.cdp.management.dao"/>
+	<context:component-scan base-package="com.epam.cdp.management.service"/>
+	<context:component-scan base-package="com.epam.cdp.management.controller"/>
 	<context:component-scan base-package="com.epam.cdp.management.listener"/>
 	
 	<!-- DataBase -->
@@ -51,7 +53,7 @@
 	<jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
 		<jms:listener destination="${jms.reportQueue.name}" 
 			ref="reportListener" method="onMessage" />
-			
+		 	
 		<jms:listener destination="${jms.errorQueue.name}" 
 			ref="errorListener" method="onMessage" /> 
 	</jms:listener-container>
