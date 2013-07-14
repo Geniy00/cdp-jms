@@ -8,7 +8,7 @@
 <body>
 	<br/><br/>
 	<h2>Reports:</h2>
-	<c:forEach var="report" items="reports">
+	<c:forEach var="report" items="${reports}">
 	<div style="border: solid 1px black; display:inline-block; margin: 8px;">
 		<table>
 			<tr>

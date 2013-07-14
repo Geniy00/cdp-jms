@@ -41,7 +41,7 @@
 				<td><sf:select path="orderType" items="${orderTypeValues}"/></td>
 			</tr>
 			<tr>
-				<td>Price: </td><td><sf:label path="price"/></td>
+				<td>Price: </td><td><sf:input path="price"/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><sf:button>Send</sf:button></td>

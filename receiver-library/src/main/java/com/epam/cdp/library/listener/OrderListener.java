@@ -35,6 +35,7 @@ public class OrderListener {
 					OrderManager.getTaxiId());
 			report.addHistoryItem(historyItem);
 			jmsService.sendFailureReport(report);
+			return;
 		}
 		
 		orderBlockingList.add(order);
@@ -49,9 +50,10 @@ public class OrderListener {
 				|| order.getCustomer().getPhone() == null || order.getCustomer().getPhone().isEmpty()
 				|| order.getStartPosition() == null
 				|| order.getFinishPosition() == null
-				|| order.getDateTime().isAfter(currentTime.minusMinutes(10))
+				|| order.getDateTime().isBefore(currentTime.minusMinutes(10))
 				|| order.getDateTime().isAfter(currentTime.plusDays(30))
-				|| order.getPrice() == null){
+				|| order.getPrice() == null
+				|| order.getPrice() <= 0){
 			return false;
 		}
 		return true;

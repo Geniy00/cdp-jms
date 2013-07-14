@@ -2,57 +2,25 @@ package com.epam.cdp.management.dao;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-
-import org.springframework.stereotype.Repository;
-
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Report;
+import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 
-@Repository
-public class ReportDao {
-	
-	@PersistenceContext
-	EntityManager em;
-	
-	public void create(Report report){
-		em.persist(report);
-	}
-	
-	public void update(Report report){
-		em.merge(report);
-	}
-	
-	public void remove(Report report){
-		em.remove(em.merge(report));
-	}
-	
-	public Report find(String id){
-		return em.find(Report.class, id);
-	}
-	
-	public List<Report> findAll(){
-		TypedQuery<Report> query = 
-				em.createQuery("SELECT r FROM Report r", Report.class);
-		return query.getResultList();
-	}
-	
+public interface ReportDao {
+
+	public abstract void create(Report report);
+
+	public abstract void update(Report report);
+
+	public abstract void remove(Report report);
+
+	public abstract Report find(String id);
+
+	public abstract List<Report> findAll();
+
 	//TODO: fix this method!!!
-	public List<Report> findFromInterval(int startIndex, int count){
-		TypedQuery<Report> query =
-				em.createQuery("SELECT r FROM Report r LIMIT :startIndex, :coun", Report.class)
-				.setParameter("startIndex", startIndex)
-				.setParameter("coun", count);
-		return query.getResultList();
-	}
-	
+	public List<Report> findFromInterval(int startIndex, int count);
+
 	//TODO: fix this method!!!
-	public List<Report> findReportWithStatus(ReportStatus reportStatus){
-//		TypedQuery<Report> query = 
-//				em.createQuery("SELECT r FROM Report r WHERE r.", Report.class);
-//		return query.getResultList();
-			throw new RuntimeException();	
-	}
+	public List<Report> findReportWithStatus(ReportStatus reportStatus);
+
 }

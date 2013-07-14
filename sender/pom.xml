@@ -108,7 +108,14 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.1</version>
 		</dependency>
-            
+        
+        <!-- JSP validators -->
+        <dependency>
+	        <groupId>org.apache.tomcat</groupId>
+	        <artifactId>tomcat-jsp-api</artifactId>
+	        <version>7.0.28</version>
+	    </dependency>
+        
 	</dependencies>
 	
 	<build>

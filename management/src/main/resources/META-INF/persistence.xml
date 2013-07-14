@@ -9,6 +9,7 @@
 		<class>com.epam.cdp.core.entity.HistoryItem</class>
 		<class>com.epam.cdp.core.entity.Order</class>
 		<class>com.epam.cdp.core.entity.Report</class>
+		<!-- <class>com.epam.cdp.management.test.TestEntity</class> -->
 		<properties>
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />

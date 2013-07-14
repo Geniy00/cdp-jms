@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
-import com.epam.cdp.management.dao.ReportDao;
+import com.epam.cdp.management.service.ReportService;
 
 @Controller
 public class MainController {
 
 	@Autowired
-	ReportDao reportDao;
+	ReportService reportService;
 	
 	@RequestMapping("/")
 	public String index(){
@@ -26,7 +26,7 @@ public class MainController {
 	
 	@RequestMapping("/reports")
 	public String showReportList(Model model){
-		List<Report> reports = reportDao.findAll();
+		List<Report> reports = reportService.getAllReports();
 				//findFromInterval(0, 100);
 		model.addAttribute("reports", reports);
 		return "report/list";
@@ -34,14 +34,14 @@ public class MainController {
 	
 	@RequestMapping("/report/{id}")
 	public String showReport(@PathVariable String id, Model model){
-		Report report = reportDao.find(id);
+		Report report = reportService.find(id);
 		model.addAttribute("report", report);
 		return "report/view";
 	}
 	
 	@RequestMapping("/order/{id}")
 	public String showOrder(@PathVariable String id, Model model){
-		Report report = reportDao.find(id);
+		Report report = reportService.find(id);
 		Order order = report.getOrder();
 		model.addAttribute("order", order);
 		return "order/view";
@@ -49,7 +49,7 @@ public class MainController {
 	
 	@RequestMapping("/error")
 	public String showFailureReports(Model model){
-		List<Report> reports = reportDao.findReportWithStatus(ReportStatus.FAILURE);
+		List<Report> reports = reportService.findReportWithStatus(ReportStatus.FAILURE);
 		model.addAttribute("reports", reports);
 		
 		return "error/list";

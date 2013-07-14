@@ -8,12 +8,12 @@
 <body>
 	<br/><br/>
 	<h2>Reports:</h2>
-	<c:forEach var="report" items="reports">
-	<div style="border: solid 1px black; display:inline-block; margin: 8px;">
+	<c:forEach var="report" items="${reports}">
+	<div style="border: solid 1px black; display:inline-block; margin: 8px; width: 60%">
 		<table>
 			<tr>
-				<td>Id: <a href="${pageContext.request.contextPath}/report/${report.id}">${report.id}</a></td>
-				<td>Status: ${report.getReportStatus()}</td>	
+				<td width="30%">Id: <a href="${pageContext.request.contextPath}/report/${report.id}">${report.id}</a></td>
+				<td width="30%">Status: ${report.getReportStatus()}</td>	
 			</tr>
 			<tr>
 				<td><a href="${pageContext.request.contextPath}/order/${report.id}">order details</a></td>

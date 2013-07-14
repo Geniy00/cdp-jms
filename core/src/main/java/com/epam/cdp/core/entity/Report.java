@@ -29,6 +29,8 @@ public class Report implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="report", orphanRemoval=true)
 	private List<HistoryItem> history;
 	
+	public Report() { }
+	
 	public Report(Order order){
 		this.id = order.getId();
 		this.order = order;
@@ -36,16 +38,22 @@ public class Report implements Serializable {
 	}
 	
 	public void addHistoryItem(HistoryItem item){
+		item.setReport(this);
 		history.add(item);
 	}
 	
 	public void addAllHistoryItems(List<HistoryItem> historyItems){
-		history.addAll(historyItems);
+		for(HistoryItem item : historyItems){
+			addHistoryItem(item);
+		}
 	}
 	
 	public ReportStatus getReportStatus(){
-		HistoryItem historyItem = history.get(history.size() - 1);
-		return historyItem.getReportStatus();
+		if(history.size() > 0){
+			HistoryItem historyItem = history.get(history.size() - 1);
+			return historyItem.getReportStatus();
+		}
+		return null;
 	}
 	
 	public String getId() {

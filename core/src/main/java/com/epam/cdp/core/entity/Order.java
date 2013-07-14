@@ -2,8 +2,6 @@ package com.epam.cdp.core.entity;
 
 import java.io.Serializable;
 
-import javassist.bytecode.stackmap.BasicBlock.Catch;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
