@@ -122,6 +122,12 @@ public class Order implements Serializable {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+	
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", customer=" + customer + ", dateTime="
+				+ dateTime + ", price=" + price + "]";
+	}
 
 	@Override
 	public int hashCode() {

@@ -19,10 +19,12 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	HistoryList historyList;
 
+	@Override
 	public Order peekOrder(){
 		return orderManager.peekOrder();
 	}
 	
+	@Override
 	public Order acceptOrder(String id){
 		Order order = orderManager.acceptOrder(id);
 		
@@ -32,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
 		return order;
 	}
 	
+	@Override
 	public Order rejectOrder(String id){
 		Order order = orderManager.rejectOrder(id);
 		
@@ -41,6 +44,7 @@ public class OrderServiceImpl implements OrderService {
 		return order;
 	}
 	
+	@Override
 	public Order refuseOrder(String id, String reason) {
 		Order order = historyList.getOrderById(id);
 		if(order == null) return null;
@@ -53,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
 		return order;
 	}
 
+	@Override
 	public int getQueueSize(){
 		return orderManager.getQueueSize();
 	}

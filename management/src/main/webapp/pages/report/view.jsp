@@ -16,10 +16,14 @@
 			<td>${report.id}</td>
 		</tr>
 		<tr>
-			<td colspan="2">History:</td>
+			<td>Status:</td>
+			<td>${report.getReportStatus()}</td>
 		</tr>
 		<tr>
-			<td colspan="2">			
+			<td colspan="2">	
+				<br/>		
+				History:
+				<br/>==========================<br/>
 				<c:forEach var="item" items="${report.history}" varStatus="theCount">
 				<div>
 					${theCount.count}) Status: ${item.reportStatus.name()} <br/>

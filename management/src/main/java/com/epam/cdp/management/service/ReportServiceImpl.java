@@ -42,6 +42,4 @@ public class ReportServiceImpl implements ReportService {
 	public List<Report> findReportWithStatus(ReportStatus reportStatus) {
 		return reportDao.findReportWithStatus(reportStatus);
 	}
-
-	
 }

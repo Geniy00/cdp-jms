@@ -30,6 +30,7 @@ public class JmsServiceImpl implements JmsService {
 	@Value("${jms.errorQueue.name}")
 	private String ERROR_DESTINATION;
 	
+	@Override
 	public void sendReport(final Report report) {
 		jmsTemplate.send(REPORT_DESTINATION, new MessageCreator() {
 			
@@ -40,6 +41,7 @@ public class JmsServiceImpl implements JmsService {
 		LOG.debug("Report with id: " + report.getId() + " was sent");
 	}
 
+	@Override
 	public void sendOrderBack(final Order order) {
 		jmsTemplate.send(ORDER_DESTINATION, new MessageCreator() {
 			
@@ -50,6 +52,7 @@ public class JmsServiceImpl implements JmsService {
 		LOG.info("Order with id: " + order.getId() + " was returned back");
 	}
 
+	@Override
 	public void sendFailureReport(final Report report) {
 		jmsTemplate.send(ERROR_DESTINATION, new MessageCreator() {
 			

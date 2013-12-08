@@ -56,6 +56,11 @@ public class Customer implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+	
+	@Override
+	public String toString() {
+		return "Customer [name=" + name + ", phone=" + phone + "]";
+	}
 
 	@Override
 	public int hashCode() {

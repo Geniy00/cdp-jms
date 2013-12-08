@@ -20,6 +20,7 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	JmsTemplate jmsTemplate;
 	
+	@Override
 	public void sendOrder(final Order order) {
 		jmsTemplate.send(new MessageCreator() {
 			
