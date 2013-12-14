@@ -25,8 +25,7 @@
  
  	<!-- Receiving JMS messages --> 
  	<jms:listener-container  acknowledge="transacted" connection-factory="connectionFactory">
-		<jms:listener destination="${jms.orderQueue.name}" 
-			ref="orderListener"	method="onMessage" />
+		<jms:listener destination="${jms.orderQueue.name}" ref="orderListener" />
 	</jms:listener-container>
 
 	<!-- JmsTemplate for sending messages -->

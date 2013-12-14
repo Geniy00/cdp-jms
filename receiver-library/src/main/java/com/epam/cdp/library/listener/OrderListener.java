@@ -12,9 +12,13 @@ import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.library.bean.OrderBlockingList;
 import com.epam.cdp.library.logic.OrderManager;
 import com.epam.cdp.library.service.JmsService;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import javax.jms.Message;
+import javax.jms.MessageListener;
 
 @Component
-public class OrderListener {
+public class OrderListener implements MessageListener {
 
 	public static final Logger LOG = Logger.getLogger(OrderListener.class);
 	
@@ -24,22 +28,25 @@ public class OrderListener {
 	@Autowired
 	JmsService jmsService;
 	
-	public void onMessage(Order order){
-		LOG.info("Order with id: " + order.getId() + " received");
-		
-		if(isCorrect(order) == false){
-			LOG.warn("The order with id: " + order.getId() + " is uncorrect");
-			Report report = new Report(order);
-			HistoryItem historyItem = new HistoryItem(
-					ReportStatus.FAILURE, "The order can't pass validation", 
-					OrderManager.getTaxiId());
-			report.addHistoryItem(historyItem);
-			jmsService.sendFailureReport(report);
-			return;
-		}
-		
-		orderBlockingList.add(order);
-		LOG.info("Order with id: " + order.getId() + " was sent to the queue");
+	public void onMessage(Message message){
+        LOG.error("Error!!!!");
+        throw new RuntimeException("com.epam.cdp.library.listener.OrderListener has not " +
+                "implemented method onMessage");
+//		LOG.info("Order with id: " + order.getId() + " received");
+//
+//		if(isCorrect(order) == false){
+//			LOG.warn("The order with id: " + order.getId() + " is uncorrect");
+//			Report report = new Report(order);
+//			HistoryItem historyItem = new HistoryItem(
+//					ReportStatus.FAILURE, "The order can't pass validation",
+//					OrderManager.getTaxiId());
+//			report.addHistoryItem(historyItem);
+//			jmsService.sendFailureReport(report);
+//			return;
+//		}
+//
+//		orderBlockingList.add(order);
+//		LOG.info("Order with id: " + order.getId() + " was sent to the queue");
 	}
 	
 	protected boolean isCorrect(Order order){

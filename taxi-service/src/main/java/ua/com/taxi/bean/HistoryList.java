@@ -25,7 +25,7 @@ public class HistoryList {
 	private Lock lock;
 	
 	public HistoryList() {
-		reportList = new LinkedList<Report>();
+		reportList = new LinkedList<>();
 		lock = new ReentrantLock();
 	}
 	
@@ -51,7 +51,7 @@ public class HistoryList {
 	}
 	
 	public List<Report> getReportHistory() {
-		List<Report> list = new ArrayList<Report>(CAPACITY);
+		List<Report> list = new ArrayList<>(CAPACITY);
 		
 		try {
 			if(lock.tryLock(TRYLOCK_INTERVAL, TimeUnit.SECONDS)){

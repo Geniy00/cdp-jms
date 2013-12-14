@@ -45,7 +45,7 @@ public class Order implements Serializable {
 	Double price;
 
 	public enum OrderType {
-		PASSENGER, CARGO;
+		PASSENGER, CARGO
 	}
 	
 	public Order() {

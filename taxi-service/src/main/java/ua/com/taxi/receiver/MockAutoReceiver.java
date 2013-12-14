@@ -4,7 +4,7 @@ import com.epam.cdp.core.entity.Order;
 
 import ua.com.taxi.service.OrderService;
 
-public class Receiver implements Runnable {
+public class MockAutoReceiver implements Runnable {
 
 	/** Delay between  receiving orders*/
 	private int DELAY = 5000;
@@ -16,7 +16,7 @@ public class Receiver implements Runnable {
 
 	OrderService orderService;
 
-	public Receiver(OrderService orderService) {
+	public MockAutoReceiver(OrderService orderService) {
 		super();
 		this.orderService = orderService;
 		stopFlag = false;
