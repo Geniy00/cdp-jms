@@ -3,7 +3,7 @@
 	      http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
 
-	<display-name>Custom receiver Web Application</display-name>
+	<display-name>Custom sender Web Application</display-name>
 	
 	<context-param>
 		<param-name>contextConfigLocation</param-name>

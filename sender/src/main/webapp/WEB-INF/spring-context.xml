@@ -23,7 +23,7 @@
 	</bean>
 	
 	<bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg value="${jms.orderQueue.name}"/>
+		<constructor-arg value="${jms.input.order.queue}"/>
 	</bean>
 	
 	<bean id="jmsTemplate" 

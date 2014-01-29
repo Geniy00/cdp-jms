@@ -11,12 +11,12 @@
 	<modules>
 		<module>sender</module>
 		<module>core</module>
-		<module>receiver</module>
+        <module>router</module>
 		<module>management</module>
 		<module>receiver-library</module>
-    <module>taxi-service</module>
-  </modules>
-  
+        <module>taxi-service</module>
+    </modules>
+
   <build>
   	<plugins>
 		<plugin>

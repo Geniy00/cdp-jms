@@ -34,7 +34,7 @@ public class Report implements Serializable {
 	public Report(Order order){
 		this.id = order.getId();
 		this.order = order;
-		history = new LinkedList<HistoryItem>();
+		this.history = new LinkedList<HistoryItem>();
 	}
 	
 	public void addHistoryItem(HistoryItem item){

@@ -1,0 +1,34 @@
+package com.epam.cdp.router.dao;
+
+import com.epam.cdp.core.entity.TaxiDispatcher;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
+
+@Repository
+public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
+
+    private static final String SELECT_ALL_TAXI_DISPATCHERS = "SELECT td FROM TaxiDispatcher td";
+    private static final String SELECT_ACTIVE_TAXI_DISPATCHERS = "SELECT td FROM TaxiDispatcher td WHERE td.disabled=false";
+
+
+    @PersistenceContext
+    EntityManager em;
+
+    @Override
+    public List<TaxiDispatcher> getAllTaxiDispatchers() {
+        TypedQuery<TaxiDispatcher> query =
+                em.createQuery(SELECT_ALL_TAXI_DISPATCHERS, TaxiDispatcher.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<TaxiDispatcher> getActiveTaxiDispatchers() {
+        TypedQuery<TaxiDispatcher> query =
+                em.createQuery(SELECT_ACTIVE_TAXI_DISPATCHERS, TaxiDispatcher.class);
+        return query.getResultList();
+    }
+}
