@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface TaxiDispatcherDao {
 
-    List<TaxiDispatcher> getAllTaxiDispatchers();
+    List<TaxiDispatcher> findAllTaxiDispatchers();
 
-    List<TaxiDispatcher> getActiveTaxiDispatchers();
+    List<TaxiDispatcher> findActiveTaxiDispatchers();
 
 }

@@ -12,8 +12,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
-
+/**
+ *
+ * @author Geniy00
+ */
 @Entity
 @Table(name="report")
 public class Report implements Serializable {
@@ -27,32 +29,29 @@ public class Report implements Serializable {
 	private Order order;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="report", orphanRemoval=true)
-	private List<HistoryItem> history;
+	private List<BookingResponse> history;
 	
 	public Report() { }
 	
 	public Report(Order order){
 		this.id = order.getId();
 		this.order = order;
-		this.history = new LinkedList<HistoryItem>();
+		this.history = new LinkedList<BookingResponse>();
 	}
 	
-	public void addHistoryItem(HistoryItem item){
-		item.setReport(this);
+	public void addHistoryItem(BookingResponse item){
+
 		history.add(item);
 	}
 	
-	public void addAllHistoryItems(List<HistoryItem> historyItems){
-		for(HistoryItem item : historyItems){
+	public void addAllHistoryItems(List<BookingResponse> bookingResponses){
+		for(BookingResponse item : bookingResponses){
 			addHistoryItem(item);
 		}
 	}
 	
-	public ReportStatus getReportStatus(){
-		if(history.size() > 0){
-			HistoryItem historyItem = history.get(history.size() - 1);
-			return historyItem.getReportStatus();
-		}
+	public BookingResponse.BookingResponseStatus getReportStatus(){
+
 		return null;
 	}
 	
@@ -64,11 +63,11 @@ public class Report implements Serializable {
 		this.id = id;
 	}
 
-	public List<HistoryItem> getHistory() {
+	public List<BookingResponse> getHistory() {
 		return history;
 	}
 	
-	public void setHistory(List<HistoryItem> history) {
+	public void setHistory(List<BookingResponse> history) {
 		this.history = history;
 	}
 

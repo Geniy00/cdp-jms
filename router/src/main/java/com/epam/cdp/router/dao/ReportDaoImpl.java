@@ -1,3 +1,4 @@
+/*
 package com.epam.cdp.router.dao;
 
 import com.epam.cdp.core.entity.Report;
@@ -32,3 +33,4 @@ public class ReportDaoImpl implements ReportDao {
         return em.find(Report.class, id);
     }
 }
+*/

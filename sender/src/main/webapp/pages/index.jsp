@@ -3,7 +3,7 @@
            
 <html>
 <head>
-	<title>New order</title>
+	<title>New reservation request</title>
 </head>
 <body>	
 	<a href="manual">Manual sending</a> <br/>

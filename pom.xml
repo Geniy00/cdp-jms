@@ -12,9 +12,9 @@
 		<module>sender</module>
 		<module>core</module>
         <module>router</module>
-		<module>management</module>
-		<module>receiver-library</module>
-        <module>taxi-service</module>
+		<!--<module>management</module>-->
+		<!--<module>receiver-library</module>-->
+        <!--<module>taxi-service</module>-->
     </modules>
 
   <build>

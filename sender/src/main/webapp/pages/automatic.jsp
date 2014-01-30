@@ -3,7 +3,7 @@
            
 <html>
 <head>
-	<title>Sending orders from file</title>
+	<title>Sending random reservation requests automatically</title>
 </head>
 <body>	
 	<br /><br />
@@ -30,11 +30,11 @@
 	<br/>
 	<br/>
 	<c:if test="${messageCount != null && messageCount > 0}">
-		<font color="green">Message: ${messageCount} messages were sent</font>
+		<span style="color: green; ">Message: ${messageCount} messages were sent</span>
 	</c:if>
 	
 	<c:if test="${error != null}">
-	<font color="red">Error: ${error}</font>
+	    <span style="color: red; ">Error: ${error}</span>
 	</c:if>
 	
 	

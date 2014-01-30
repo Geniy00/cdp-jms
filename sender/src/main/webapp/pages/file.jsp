@@ -3,7 +3,7 @@
            
 <html>
 <head>
-	<title>Sending orders from file</title>
+	<title>Sending reservation requests from file</title>
 </head>
 <body>	
 	<br /><br />
@@ -23,11 +23,11 @@
 	<br/>
 	<br/>
 	<c:if test="${message != null}">
-	<font color="green">Message: ${message}</font>
+	<span style="color: green; ">Message: ${message}</span>
 	</c:if>
 	
 	<c:if test="${error != null}">
-	<font color="red">Error: ${error}</font>
+	<span style="color: red; ">Error: ${error}</span>
 	</c:if>
 	
 	

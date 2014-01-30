@@ -9,6 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ *
+ * @author Geniy00
+ */
 @Entity
 @Table(name="customer")
 public class Customer implements Serializable {
@@ -21,8 +25,8 @@ public class Customer implements Serializable {
 	
 	@Column(name="name")
 	private String name;
-	
-	@Column(name="phone")
+
+	@Column(name="phone", unique = true)
 	private String phone;
 
 	public Customer() { }

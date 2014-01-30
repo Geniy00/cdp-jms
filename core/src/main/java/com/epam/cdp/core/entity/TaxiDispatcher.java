@@ -1,10 +1,15 @@
 package com.epam.cdp.core.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+/**
+ *
+ * @author Geniy00
+ */
 @Entity
 @Table(name="taxi_dispatcher")
-public class TaxiDispatcher {
+public class TaxiDispatcher implements Serializable {
     private static final long serialVersionUID = -8888243225734454214L;
 
     @Id

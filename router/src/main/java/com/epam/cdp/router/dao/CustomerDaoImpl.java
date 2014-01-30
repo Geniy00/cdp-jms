@@ -1,0 +1,59 @@
+package com.epam.cdp.router.dao;
+
+import com.epam.cdp.core.entity.Customer;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
+
+/**
+ * @author Geniy00
+ */
+@Repository
+public class CustomerDaoImpl implements CustomerDao {
+
+    private static final String SELECT_CUSTOMER_BY_PHONE_NUMBER = "SELECT c FROM Customer c WHERE c.phone=:phone";
+    @PersistenceContext
+    EntityManager em;
+
+    @Override
+    public Customer saveOrUpdate(Customer customer) {
+
+        if(customer.getId() != null){
+            if( find(customer.getId()) != null){
+                return em.merge(customer);
+            }
+        }
+
+        Customer originalCustomer = findCustomerByPhoneNumber(customer.getPhone());
+        if(originalCustomer != null){
+            customer.setId(originalCustomer.getId());
+            return em.merge(customer);
+        }
+
+        return em.merge(customer);
+    }
+
+    @Override
+    public Customer find(Long id) {
+        return em.find(Customer.class, id);
+    }
+
+    @Override
+    public Customer findCustomerByPhoneNumber(String phoneNumber) {
+        TypedQuery<Customer> query = em.createQuery(SELECT_CUSTOMER_BY_PHONE_NUMBER, Customer.class);
+        query.setParameter("phone", phoneNumber);
+        List<Customer> results = query.getResultList();
+        if(results.size() == 0) return null;
+        if(results.size() > 1) throw new NonUniqueResultException();
+        return results.get(0);
+    }
+
+    @Override
+    public void delete(Customer customer) {
+        em.remove(em.merge(customer));
+    }
+}

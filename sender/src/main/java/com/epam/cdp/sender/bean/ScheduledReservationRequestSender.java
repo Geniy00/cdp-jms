@@ -4,20 +4,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.epam.cdp.core.util.ReservationRequestGenerator;
+import com.epam.cdp.sender.service.ReservationService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.epam.cdp.core.util.OrderGenerator;
-import com.epam.cdp.sender.service.OrderService;
-
 @Component
-public class ScheduledOrderSender {
+public class ScheduledReservationRequestSender {
 
-	private static final Logger LOG = Logger.getLogger(ScheduledOrderSender.class);
+	private static final Logger LOG = Logger.getLogger(ScheduledReservationRequestSender.class);
 	
 	@Autowired
-	OrderService orderService;
+    ReservationService reservationService;
 	
 	private Status status;
 	private long messageCount;
@@ -29,7 +28,7 @@ public class ScheduledOrderSender {
 		SENDING, STOPPED
 	}
 	
-	public ScheduledOrderSender(){
+	public ScheduledReservationRequestSender(){
 		status = Status.STOPPED;
 		delay = 5000;
 	}
@@ -43,13 +42,13 @@ public class ScheduledOrderSender {
 		service = Executors.newScheduledThreadPool(1);
 		Runnable runnableSender = new Runnable() {
 			public void run() {
-				orderService.sendOrder(OrderGenerator.generateRandomOrder());
+				reservationService.sendReservationRequest(ReservationRequestGenerator.generateRandomReservationRequest());
 				messageCount++;
 			}
 		};
 		service.scheduleWithFixedDelay(runnableSender, 0, this.delay, TimeUnit.MILLISECONDS);
 		status = Status.SENDING;
-		LOG.info("Scheduled order sender was started");
+		LOG.info("Scheduled reservation request sender was started");
 	}
 
 	public void stopSending(){
@@ -63,7 +62,7 @@ public class ScheduledOrderSender {
 			e.printStackTrace();
 		}
 		status = Status.STOPPED;
-		LOG.info("Scheduled order sender was stopped");
+		LOG.info("Scheduled reservation request sender was stopped");
 	}
 	
 	public Status getStatus() {

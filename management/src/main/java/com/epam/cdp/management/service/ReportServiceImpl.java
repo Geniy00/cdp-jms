@@ -2,11 +2,11 @@ package com.epam.cdp.management.service;
 
 import java.util.List;
 
+import com.epam.cdp.core.entity.BookingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.management.dao.ReportDao;
 
@@ -39,7 +39,7 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public List<Report> findReportWithStatus(ReportStatus reportStatus) {
-		return reportDao.findReportWithStatus(reportStatus);
+	public List<Report> findReportWithStatus(BookingResponse.BookingResponseStatus bookingResponseStatus) {
+		return reportDao.findReportWithStatus(bookingResponseStatus);
 	}
 }

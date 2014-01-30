@@ -6,9 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import com.epam.cdp.core.entity.BookingResponse;
 import org.springframework.stereotype.Repository;
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
-import com.epam.cdp.core.entity.HistoryItem;
+import com.epam.cdp.core.entity.BookingResponse.BookingResponseStatus;
 import com.epam.cdp.core.entity.Report;
 
 @Repository
@@ -20,7 +20,7 @@ public class ReportDaoImpl implements ReportDao {
 	@Override
 	public void create(Report report){
 		em.merge(report);
-		for(HistoryItem item : report.getHistory()){
+		for(BookingResponse item : report.getHistory()){
 			if(item.getReport() == null){
 				item.setReport(report);
 			}
@@ -59,7 +59,7 @@ public class ReportDaoImpl implements ReportDao {
 	}
 	
 	@Override
-	public List<Report> findReportWithStatus(ReportStatus reportStatus){
+	public List<Report> findReportWithStatus(BookingResponseStatus bookingResponseStatus){
 		TypedQuery<Report> query = 
 				em.createQuery("SELECT r FROM Report r JOIN r.history hi  WHERE r.id = hi.report.id AND hi.reportStatus = 'failure'", Report.class);
 		return query.getResultList();

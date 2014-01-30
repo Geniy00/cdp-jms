@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.Report;
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
+import com.epam.cdp.core.entity.BookingResponse.BookingResponseStatus;
 import com.epam.cdp.management.service.ReportService;
 
 @Controller
@@ -49,7 +49,7 @@ public class MainController {
 	
 	@RequestMapping("/error")
 	public String showFailureReports(Model model){
-		List<Report> reports = reportService.findReportWithStatus(ReportStatus.FAILURE);
+		List<Report> reports = reportService.findReportWithStatus(BookingResponseStatus.FAILURE);
 		model.addAttribute("reports", reports);
 		
 		return "error/list";

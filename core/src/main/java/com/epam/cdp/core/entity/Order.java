@@ -1,19 +1,18 @@
 package com.epam.cdp.core.entity;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
+/**
+ *
+ * @author Geniy00
+ */
 @Entity
 @Table(name="ord")
 public class Order implements Serializable {
@@ -24,134 +23,106 @@ public class Order implements Serializable {
 	@Column(name="id")
 	private String id;
 	
-	@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
 	private Customer customer;
 	
-	@Column(name="startPosition")
-	private Integer startPosition;
-	
-	@Column(name="finishPosition")
-	private Integer finishPosition;
+	@OneToOne (cascade = CascadeType.ALL)
+    private ReservationRequest reservationRequest;
 
-	@Column(name="dateTime")
-	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
-	DateTime dateTime;
+    // TODO: check orphanRemoval = true!!!
+    @OneToMany (cascade = CascadeType.ALL)
+    private List<BookingRequest> bookingRequests;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name="orderType")
-	OrderType orderType;
-	
-	@Column(name="price")
-	Double price;
+    @Enumerated(EnumType.STRING)
+    @Column(name="orderStatus")
+    private OrderStatus orderStatus;
 
-	public enum OrderType {
-		PASSENGER, CARGO
-	}
-	
-	public Order() {
-	}
 
-	public Order(String id, Customer customer, Integer startPosition,
-			Integer finishPosition, DateTime dateTime, OrderType orderType) {
-		super();
-		this.id = id;
-		this.customer = customer;
-		this.startPosition = startPosition;
-		this.finishPosition = finishPosition;
-		this.dateTime = dateTime;
-		this.orderType = orderType;
-		calculatePrice();
-	}
+    //TODO: check if EXPIRED status is needed
+    public enum OrderStatus{
+        NEW, SENT, RESENT, PROCESSED, FINISHED, EXPIRED, CANCELED;
+    }
 
-	public void calculatePrice(){
-		this.price = Math.abs((double)startPosition - finishPosition);
-	}
-	
-	public String getId() {
-		return id;
-	}
+    public Order() {
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public Order(String id, Customer customer, ReservationRequest reservationRequest) {
+        this.id = id;
+        this.customer = customer;
+        this.reservationRequest = reservationRequest;
+        bookingRequests = new LinkedList<>();
+        orderStatus = OrderStatus.NEW;
+    }
 
-	public Customer getCustomer() { 
-		return customer;
-	}
+    public void addBookingRequest(BookingRequest bookingRequest){
+        this.bookingRequests.add(bookingRequest);
+    }
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
-	
-	public Integer getStartPosition() {
-		return startPosition;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setStartPosition(Integer startPosition) {
-		this.startPosition = startPosition;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Integer getFinishPosition() {
-		return finishPosition;
-	}
+    public Customer getCustomer() {
+        return customer;
+    }
 
-	public void setFinishPosition(Integer finishPosition) {
-		this.finishPosition = finishPosition;
-	}
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
-	public DateTime getDateTime() {
-		return dateTime;
-	}
+    public ReservationRequest getReservationRequest() {
+        return reservationRequest;
+    }
 
-	public void setDateTime(DateTime dateTime) {
-		this.dateTime = dateTime;
-	}
+    public void setReservationRequest(ReservationRequest reservationRequest) {
+        this.reservationRequest = reservationRequest;
+    }
 
-	public OrderType getOrderType() {
-		return orderType;
-	}
+    public List<BookingRequest> getBookingRequests() {
+        return bookingRequests;
+    }
 
-	public void setOrderType(OrderType orderType) {
-		this.orderType = orderType;
-	}
+    public void setBookingRequests(List<BookingRequest> bookingRequests) {
+        this.bookingRequests = bookingRequests;
+    }
 
-	public Double getPrice() {
-		return price;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-	
-	@Override
-	public String toString() {
-		return "Order [id=" + id + ", customer=" + customer + ", dateTime="
-				+ dateTime + ", price=" + price + "]";
-	}
+        Order order = (Order) o;
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+        if (bookingRequests != null ? !bookingRequests.equals(order.bookingRequests) : order.bookingRequests != null)
+            return false;
+        if (customer != null ? !customer.equals(order.customer) : order.customer != null) return false;
+        if (id != null ? !id.equals(order.id) : order.id != null) return false;
+        if (reservationRequest != null ? !reservationRequest.equals(order.reservationRequest) : order.reservationRequest != null)
+            return false;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Order other = (Order) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
+        return true;
+    }
 
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (customer != null ? customer.hashCode() : 0);
+        result = 31 * result + (reservationRequest != null ? reservationRequest.hashCode() : 0);
+        result = 31 * result + (bookingRequests != null ? bookingRequests.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + id + '\'' +
+                ", customer=" + customer +
+                ", reservationRequest=" + reservationRequest +
+                ", bookingRequests=" + bookingRequests +
+                '}';
+    }
 }

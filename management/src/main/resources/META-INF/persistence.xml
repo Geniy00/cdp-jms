@@ -6,7 +6,7 @@
 	<persistence-unit name="MANAGEPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>com.epam.cdp.core.entity.Customer</class>
-		<class>com.epam.cdp.core.entity.HistoryItem</class>
+		<class>com.epam.cdp.core.entity.BookingResponse</class>
 		<class>com.epam.cdp.core.entity.Order</class>
 		<class>com.epam.cdp.core.entity.Report</class>
 		<!-- <class>com.epam.cdp.management.test.TestEntity</class> -->

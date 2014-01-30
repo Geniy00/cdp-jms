@@ -1,16 +1,12 @@
 package com.epam.cdp.library.logic;
 
 
+import com.epam.cdp.core.entity.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.epam.cdp.core.entity.Customer;
-import com.epam.cdp.core.entity.HistoryItem;
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
-import com.epam.cdp.core.entity.Order;
-import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.library.bean.OrderBlockingList;
 import com.epam.cdp.library.service.JmsService;
 
@@ -39,9 +35,9 @@ public final class OrderManager {
 	/**
 	 * Taxi service id, for distinguish taxi services
 	 */
-	private static String taxiId;
+	private static TaxiDispatcher taxiId;
 	
-	public OrderManager(String taxiId) {
+	public OrderManager(TaxiDispatcher taxiId) {
 		OrderManager.taxiId = taxiId;
 		//load beans from library spring context
 		orderBlockingList = context.getBean(OrderBlockingList.class);
@@ -62,7 +58,7 @@ public final class OrderManager {
 				new Customer("hidden", "hidden"), 
 				order.getStartPosition(), 
 				order.getFinishPosition(), 
-				order.getDateTime(), 
+				order.getDeliveryTime(),
 				order.getOrderType());
 		
 		return clonedOrder;
@@ -78,7 +74,7 @@ public final class OrderManager {
 		
 		//generate report
 		Report report = new Report(order);
-		report.addHistoryItem(new HistoryItem(ReportStatus.ACCEPTED, "order accepted", taxiId));
+		report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.ACCEPTED, "order accepted", taxiId));
 		
 		jmsService.sendReport(report);
 		
@@ -90,7 +86,7 @@ public final class OrderManager {
 		
 		//generate report
 		Report report = new Report(order);
-		report.addHistoryItem(new HistoryItem(ReportStatus.REJECTED, "order rejected", taxiId));
+		report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.REJECTED, "order rejected", taxiId));
 		
 		//Send messages
 		jmsService.sendReport(report);		
@@ -102,7 +98,7 @@ public final class OrderManager {
 				new Customer("hidden", "hidden"), 
 				order.getStartPosition(), 
 				order.getFinishPosition(), 
-				order.getDateTime(), 
+				order.getDeliveryTime(),
 				order.getOrderType());
 		return clonedOrder;
 	}
@@ -116,7 +112,7 @@ public final class OrderManager {
 	public void refuseOrder(Order order, String reason){
 		
 		Report report = new Report(order);
-		report.addHistoryItem(new HistoryItem(ReportStatus.REFUSED, reason, taxiId));
+		report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.REFUSED, reason, taxiId));
 		
 		jmsService.sendReport(report);
 		
@@ -126,7 +122,7 @@ public final class OrderManager {
 		return orderBlockingList.size();
 	}
 
-	public static String getTaxiId() {
+	public static TaxiDispatcher getTaxiId() {
 		return taxiId;
 	}
 	

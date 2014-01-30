@@ -3,6 +3,8 @@ package com.epam.cdp.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+
+import com.epam.cdp.core.entity.ReservationRequest;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -20,42 +22,43 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 /**
- * This class is used for generating json presentation of Order class
- * and for parsing json files to array of Orders
- * @author Geniy
+ * This class is used for generating json presentation of ReservationRequest class
+ * and for parsing json files to array of ReservationRequests
+ *
+ * @author Geniy00
  *
  */
 public class JsonGenerator {
 	
-	private static final int ORDER_COUNT = 10;
+	private static final int RESERVATION_REQUEST_COUNT = 10;
 	private static final String PATH_TO_FILE = "c:\\orders.txt";
 	
 	public static void main(String[] args) throws IOException {
-						
-		Order[] orders = new Order[ORDER_COUNT];
-		for (int i = 0; i < orders.length; i++) {
-			orders[i] = OrderGenerator.generateRandomOrder();
-		}
-		
+
+        ReservationRequest[] reservationRequests = new ReservationRequest[RESERVATION_REQUEST_COUNT];
+        for (int i = 0; i < reservationRequests.length; i++) {
+            reservationRequests[i] = ReservationRequestGenerator.generateRandomReservationRequest();
+        }
+
+        Gson gson = new GsonBuilder()
+                .setDateFormat("dd/MMM/yyyy HH:mm:ss")
+                .registerTypeAdapter(DateTime.class, new DateTimeSerialization())
+                .setPrettyPrinting().create();
+
+        String json = gson.toJson(reservationRequests);
+        FileUtils.writeStringToFile(new File(PATH_TO_FILE), json);
+
+        System.out.println("Json file was created!");
+    }
+
+    public ReservationRequest[] parseJson(String jsonString){
 		Gson gson = new GsonBuilder()
 			.setDateFormat("dd/MMM/yyyy HH:mm:ss")
 			.registerTypeAdapter(DateTime.class, new DateTimeSerialization())
 			.setPrettyPrinting().create();
 
-		String json = gson.toJson(orders);
-		FileUtils.writeStringToFile(new File(PATH_TO_FILE), json);
-		
-		System.out.println("Json file was created!");
-	}
-	
-	public Order[] parseJson(String jsonString){
-		Gson gson = new GsonBuilder()
-			.setDateFormat("dd/MMM/yyyy HH:mm:ss")
-			.registerTypeAdapter(DateTime.class, new DateTimeSerialization())
-			.setPrettyPrinting().create();
-		
-		Order[] orders = gson.fromJson(jsonString, Order[].class);
-		return orders;
+        ReservationRequest[] reservationRequests = gson.fromJson(jsonString, ReservationRequest[].class);
+		return reservationRequests;
 	}
 	
 }

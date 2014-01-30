@@ -2,8 +2,8 @@ package com.epam.cdp.management.service;
 
 import java.util.List;
 
+import com.epam.cdp.core.entity.BookingResponse;
 import com.epam.cdp.core.entity.Report;
-import com.epam.cdp.core.entity.HistoryItem.ReportStatus;
 
 public interface ReportService {
 
@@ -13,5 +13,5 @@ public interface ReportService {
 	
 	public List<Report> getAllReports();
 
-	public List<Report> findReportWithStatus(ReportStatus reportStatus);
+	public List<Report> findReportWithStatus(BookingResponse.BookingResponseStatus bookingResponseStatus);
 }
