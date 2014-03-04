@@ -12,7 +12,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.io.Serializable;
-
+//TODO: move this package to gateway and fix spring context
 @Component
 public class InputOrderListener implements MessageListener {
 
@@ -37,8 +37,8 @@ public class InputOrderListener implements MessageListener {
             Order order = orderService.createAndSaveNewOrder(reservationRequest);
             LOG.info("Order with id: " + order.getId() + " was created successfully");
         } else {
-            LOG.error("JMS message must be of ReservationRequest type");
-            throw new IllegalArgumentException("JMS message must be of type Order");
+            LOG.error("Unknown JMS message type. It must be of ReservationRequest type");
+            throw new IllegalArgumentException("Unknown JMS message type");
         }
 
     }

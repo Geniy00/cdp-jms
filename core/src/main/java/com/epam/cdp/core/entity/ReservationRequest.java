@@ -34,7 +34,7 @@ public class ReservationRequest implements Serializable {
     private Integer finishPosition;
 
     @Column(name="deliveryTime")
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)

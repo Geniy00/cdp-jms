@@ -1,10 +1,13 @@
 package com.epam.cdp.router.dao;
 
 import com.epam.cdp.core.entity.Order;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * @author Geniy00
@@ -12,14 +15,14 @@ import javax.persistence.PersistenceContext;
 @Repository
 public class OrderDaoImpl implements OrderDao {
 
+    private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord where ord.orderStatus=:status";
+
     @PersistenceContext
     EntityManager em;
 
     @Override
     public Order saveOrUpdate(Order order) {
-        Order order1 =  em.merge(order);
-        em.flush();
-        return order1;
+        return em.merge(order);
     }
 
     @Override
@@ -31,4 +34,17 @@ public class OrderDaoImpl implements OrderDao {
     public void delete(Order order) {
         em.remove(em.merge(order));
     }
+
+    @Override
+    public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
+        TypedQuery<Order> query =
+                em.createQuery(SELECT_ORDER_BY_STATUS, Order.class);
+        query.setParameter("status", status);
+        List<Order> result = query.getResultList();
+        for (Order order : result) {
+            Hibernate.initialize(order.getBookingRequests());
+        }
+        return result;
+    }
+
 }

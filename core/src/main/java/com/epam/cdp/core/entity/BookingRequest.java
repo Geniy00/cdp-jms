@@ -28,7 +28,7 @@ public class BookingRequest implements Serializable {
     private Integer finishPosition;
 
     @Column(name="deliveryTime")
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)
@@ -39,9 +39,11 @@ public class BookingRequest implements Serializable {
     private Double payment;
 
     @Column(name="expiryTime")
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime expiryTime;
 
+
+    //TODO: check if we need to send customer and order attributes to taxi service
     @ManyToOne
     private Customer customer;
 
@@ -51,12 +53,12 @@ public class BookingRequest implements Serializable {
     public BookingRequest() {
     }
 
-    public BookingRequest(Order order, ReservationRequest reservationRequest, Double payment, DateTime expiryTime) {
+    public BookingRequest(Order order, Double payment, DateTime expiryTime) {
         this.id = order.getId();
-        this.startPosition = reservationRequest.getStartPosition();
-        this.finishPosition = reservationRequest.getFinishPosition();
-        this.deliveryTime = reservationRequest.getDeliveryTime();
-        this.vehicleType = reservationRequest.getVehicleType();
+        this.startPosition = order.getReservationRequest().getStartPosition();
+        this.finishPosition = order.getReservationRequest().getFinishPosition();
+        this.deliveryTime = order.getReservationRequest().getDeliveryTime();
+        this.vehicleType = order.getReservationRequest().getVehicleType();
 
         this.payment = payment;
         this.expiryTime = expiryTime;

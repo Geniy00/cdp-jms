@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.transaction.Transaction;
 import java.rmi.server.UID;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,5 +35,15 @@ public class OrderServiceImpl implements OrderService {
         String id = UUID.randomUUID().toString();
         Order order = new Order(id, customer, reservationRequest);
         return orderDao.saveOrUpdate(order);
+    }
+
+    @Override
+    public void updateOrder(Order order){
+        orderDao.saveOrUpdate(order);
+    }
+
+    @Override
+    public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
+        return orderDao.findAllByOrderStatus(status);
     }
 }

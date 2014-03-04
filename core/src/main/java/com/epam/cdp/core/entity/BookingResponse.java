@@ -35,7 +35,7 @@ public class BookingResponse implements Serializable{
     private String reason;
 
 	@Column(name="dateTime")
-	@Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime dateTime;
 	
 

@@ -39,6 +39,10 @@ public class CustomerDaoImpl implements CustomerDao {
 
     @Override
     public Customer find(Long id) {
+        //TODO: remove fake customer
+        if(id == -1){
+            return new Customer("80639512345", "TestUser");
+        }
         return em.find(Customer.class, id);
     }
 

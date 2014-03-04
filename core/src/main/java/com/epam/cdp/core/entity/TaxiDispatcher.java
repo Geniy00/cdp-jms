@@ -24,7 +24,7 @@ public class TaxiDispatcher implements Serializable {
     private String jmsQueue;
 
     @Column(name = "jms_queue_capacity")
-    private Long jmsQueueCapacity;
+    private Integer jmsQueueCapacity;
 
     @Column(name = "email")
     private String email;
@@ -39,7 +39,7 @@ public class TaxiDispatcher implements Serializable {
     public TaxiDispatcher() {
     }
 
-    public TaxiDispatcher(String name, String jmsQueue, Long jmsQueueCapacity, String email, Boolean disabled) {
+    public TaxiDispatcher(String name, String jmsQueue, Integer jmsQueueCapacity, String email, Boolean disabled) {
         this.name = name;
         this.jmsQueue = jmsQueue;
         this.jmsQueueCapacity = jmsQueueCapacity;
@@ -71,11 +71,11 @@ public class TaxiDispatcher implements Serializable {
         this.jmsQueue = jmsQueue;
     }
 
-    public Long getJmsQueueCapacity() {
+    public Integer getJmsQueueCapacity() {
         return jmsQueueCapacity;
     }
 
-    public void setJmsQueueCapacity(Long jmsQueueCapacity) {
+    public void setJmsQueueCapacity(Integer jmsQueueCapacity) {
         this.jmsQueueCapacity = jmsQueueCapacity;
     }
 

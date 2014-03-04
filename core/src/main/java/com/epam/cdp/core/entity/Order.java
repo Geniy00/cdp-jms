@@ -40,7 +40,19 @@ public class Order implements Serializable {
 
     //TODO: check if EXPIRED status is needed
     public enum OrderStatus{
-        NEW, SENT, RESENT, PROCESSED, FINISHED, EXPIRED, CANCELED;
+        /**
+         * Order status meaning
+         * NEW - just received from sender module
+         * SENT - order was sent to taxi service and processing by it
+         * DECLINED - order was rejected by taxi service
+         * PROCESSED - order was processed by some taxi service
+         * FINISHED - order was processed N hours ago (i.e. 24 hours ago)
+         *
+         * Exceptional statuses:
+         * EXPIRED - order can't be sent because delivery time is expired
+         * CANCELED - order was canceled
+         */
+        NEW, SENT, DECLINED, PROCESSED, FINISHED, EXPIRED, CANCELED
     }
 
     public Order() {
@@ -88,6 +100,14 @@ public class Order implements Serializable {
 
     public void setBookingRequests(List<BookingRequest> bookingRequests) {
         this.bookingRequests = bookingRequests;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     @Override
