@@ -4,14 +4,14 @@ import com.epam.cdp.core.entity.Order;
 
 public interface OrderService {
 
-	public Order peekOrder();
+    public Order peekOrder();
 
-	public Order acceptOrder(String id);
+    public Order acceptOrder(String id);
 
-	public Order rejectOrder(String id);
-	
-	public Order refuseOrder(String id, String reason);
+    public Order rejectOrder(String id);
 
-	public int getQueueSize();
+    public Order refuseOrder(String id, String reason);
+
+    public int getQueueSize();
 
 }

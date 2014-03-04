@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class TestController {
-	
-	@Autowired
-	TestService service;
 
-	@RequestMapping("/doaction")
-	public String doAction(){
-		TestEntity entity = new TestEntity("test");
-		service.createTestEntity(entity);
-		return "index";
-	}
-	
+    @Autowired
+    TestService service;
+
+    @RequestMapping("/doaction")
+    public String doAction() {
+        TestEntity entity = new TestEntity("test");
+        service.createTestEntity(entity);
+        return "index";
+    }
+
 }

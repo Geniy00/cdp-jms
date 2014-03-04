@@ -9,6 +9,7 @@ public interface CustomerService {
 
     /**
      * Enrich customer from external storage (DB)
+     *
      * @param customer customer with partially filled fields
      * @return enriched customer from external storage
      */

@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transaction;
-import java.rmi.server.UID;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +21,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     CustomerDao customerDao;
-    
+
     @Autowired
     OrderDao orderDao;
 
@@ -38,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateOrder(Order order){
+    public void updateOrder(Order order) {
         orderDao.saveOrUpdate(order);
     }
 

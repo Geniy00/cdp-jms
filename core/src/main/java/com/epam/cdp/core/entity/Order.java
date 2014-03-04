@@ -1,45 +1,40 @@
 package com.epam.cdp.core.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
-
 /**
- *
  * @author Geniy00
  */
 @Entity
-@Table(name="ord")
+@Table(name = "ord")
 public class Order implements Serializable {
 
-	private static final long serialVersionUID = 1820235678421505291L;
-	
-	@Id
-	@Column(name="id")
-	private String id;
-	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-	private Customer customer;
-	
-	@OneToOne (cascade = CascadeType.ALL)
+    private static final long serialVersionUID = 1820235678421505291L;
+
+    @Id
+    @Column(name = "id")
+    private String id;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    private Customer customer;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private ReservationRequest reservationRequest;
 
     // TODO: check orphanRemoval = true!!!
-    @OneToMany (cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<BookingRequest> bookingRequests;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="orderStatus")
+    @Column(name = "orderStatus")
     private OrderStatus orderStatus;
 
 
     //TODO: check if EXPIRED status is needed
-    public enum OrderStatus{
+    public enum OrderStatus {
         /**
          * Order status meaning
          * NEW - just received from sender module
@@ -47,7 +42,7 @@ public class Order implements Serializable {
          * DECLINED - order was rejected by taxi service
          * PROCESSED - order was processed by some taxi service
          * FINISHED - order was processed N hours ago (i.e. 24 hours ago)
-         *
+         * <p/>
          * Exceptional statuses:
          * EXPIRED - order can't be sent because delivery time is expired
          * CANCELED - order was canceled
@@ -66,7 +61,7 @@ public class Order implements Serializable {
         orderStatus = OrderStatus.NEW;
     }
 
-    public void addBookingRequest(BookingRequest bookingRequest){
+    public void addBookingRequest(BookingRequest bookingRequest) {
         this.bookingRequests.add(bookingRequest);
     }
 

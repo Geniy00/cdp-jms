@@ -18,27 +18,27 @@ public class ReservationRequest implements Serializable {
     private static final long serialVersionUID = 1820235672221505291L;
 
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private String id;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String customerName;
 
-    @Column(name="phone")
+    @Column(name = "phone")
     private String customerPhone;
 
-    @Column(name="startPosition")
+    @Column(name = "startPosition")
     private Integer startPosition;
 
-    @Column(name="finishPosition")
+    @Column(name = "finishPosition")
     private Integer finishPosition;
 
-    @Column(name="deliveryTime")
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Column(name = "deliveryTime")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="vehicleType")
+    @Column(name = "vehicleType")
     private VehicleType vehicleType;
 
     public ReservationRequest() {

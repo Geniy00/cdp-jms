@@ -22,14 +22,14 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public Customer saveOrUpdate(Customer customer) {
 
-        if(customer.getId() != null){
-            if( find(customer.getId()) != null){
+        if (customer.getId() != null) {
+            if (find(customer.getId()) != null) {
                 return em.merge(customer);
             }
         }
 
         Customer originalCustomer = findCustomerByPhoneNumber(customer.getPhone());
-        if(originalCustomer != null){
+        if (originalCustomer != null) {
             customer.setId(originalCustomer.getId());
             return em.merge(customer);
         }
@@ -40,7 +40,7 @@ public class CustomerDaoImpl implements CustomerDao {
     @Override
     public Customer find(Long id) {
         //TODO: remove fake customer
-        if(id == -1){
+        if (id == -1) {
             return new Customer("80639512345", "TestUser");
         }
         return em.find(Customer.class, id);
@@ -51,8 +51,8 @@ public class CustomerDaoImpl implements CustomerDao {
         TypedQuery<Customer> query = em.createQuery(SELECT_CUSTOMER_BY_PHONE_NUMBER, Customer.class);
         query.setParameter("phone", phoneNumber);
         List<Customer> results = query.getResultList();
-        if(results.size() == 0) return null;
-        if(results.size() > 1) throw new NonUniqueResultException();
+        if (results.size() == 0) return null;
+        if (results.size() > 1) throw new NonUniqueResultException();
         return results.get(0);
     }
 

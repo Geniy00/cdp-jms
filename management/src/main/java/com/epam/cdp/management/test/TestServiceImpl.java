@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TestServiceImpl implements TestService {
-	
-	@Autowired
-	TestDao testDao;
-	
-	@Override
-	public void createTestEntity(TestEntity testEntity){
-		testDao.create(testEntity);
-	}
-	
+
+    @Autowired
+    TestDao testDao;
+
+    @Override
+    public void createTestEntity(TestEntity testEntity) {
+        testDao.create(testEntity);
+    }
+
 }

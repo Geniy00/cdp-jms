@@ -13,63 +13,58 @@
        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
 
     <mvc:annotation-driven/>
-	<context:annotation-config/>
-    <context:component-scan base-package="com.epam.cdp.router.dao" />
-    <context:component-scan base-package="com.epam.cdp.router.service" />
-    <context:component-scan base-package="com.epam.cdp.router.listener" />
-    <context:component-scan base-package="com.epam.cdp.router.gateway" />
+    <context:annotation-config/>
+    <context:component-scan base-package="com.epam.cdp.router.dao"/>
+    <context:component-scan base-package="com.epam.cdp.router.service"/>
+    <context:component-scan base-package="com.epam.cdp.router.listener"/>
+    <context:component-scan base-package="com.epam.cdp.router.gateway"/>
 
-    <import resource="periodic-task-context.xml" />
+    <import resource="periodic-task-context.xml"/>
 
 
-    <bean id="dataSource"
-          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${jdbc.driverClassName}" />
-        <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <bean id="emf"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="persistenceUnitName" value="ROUTERPU" />
+    <bean id="emf"  class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceUnitName" value="ROUTERPU"/>
     </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="emf" />
+        <property name="entityManagerFactory" ref="emf"/>
     </bean>
 
     <!-- Connection Factory -->
-    <bean id="connectionFactory"
-		class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-		<property name="brokerURL" value="${jms.url}"/>
-	</bean>
+    <bean id="connectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${jms.url}"/>
+    </bean>
 
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.input.order.queue}" ref="inputOrderListener" />
+        <jms:listener destination="${jms.input.order.queue}" ref="inputOrderListener"/>
     </jms:listener-container>
 
-	
-	<!--<bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">-->
-		<!--<constructor-arg value="${jms.orderQueue.name}"/>-->
-	<!--</bean>-->
-	<!---->
-	<bean id="jmsTemplate"
-		class="org.springframework.jms.core.JmsTemplate">
-		<property name="connectionFactory" ref="connectionFactory"/>
-		<!--<property name="defaultDestination" ref="orderQueue" />-->
-	</bean>
 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
+    <!--<bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">-->
+    <!--<constructor-arg value="${jms.orderQueue.name}"/>-->
+    <!--</bean>-->
+    <!---->
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <!--<property name="defaultDestination" ref="orderQueue" />-->
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
             <list>
                 <value>classpath:jdbc.properties</value>
                 <value>classpath:config.properties</value>
-
             </list>
         </property>
-	</bean>
+    </bean>
 </beans>

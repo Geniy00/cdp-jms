@@ -12,6 +12,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.io.Serializable;
+
 //TODO: move this package to gateway and fix spring context
 @Component
 public class InputOrderListener implements MessageListener {
@@ -32,7 +33,7 @@ public class InputOrderListener implements MessageListener {
             e.printStackTrace();
         }
 
-        if (reservationRequestObject  instanceof ReservationRequest) {
+        if (reservationRequestObject instanceof ReservationRequest) {
             ReservationRequest reservationRequest = (ReservationRequest) reservationRequestObject;
             Order order = orderService.createAndSaveNewOrder(reservationRequest);
             LOG.info("Order with id: " + order.getId() + " was created successfully");

@@ -4,11 +4,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- *
  * @author Geniy00
  */
 @Entity
-@Table(name="taxi_dispatcher")
+@Table(name = "taxi_dispatcher")
 public class TaxiDispatcher implements Serializable {
     private static final long serialVersionUID = -8888243225734454214L;
 
@@ -31,6 +30,7 @@ public class TaxiDispatcher implements Serializable {
 
     @Column(name = "disabled")
     private Boolean disabled;
+
     /**
      * payment account
      * amount
