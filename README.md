@@ -11,3 +11,5 @@ How to deploy?
 1. Database
 1.1. Create cdp_taxi_service schema
 
+2.ActiveMQ at this path tcp://localhost:61616
+

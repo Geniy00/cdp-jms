@@ -57,7 +57,6 @@
             <version>2.5</version>
         </dependency>
 
-
         <!-- ActiveMQ -->
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -110,6 +109,13 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.2</version>
+        </dependency>
+
+        <!-- XStream XML parser -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.7</version>
         </dependency>
     </dependencies>
     <build>

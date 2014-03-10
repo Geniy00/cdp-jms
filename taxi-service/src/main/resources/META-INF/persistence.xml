@@ -3,15 +3,11 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
-    <persistence-unit name="ROUTERPU" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="TAXIPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>com.epam.cdp.core.entity.BookingRequest</class>
-        <class>com.epam.cdp.core.entity.BookingResponse</class>
-        <class>com.epam.cdp.core.entity.Customer</class>
-        <class>com.epam.cdp.core.entity.Order</class>
-        <!--<class>com.epam.cdp.core.entity.Report</class>-->
-        <class>com.epam.cdp.core.entity.ReservationRequest</class>
-        <class>com.epam.cdp.core.entity.TaxiDispatcher</class>
+        <class>ua.com.taxi.entity.Booking</class>
+        <class>ua.com.taxi.entity.BookingRequestDetails</class>
+        <class>ua.com.taxi.entity.ClientDetails</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

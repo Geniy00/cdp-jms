@@ -48,7 +48,7 @@ public final class OrderManager {
 	 * get Order with hidden customer information
 	 * @return
 	 */
-	public Order peekOrder(){
+	/*public Order peekOrder(){
 		Order order = orderBlockingList.peek();
 		if(order == null) return null;
 		
@@ -62,7 +62,7 @@ public final class OrderManager {
 				order.getOrderType());
 		
 		return clonedOrder;
-	}
+	}*/
 	
 	/**
 	 * When taxi service accept an order, it will got customer information like phone number
@@ -81,7 +81,7 @@ public final class OrderManager {
 		return order;
 	}
 	
-	public Order rejectOrder(String id){
+	/*public Order rejectOrder(String id){
 		Order order = orderBlockingList.remove(id);
 		
 		//generate report
@@ -101,7 +101,7 @@ public final class OrderManager {
 				order.getDeliveryTime(),
 				order.getOrderType());
 		return clonedOrder;
-	}
+	}*/
 	
 	/**
 	 * Order could be refused, when one was accepted

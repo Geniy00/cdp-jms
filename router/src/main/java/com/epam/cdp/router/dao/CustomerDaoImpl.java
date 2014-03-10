@@ -16,6 +16,7 @@ import java.util.List;
 public class CustomerDaoImpl implements CustomerDao {
 
     private static final String SELECT_CUSTOMER_BY_PHONE_NUMBER = "SELECT c FROM Customer c WHERE c.phone=:phone";
+
     @PersistenceContext
     EntityManager em;
 
