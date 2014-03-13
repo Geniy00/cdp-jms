@@ -18,32 +18,42 @@ public class BookingRequest implements Serializable {
     private static final long serialVersionUID = 1820235611121505291L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private String id;
+    private Long id;
 
-    @Column(name = "startPosition")
+    @Column(name = "startPosition", nullable = false)
     private Integer startPosition;
 
-    @Column(name = "finishPosition")
+    @Column(name = "finishPosition", nullable = false)
     private Integer finishPosition;
 
-    @Column(name = "deliveryTime")
+    @Column(name = "deliveryTime", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "vehicleType")
+    @Column(name = "vehicleType", nullable = false)
     private VehicleType vehicleType;
 
-    @Column(name = "payment")
+    @Column(name = "payment", nullable = false)
     private Double payment;
 
-    @Column(name = "expiryTime")
+    @Column(name = "expiryTime", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime expiryTime;
 
+    @OneToOne(optional = false)
+    private TaxiDispatcher taxiDispatcher;
 
-    //TODO: check if we need to send customer and order attributes to taxi service
+    @OneToOne(cascade = CascadeType.ALL)
+    private BookingResponse bookingResponse;
+
+    //TODO: check if we can use @PrePersist and @PreUpdate annotation for such fields
+    @Column(name = "created", nullable = false)
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime created;
+
     @ManyToOne
     private Customer customer;
 
@@ -51,10 +61,10 @@ public class BookingRequest implements Serializable {
     private Order order;
 
     public BookingRequest() {
+        created = new DateTime();
     }
 
-    public BookingRequest(Order order, Double payment, DateTime expiryTime) {
-        this.id = order.getId();
+    public BookingRequest(Order order, TaxiDispatcher taxiDispatcher, Double payment, DateTime expiryTime) {
         this.startPosition = order.getReservationRequest().getStartPosition();
         this.finishPosition = order.getReservationRequest().getFinishPosition();
         this.deliveryTime = order.getReservationRequest().getDeliveryTime();
@@ -62,15 +72,42 @@ public class BookingRequest implements Serializable {
 
         this.payment = payment;
         this.expiryTime = expiryTime;
+        this.taxiDispatcher = taxiDispatcher;
         this.order = order;
         this.customer = order.getCustomer();
+        this.created = new DateTime();
     }
 
-    public String getId() {
+    public void applyBookingResponse(BookingResponse bookingResponse){
+        this.bookingResponse = bookingResponse;
+        BookingResponse.BookingResponseStatus status = bookingResponse.getBookingResponseStatus();
+        switch (status){
+            case ACCEPTED:
+                order.setOrderStatus(Order.OrderStatus.PROCESSED);
+                break;
+            case REJECTED:
+                order.setOrderStatus(Order.OrderStatus.DECLINED);
+                break;
+            case REFUSED:
+                order.setOrderStatus(Order.OrderStatus.CANCELED);
+                break;
+            case EXPIRED:
+                order.setOrderStatus(Order.OrderStatus.EXPIRED);
+                break;
+            case FAILURE:
+                order.setOrderStatus(Order.OrderStatus.FAILURE);
+                break;
+            default:
+                throw new RuntimeException("Unknown bookingResponse status");
+        }
+        this.bookingResponse = bookingResponse;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -122,6 +159,30 @@ public class BookingRequest implements Serializable {
         this.expiryTime = expiryTime;
     }
 
+    public TaxiDispatcher getTaxiDispatcher() {
+        return taxiDispatcher;
+    }
+
+    public void setTaxiDispatcher(TaxiDispatcher taxiDispatcher) {
+        this.taxiDispatcher = taxiDispatcher;
+    }
+
+    public BookingResponse getBookingResponse() {
+        return bookingResponse;
+    }
+
+    public void setBookingResponse(BookingResponse bookingResponse) {
+        this.bookingResponse = bookingResponse;
+    }
+
+    public DateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(DateTime updated) {
+        this.created = updated;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
@@ -145,16 +206,10 @@ public class BookingRequest implements Serializable {
 
         BookingRequest that = (BookingRequest) o;
 
-        if (customer != null ? !customer.equals(that.customer) : that.customer != null) return false;
-        if (deliveryTime != null ? !deliveryTime.equals(that.deliveryTime) : that.deliveryTime != null) return false;
-        if (expiryTime != null ? !expiryTime.equals(that.expiryTime) : that.expiryTime != null) return false;
-        if (finishPosition != null ? !finishPosition.equals(that.finishPosition) : that.finishPosition != null)
-            return false;
+        if (!deliveryTime.equals(that.deliveryTime)) return false;
+        if (!finishPosition.equals(that.finishPosition)) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (order != null ? !order.equals(that.order) : that.order != null) return false;
-        if (payment != null ? !payment.equals(that.payment) : that.payment != null) return false;
-        if (startPosition != null ? !startPosition.equals(that.startPosition) : that.startPosition != null)
-            return false;
+        if (!startPosition.equals(that.startPosition)) return false;
         if (vehicleType != that.vehicleType) return false;
 
         return true;
@@ -163,14 +218,10 @@ public class BookingRequest implements Serializable {
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (startPosition != null ? startPosition.hashCode() : 0);
-        result = 31 * result + (finishPosition != null ? finishPosition.hashCode() : 0);
-        result = 31 * result + (deliveryTime != null ? deliveryTime.hashCode() : 0);
-        result = 31 * result + (vehicleType != null ? vehicleType.hashCode() : 0);
-        result = 31 * result + (payment != null ? payment.hashCode() : 0);
-        result = 31 * result + (expiryTime != null ? expiryTime.hashCode() : 0);
-        result = 31 * result + (customer != null ? customer.hashCode() : 0);
-        result = 31 * result + (order != null ? order.hashCode() : 0);
+        result = 31 * result + startPosition.hashCode();
+        result = 31 * result + finishPosition.hashCode();
+        result = 31 * result + deliveryTime.hashCode();
+        result = 31 * result + vehicleType.hashCode();
         return result;
     }
 }

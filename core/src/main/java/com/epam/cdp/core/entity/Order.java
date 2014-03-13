@@ -15,13 +15,13 @@ public class Order implements Serializable {
     private static final long serialVersionUID = 1820235678421505291L;
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private String id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, optional = false)
     private Customer customer;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
     private ReservationRequest reservationRequest;
 
     // TODO: check orphanRemoval = true!!!
@@ -29,7 +29,7 @@ public class Order implements Serializable {
     private List<BookingRequest> bookingRequests;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "orderStatus")
+    @Column(name = "orderStatus", nullable = false)
     private OrderStatus orderStatus;
 
 
@@ -39,15 +39,16 @@ public class Order implements Serializable {
          * Order status meaning
          * NEW - just received from sender module
          * SENT - order was sent to taxi service and processing by it
-         * DECLINED - order was rejected by taxi service
-         * PROCESSED - order was processed by some taxi service
+         * DECLINED - order was rejected by taxi service                  |taxi response: REJECTED
+         * PROCESSED - order was processed by some taxi service           |taxi response: ACCEPTED
          * FINISHED - order was processed N hours ago (i.e. 24 hours ago)
          * <p/>
          * Exceptional statuses:
-         * EXPIRED - order can't be sent because delivery time is expired
-         * CANCELED - order was canceled
+         * EXPIRED - order can't be sent because delivery time is expired |taxi response: EXPIRED
+         * CANCELED - order was canceled                                  |taxi response: REFUSED
+         * FAILURE - order can't be processed by taxi service             |taxi response: FAILURE
          */
-        NEW, SENT, DECLINED, PROCESSED, FINISHED, EXPIRED, CANCELED
+        NEW, SENT, DECLINED, PROCESSED, FINISHED, EXPIRED, CANCELED, FAILURE
     }
 
     public Order() {
@@ -61,8 +62,10 @@ public class Order implements Serializable {
         orderStatus = OrderStatus.NEW;
     }
 
-    public void addBookingRequest(BookingRequest bookingRequest) {
+    public void applyBookingRequest(BookingRequest bookingRequest) {
         this.bookingRequests.add(bookingRequest);
+        bookingRequest.setOrder(this);
+        this.orderStatus = OrderStatus.SENT;
     }
 
     public String getId() {
@@ -112,22 +115,20 @@ public class Order implements Serializable {
 
         Order order = (Order) o;
 
-        if (bookingRequests != null ? !bookingRequests.equals(order.bookingRequests) : order.bookingRequests != null)
-            return false;
-        if (customer != null ? !customer.equals(order.customer) : order.customer != null) return false;
-        if (id != null ? !id.equals(order.id) : order.id != null) return false;
-        if (reservationRequest != null ? !reservationRequest.equals(order.reservationRequest) : order.reservationRequest != null)
-            return false;
+        if (!customer.equals(order.customer)) return false;
+        if (!id.equals(order.id)) return false;
+        if (orderStatus != order.orderStatus) return false;
+        if (!reservationRequest.equals(order.reservationRequest)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (customer != null ? customer.hashCode() : 0);
-        result = 31 * result + (reservationRequest != null ? reservationRequest.hashCode() : 0);
-        result = 31 * result + (bookingRequests != null ? bookingRequests.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + customer.hashCode();
+        result = 31 * result + reservationRequest.hashCode();
+        result = 31 * result + orderStatus.hashCode();
         return result;
     }
 

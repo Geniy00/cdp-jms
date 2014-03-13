@@ -21,24 +21,24 @@ public class ReservationRequest implements Serializable {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String customerName;
 
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false)
     private String customerPhone;
 
-    @Column(name = "startPosition")
+    @Column(name = "startPosition", nullable = false)
     private Integer startPosition;
 
-    @Column(name = "finishPosition")
+    @Column(name = "finishPosition", nullable = false)
     private Integer finishPosition;
 
-    @Column(name = "deliveryTime")
+    @Column(name = "deliveryTime", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "vehicleType")
+    @Column(name = "vehicleType", nullable = false)
     private VehicleType vehicleType;
 
     public ReservationRequest() {
@@ -117,15 +117,12 @@ public class ReservationRequest implements Serializable {
 
         ReservationRequest that = (ReservationRequest) o;
 
-        if (customerName != null ? !customerName.equals(that.customerName) : that.customerName != null) return false;
-        if (customerPhone != null ? !customerPhone.equals(that.customerPhone) : that.customerPhone != null)
-            return false;
-        if (deliveryTime != null ? !deliveryTime.equals(that.deliveryTime) : that.deliveryTime != null) return false;
-        if (finishPosition != null ? !finishPosition.equals(that.finishPosition) : that.finishPosition != null)
-            return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (startPosition != null ? !startPosition.equals(that.startPosition) : that.startPosition != null)
-            return false;
+        if (!customerName.equals(that.customerName)) return false;
+        if (!customerPhone.equals(that.customerPhone)) return false;
+        if (!deliveryTime.equals(that.deliveryTime)) return false;
+        if (!finishPosition.equals(that.finishPosition)) return false;
+        if (!id.equals(that.id)) return false;
+        if (!startPosition.equals(that.startPosition)) return false;
         if (vehicleType != that.vehicleType) return false;
 
         return true;
@@ -133,13 +130,13 @@ public class ReservationRequest implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (customerName != null ? customerName.hashCode() : 0);
-        result = 31 * result + (customerPhone != null ? customerPhone.hashCode() : 0);
-        result = 31 * result + (startPosition != null ? startPosition.hashCode() : 0);
-        result = 31 * result + (finishPosition != null ? finishPosition.hashCode() : 0);
-        result = 31 * result + (deliveryTime != null ? deliveryTime.hashCode() : 0);
-        result = 31 * result + (vehicleType != null ? vehicleType.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + customerName.hashCode();
+        result = 31 * result + customerPhone.hashCode();
+        result = 31 * result + startPosition.hashCode();
+        result = 31 * result + finishPosition.hashCode();
+        result = 31 * result + deliveryTime.hashCode();
+        result = 31 * result + vehicleType.hashCode();
         return result;
     }
 }

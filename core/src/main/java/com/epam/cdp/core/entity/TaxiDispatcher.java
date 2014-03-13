@@ -16,22 +16,23 @@ public class TaxiDispatcher implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "jms_queue")
+    @Column(name = "jms_queue", nullable = false)
     private String jmsQueue;
 
-    @Column(name = "jms_queue_capacity")
+    @Column(name = "jms_queue_capacity", nullable = false)
     private Integer jmsQueueCapacity;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "disabled")
+    @Column(name = "disabled", nullable = false)
     private Boolean disabled;
 
     /**
+     * TODO: check additional attributes
      * payment account
      * amount
      */
@@ -96,6 +97,23 @@ public class TaxiDispatcher implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TaxiDispatcher that = (TaxiDispatcher) o;
+
+        if (!disabled.equals(that.disabled)) return false;
+        if (!email.equals(that.email)) return false;
+        if (!id.equals(that.id)) return false;
+        if (!jmsQueue.equals(that.jmsQueue)) return false;
+        if (!jmsQueueCapacity.equals(that.jmsQueueCapacity)) return false;
+        if (!name.equals(that.name)) return false;
+
+        return true;
+    }
+
+    @Override
     public int hashCode() {
         int result = id.hashCode();
         result = 31 * result + name.hashCode();
@@ -104,24 +122,6 @@ public class TaxiDispatcher implements Serializable {
         result = 31 * result + email.hashCode();
         result = 31 * result + disabled.hashCode();
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TaxiDispatcher)) return false;
-
-        TaxiDispatcher that = (TaxiDispatcher) o;
-
-        if (disabled != null ? !disabled.equals(that.disabled) : that.disabled != null) return false;
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (jmsQueue != null ? !jmsQueue.equals(that.jmsQueue) : that.jmsQueue != null) return false;
-        if (jmsQueueCapacity != null ? !jmsQueueCapacity.equals(that.jmsQueueCapacity) : that.jmsQueueCapacity != null)
-            return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
-        return true;
     }
 
     @Override
