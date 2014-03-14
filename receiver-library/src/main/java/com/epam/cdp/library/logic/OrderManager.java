@@ -74,7 +74,7 @@ public final class OrderManager {
 		
 		//generate report
 		Report report = new Report(order);
-		report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.ACCEPTED, "order accepted", taxiId));
+		//report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.ACCEPTED, "order accepted", taxiId));
 		
 		jmsService.sendReport(report);
 		
@@ -112,7 +112,7 @@ public final class OrderManager {
 	public void refuseOrder(Order order, String reason){
 		
 		Report report = new Report(order);
-		report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.REFUSED, reason, taxiId));
+		//report.addHistoryItem(new BookingResponse(BookingResponse.BookingResponseStatus.REFUSED, reason, taxiId));
 		
 		jmsService.sendReport(report);
 		
