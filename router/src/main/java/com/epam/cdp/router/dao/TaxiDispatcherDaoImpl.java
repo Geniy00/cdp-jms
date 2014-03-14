@@ -19,6 +19,11 @@ public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
     EntityManager em;
 
     @Override
+    public TaxiDispatcher find(Long id) {
+        return em.find(TaxiDispatcher.class, id);
+    }
+
+    @Override
     public List<TaxiDispatcher> findAllTaxiDispatchers() {
         TypedQuery<TaxiDispatcher> query =
                 em.createQuery(SELECT_ALL_TAXI_DISPATCHERS, TaxiDispatcher.class);

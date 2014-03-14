@@ -1,5 +1,6 @@
 package com.epam.cdp.router.dao;
 
+import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.Order;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,16 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Order find(String id) {
         return em.find(Order.class, id);
+    }
+
+    @Override
+    public BookingRequest updateBookingRequest(BookingRequest bookingRequest) {
+        return em.merge(bookingRequest);
+    }
+
+    @Override
+    public BookingRequest findBookingRequest(Long id) {
+        return em.find(BookingRequest.class, id);
     }
 
     @Override

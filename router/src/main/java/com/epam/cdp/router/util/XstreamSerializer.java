@@ -1,5 +1,6 @@
 package com.epam.cdp.router.util;
 
+import com.epam.cdp.core.entity.Customer;
 import com.epam.cdp.core.xml.BookingRequestMessage;
 import com.thoughtworks.xstream.XStream;
 
@@ -20,6 +21,7 @@ public class XstreamSerializer {
     public XstreamSerializer() {
         this.xStream = new XStream();
         xStream.aliasType("BookingRequestMessage", BookingRequestMessage.class);
+        xStream.aliasType("Customer", Customer.class);
         xStream.registerConverter(new JodaTimeConverter());
     }
 

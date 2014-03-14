@@ -1,4 +1,4 @@
-package com.epam.cdp.router.listener;
+package com.epam.cdp.router.gateway;
 
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.ReservationRequest;
