@@ -113,6 +113,13 @@
             <artifactId>joda-time</artifactId>
             <version>2.2</version>
         </dependency>
+        <!-- JodaTime JSP tags -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time-jsptags</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
 
         <!-- XStream XML parser -->
         <dependency>

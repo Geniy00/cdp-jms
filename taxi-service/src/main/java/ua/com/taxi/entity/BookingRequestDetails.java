@@ -17,33 +17,33 @@ public class BookingRequestDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "bookingRequestId")
-    private String bookingRequestId;
+    @Column(name = "bookingRequestId", nullable = false)
+    private Long bookingRequestId;
 
-    @Column(name = "startPosition")
+    @Column(name = "startPosition", nullable = false)
     private Integer startPosition;
 
-    @Column(name = "finishPosition")
+    @Column(name = "finishPosition", nullable = false)
     private Integer finishPosition;
 
-    @Column(name = "deliveryTime")
+    @Column(name = "deliveryTime", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime deliveryTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "vehicleType")
+    @Column(name = "vehicleType", nullable = false)
     private VehicleType vehicleType;
 
-    @Column(name = "payment")
+    @Column(name = "payment", nullable = false)
     private Double payment;
 
-    @Column(name = "expiryTime")
+    @Column(name = "expiryTime", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime expiryTime;
 
-    @Column(name = "orderId")
+    @Column(name = "orderId", nullable = false)
     private String orderId;
 
     public BookingRequestDetails() {
@@ -60,19 +60,19 @@ public class BookingRequestDetails {
         orderId = bookingRequestMessage.getOrderId();
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getBookingRequestId() {
+    public Long getBookingRequestId() {
         return bookingRequestId;
     }
 
-    public void setBookingRequestId(String bookingRequestId) {
+    public void setBookingRequestId(Long bookingRequestId) {
         this.bookingRequestId = bookingRequestId;
     }
 
@@ -139,17 +139,14 @@ public class BookingRequestDetails {
 
         BookingRequestDetails that = (BookingRequestDetails) o;
 
-        if (bookingRequestId != null ? !bookingRequestId.equals(that.bookingRequestId) : that.bookingRequestId != null)
-            return false;
-        if (deliveryTime != null ? !deliveryTime.equals(that.deliveryTime) : that.deliveryTime != null) return false;
-        if (expiryTime != null ? !expiryTime.equals(that.expiryTime) : that.expiryTime != null) return false;
-        if (finishPosition != null ? !finishPosition.equals(that.finishPosition) : that.finishPosition != null)
-            return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (orderId != null ? !orderId.equals(that.orderId) : that.orderId != null) return false;
-        if (payment != null ? !payment.equals(that.payment) : that.payment != null) return false;
-        if (startPosition != null ? !startPosition.equals(that.startPosition) : that.startPosition != null)
-            return false;
+        if (!bookingRequestId.equals(that.bookingRequestId)) return false;
+        if (!deliveryTime.equals(that.deliveryTime)) return false;
+        if (!expiryTime.equals(that.expiryTime)) return false;
+        if (!finishPosition.equals(that.finishPosition)) return false;
+        if (!id.equals(that.id)) return false;
+        if (!orderId.equals(that.orderId)) return false;
+        if (!payment.equals(that.payment)) return false;
+        if (!startPosition.equals(that.startPosition)) return false;
         if (vehicleType != that.vehicleType) return false;
 
         return true;
@@ -157,15 +154,15 @@ public class BookingRequestDetails {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (bookingRequestId != null ? bookingRequestId.hashCode() : 0);
-        result = 31 * result + (startPosition != null ? startPosition.hashCode() : 0);
-        result = 31 * result + (finishPosition != null ? finishPosition.hashCode() : 0);
-        result = 31 * result + (deliveryTime != null ? deliveryTime.hashCode() : 0);
-        result = 31 * result + (vehicleType != null ? vehicleType.hashCode() : 0);
-        result = 31 * result + (payment != null ? payment.hashCode() : 0);
-        result = 31 * result + (expiryTime != null ? expiryTime.hashCode() : 0);
-        result = 31 * result + (orderId != null ? orderId.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + bookingRequestId.hashCode();
+        result = 31 * result + startPosition.hashCode();
+        result = 31 * result + finishPosition.hashCode();
+        result = 31 * result + deliveryTime.hashCode();
+        result = 31 * result + vehicleType.hashCode();
+        result = 31 * result + payment.hashCode();
+        result = 31 * result + expiryTime.hashCode();
+        result = 31 * result + orderId.hashCode();
         return result;
     }
 }

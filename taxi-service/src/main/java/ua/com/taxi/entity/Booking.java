@@ -12,7 +12,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
     private BookingRequestDetails bookingRequest;
@@ -40,11 +40,11 @@ public class Booking {
         this.status = BookingStatus.NEW;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

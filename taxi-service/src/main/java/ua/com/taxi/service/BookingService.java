@@ -1,5 +1,6 @@
 package ua.com.taxi.service;
 
+import com.epam.cdp.core.entity.Customer;
 import org.joda.time.DateTime;
 import ua.com.taxi.entity.Booking;
 
@@ -12,7 +13,7 @@ public interface BookingService {
 
     void delete(Booking booking);
 
-    Booking find(String id);
+    Booking find(Long id);
 
     Booking findFreeBooking();
 
@@ -20,7 +21,7 @@ public interface BookingService {
 
     void unassignBooking(Booking booking);
 
-    Boolean acceptBooking(Booking booking);
+    Booking acceptBooking(Long bookingId);
 
     Boolean rejectBooking(Booking booking);
 

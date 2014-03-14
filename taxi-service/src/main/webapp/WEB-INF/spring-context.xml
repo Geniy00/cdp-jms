@@ -19,7 +19,7 @@
     <context:annotation-config/>
     <context:component-scan base-package="ua.com.taxi.bean"/>
     <context:component-scan base-package="ua.com.taxi.dao"/>
-    <context:component-scan base-package="ua.com.taxi.listener"/>
+    <context:component-scan base-package="ua.com.taxi.gateway"/>
     <context:component-scan base-package="ua.com.taxi.service"/>
     <context:component-scan base-package="ua.com.taxi.controller"/>
 
@@ -55,6 +55,10 @@
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="emf"/>
     </bean>
+
+    <!-- RestTemplate -->
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
+
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">

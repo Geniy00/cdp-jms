@@ -1,4 +1,4 @@
-package ua.com.taxi.listener;
+package ua.com.taxi.gateway;
 
 import com.epam.cdp.core.xml.BookingRequestMessage;
 import org.apache.log4j.Logger;
@@ -51,7 +51,7 @@ public class BookingRequestListener implements MessageListener {
         booking.setBookingRequest(bookingRequestDetails);
 
         bookingService.saveOrUpdate(booking);
-        LOG.info("New booking request with id:" + booking.getBookingRequest().getBookingRequestId() + " received.");
+        LOG.info("New booking request message with id:" + booking.getBookingRequest().getOrderId() + " is received.");
     }
 
     protected boolean isCorrect(BookingRequestMessage bookingRequestMessage) {

@@ -2,6 +2,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="joda" uri="http://www.joda.org/joda/time/tags" %>
 
 <html>
 <body>
@@ -16,51 +17,53 @@
     <div style="border: solid 1px green; margin: 15px; display:inline-block;">
         <table>
             <tr>
-                <td>id:</td>
-                <td>${booking.id }</td>
+                <td>BookingRequest id:</td>
+                <td>${booking.bookingRequest.bookingRequestId }</td>
             </tr>
+            <c:if test="${booking.client != null}">
             <tr>
-                <td>Customer:</td>
-                <td>name: ${customerName} <br/>phone: ${customerPhone}</td>
+                <td><b>Customer:</b></td>
+                <td><b>name: ${customerName} <br/>phone: ${customerPhone}</b></td>
             </tr>
+            </c:if>
             <tr>
                 <td>Start position:</td>
-                <td>${booking.startPosition}</td>
+                <td>${booking.bookingRequest.startPosition}</td>
             </tr>
             <tr>
                 <td>Finish position:</td>
-                <td>${booking.finishPosition}</td>
+                <td>${booking.bookingRequest.finishPosition}</td>
             </tr>
             <tr>
                 <td>Delivery time:</td>
-                <td>${booking.deliveryTime}</td>
+                <td><joda:format value="${booking.bookingRequest.deliveryTime}" pattern="HH:mm, dd MMM"/> </td>
             </tr>
             <tr>
                 <td>Vehicle type:</td>
-                <td>${booking.vehicleType}</td>
+                <td>${booking.bookingRequest.vehicleType}</td>
             </tr>
             <tr>
                 <td>Payment:</td>
-                <td><b>$ ${booking.payment}</b></td>
+                <td><b>$ ${booking.bookingRequest.payment}</b></td>
             </tr>
             <tr>
                 <td>Expiry time:</td>
-                <td>${booking.expiryTime}</td>
+                <td><joda:format value="${booking.bookingRequest.expiryTime}" pattern="HH:mm, dd MMM"/></td>
             </tr>
         </table>
     </div>
     <br/>
-    <c:if test="${customerName == null || customerPhone == null}">
+    <c:if test="${booking.client == null}">
         <div style="border: solid 1px green; margin: 15px; display:inline-block;">Resolution:
             <table>
                 <tr>
                     <td width="100px">
-                        <form action="order/${order.id}/accept" method="post">
+                        <form action="${booking.id}/accept" method="post">
                             <input type="submit" value="Accept"/>
                         </form>
                     </td>
                     <td width="100px">
-                        <form action="order/${order.id}/reject" method="post">
+                        <form action="${booking.id}/reject" method="post">
                             <input type="submit" value="Reject"/>
                         </form>
                     </td>
@@ -72,7 +75,7 @@
     </c:if>
 </c:if>
 <c:if test="${booking == null}">
-    <span style="color: red; ">The queue is empty</span>
+    <span style="color: red; ">The queue is empty or all request are in processing</span>
 </c:if>
 
 <br/><br/>

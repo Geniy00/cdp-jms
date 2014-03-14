@@ -15,7 +15,7 @@ public interface BookingDao {
 
     void delete(Booking booking);
 
-    Booking find(String id);
+    Booking find(Long id);
 
     List<Booking> findBookingByStatus(Booking.BookingStatus status);
 

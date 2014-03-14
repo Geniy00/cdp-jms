@@ -36,7 +36,7 @@ public class BookingDaoImpl implements BookingDao {
     }
 
     @Override
-    public Booking find(String id) {
+    public Booking find(Long id) {
         return em.find(Booking.class, id);
     }
 
