@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "ord")
 public class Order implements Serializable {
-
+    //TODO: add @Version annotation
     private static final long serialVersionUID = 1820235678421505291L;
 
     @Id
@@ -46,9 +46,9 @@ public class Order implements Serializable {
          * Exceptional statuses:
          * EXPIRED - order can't be sent because delivery time is expired |taxi response: EXPIRED
          * CANCELED - order was canceled                                  |taxi response: REFUSED
-         * FAILURE - order can't be processed by taxi service             |taxi response: FAILURE
+         * FAILED - order can't be processed by taxi service             |taxi response: FAILED
          */
-        NEW, SENT, DECLINED, PROCESSED, FINISHED, EXPIRED, CANCELED, FAILURE
+        NEW, SENT, DECLINED, PROCESSED, FINISHED, EXPIRED, CANCELED, FAILED
     }
 
     public Order() {

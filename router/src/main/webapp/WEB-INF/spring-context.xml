@@ -49,7 +49,7 @@
 
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.input.order.queue}" ref="inputOrderListener"/>
+        <jms:listener destination="${jms.input.order.queue}" ref="reservationRequestListener"/>
     </jms:listener-container>
 
 

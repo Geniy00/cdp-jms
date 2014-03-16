@@ -1,5 +1,6 @@
 package ua.com.taxi.service;
 
+import com.epam.cdp.core.entity.BookingRequestEnum;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class BookingServiceImpl implements BookingService {
     @Value("${router.rest.url}")
     private String ROUTER_REST_URL;
 
-    private String REST_URL_PARAMETERS = "?id={id}&action={action}&reason={reason}";
+    private String REST_URL_PARAMETERS = "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
 
-    private XstreamSerializer xstreamSerializer;
+    private XstreamSerializer xstreamSerializer = new XstreamSerializer();
 
     @Autowired
     BookingDao bookingDao;
@@ -91,7 +92,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingDao.find(bookingId);
 
         Map<String, String> mapVariables = new HashMap<>();
-        mapVariables.put("id", booking.getBookingRequest().getId().toString());
+        mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
+        mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
         mapVariables.put("action", "ACCEPT");
         mapVariables.put("reason", "");
         String response = restTemplate.getForObject(
@@ -99,19 +101,61 @@ public class BookingServiceImpl implements BookingService {
                 String.class,
                 mapVariables);
 
-        ClientDetails clientDetails = xstreamSerializer.deserialize(response, ClientDetails.class);
-        booking.setClient(clientDetails);
+        ClientDetails clientDetails = null;
+        try {
+            clientDetails = xstreamSerializer.deserialize(response, ClientDetails.class);
+        } catch (Exception e) {
+            LOG.error("Can't parse response:\n" + response);
+        }
+
+        if (clientDetails != null) {
+            booking.setClient(clientDetails);
+            booking.setStatus(Booking.BookingStatus.ACCEPTED);
+            bookingDao.update(booking);
+        }
+
+        return booking;
+    }
+
+    @Override
+    public Booking rejectBooking(Long bookingId) {
+        Booking booking = bookingDao.find(bookingId);
+
+        Map<String, String> mapVariables = new HashMap<>();
+        mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
+        mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
+        mapVariables.put("action", "REJECT");
+        mapVariables.put("reason", "");
+        String response = restTemplate.getForObject(
+                ROUTER_REST_URL + REST_URL_PARAMETERS,
+                String.class,
+                mapVariables);
+
+        BookingRequestEnum.Status status = null;
+        try {
+            status = xstreamSerializer.deserialize(response, BookingRequestEnum.Status.class);
+        } catch (Exception e) {
+            LOG.error("Can't parse response:\n" + response);
+        }
+
+        switch (status) {
+            case REJECTED:
+                booking.setStatus(Booking.BookingStatus.REJECTED);
+                break;
+            case EXPIRED:
+                booking.setStatus(Booking.BookingStatus.EXPIRED);
+                break;
+            default:
+                LOG.error("Unexpected response status [" + status + "] for reject quest");
+                return null;
+        }
+
         bookingDao.update(booking);
         return booking;
     }
 
     @Override
-    public Boolean rejectBooking(Booking booking) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Boolean refuseBooking(Booking booking, String reason) {
+    public Boolean refuseBooking(Long bookingId, String reason) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

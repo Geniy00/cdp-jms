@@ -8,7 +8,6 @@ import com.epam.cdp.router.service.CostService;
 import com.epam.cdp.router.service.OrderService;
 import com.epam.cdp.router.service.TaxiDispatcherSelector;
 import com.epam.cdp.router.service.XmlSerializer;
-import com.epam.cdp.router.util.XstreamSerializer;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import java.util.List;
 public class BookingRequestSender {
 
     public static final Logger LOG = Logger.getLogger(BookingRequestSender.class);
-    public static final int BOOKING_REQUEST_MINUTES_EXPIRATION = 5;                 // 5 mins
+    public static final int BOOKING_REQUEST_MINUTES_EXPIRATION = 15;                 // 15 mins
 
     @Autowired
     JmsTemplate jmsTemplate;
@@ -49,6 +48,10 @@ public class BookingRequestSender {
         List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
 
         for (Order order : newOrders) {
+            if(order.getOrderStatus() != Order.OrderStatus.NEW) {
+                throw new RuntimeException("Order can't has status NEW. concurrent exception.");
+            }
+
             //Select taxi dispatcher
             TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);
 

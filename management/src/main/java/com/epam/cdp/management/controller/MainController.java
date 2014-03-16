@@ -1,6 +1,6 @@
 package com.epam.cdp.management.controller;
 
-import com.epam.cdp.core.entity.BookingResponse.BookingResponseStatus;
+import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.management.service.ReportService;
@@ -48,7 +48,7 @@ public class MainController {
 
     @RequestMapping("/error")
     public String showFailureReports(Model model) {
-        List<Report> reports = reportService.findReportWithStatus(BookingResponseStatus.FAILURE);
+        List<Report> reports = reportService.findReportWithStatus(BookingRequestEnum.Status.FAILED);
         model.addAttribute("reports", reports);
 
         return "error/list";

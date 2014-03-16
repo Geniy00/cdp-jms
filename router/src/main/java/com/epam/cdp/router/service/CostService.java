@@ -11,6 +11,7 @@ public class CostService {
     }
 
     public Double calculateTaxiServicePayment(ReservationRequest reservationRequest) {
-        return calculateOrderPrice(reservationRequest) * 0.15;
+        Double res = calculateOrderPrice(reservationRequest) * 0.15;
+        return Math.round(res * 100) / 100.0;
     }
 }

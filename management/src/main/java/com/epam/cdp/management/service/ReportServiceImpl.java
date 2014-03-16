@@ -1,6 +1,6 @@
 package com.epam.cdp.management.service;
 
-import com.epam.cdp.core.entity.BookingResponse;
+import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.Report;
 import com.epam.cdp.management.dao.ReportDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> findReportWithStatus(BookingResponse.BookingResponseStatus bookingResponseStatus) {
-        return reportDao.findReportWithStatus(bookingResponseStatus);
+    public List<Report> findReportWithStatus(BookingRequestEnum.Status status) {
+        return reportDao.findReportWithStatus(status);
     }
 }

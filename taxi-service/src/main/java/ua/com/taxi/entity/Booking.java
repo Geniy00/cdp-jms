@@ -28,7 +28,7 @@ public class Booking {
     private String reason;
 
     public enum BookingStatus {
-        NEW, ASSIGNED, UNASSIGNED, ACCEPTED, REJECTED, REFUSED
+        NEW, ASSIGNED, UNASSIGNED, ACCEPTED, REJECTED, REFUSED, EXPIRED
     }
 
     public Booking() {

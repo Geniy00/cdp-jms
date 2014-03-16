@@ -7,7 +7,7 @@
 <html>
 <body>
 <h2>Booking</h2>
-</body>
+
 <br/><br/>
 
 <c:if test="${booking != null}">
@@ -23,7 +23,7 @@
             <c:if test="${booking.client != null}">
             <tr>
                 <td><b>Customer:</b></td>
-                <td><b>name: ${customerName} <br/>phone: ${customerPhone}</b></td>
+                <td><b>name: ${booking.client.name} <br/>phone: ${booking.client.phone}</b></td>
             </tr>
             </c:if>
             <tr>
@@ -58,18 +58,23 @@
             <table>
                 <tr>
                     <td width="100px">
-                        <form action="${booking.id}/accept" method="post">
+                        <form action="booking/${booking.id}" method="post">
+                            <input type="hidden" name="action" value="ACCEPT" />
                             <input type="submit" value="Accept"/>
                         </form>
                     </td>
                     <td width="100px">
-                        <form action="${booking.id}/reject" method="post">
+                        <form action="booking/${booking.id}" method="post">
+                            <input type="hidden" name="action" value="REJECT" />
                             <input type="submit" value="Reject"/>
                         </form>
                     </td>
                 </tr>
             </table>
 
+            <c:if test="${message != null}">
+                <strong>Message: ${message}</strong>
+            </c:if>
 
         </div>
     </c:if>
@@ -86,4 +91,6 @@
 
 <br/><br/>
 <a href="${pageContext.request.contextPath}">Back</a>
+
+</body>
 </html>

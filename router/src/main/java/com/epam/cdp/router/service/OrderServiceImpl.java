@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Geniy00
@@ -52,62 +53,74 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean isOrderActual(Long id) {
-        BookingRequest bookingRequest = orderDao.findBookingRequest(id);
-        Boolean isNotExpired = new DateTime().isAfter(bookingRequest.getExpiryTime());
+    public Boolean isOrderActual(String orderId, Long bookingRequestId) {
+        BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        return isNotExpired;
+        if (bookingRequest == null) {
+            LOG.warn("bookingRequest with id:" + bookingRequestId + " is null");
+            return false;
+        }
+
+        if (!bookingRequest.getOrder().getId().equals(orderId)
+                || !bookingRequest.getId().equals(bookingRequestId)) {
+            LOG.warn("orderId:" + orderId + " and bookingRequestId:" + bookingRequestId + " are not linked");
+            return false;
+        }
+
+        if (new DateTime().isAfter(bookingRequest.getExpiryTime())) {
+            LOG.warn("bookingRequestId:" + bookingRequestId + " is expired");
+            return false;
+        }
+
+        return true;
     }
 
     @Override
-    public Customer acceptOrder(Long id) {
-        BookingRequest bookingRequest = orderDao.findBookingRequest(id);
+    public Customer acceptOrder(String orderId, Long bookingRequestId) {
+        BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if (bookingRequest == null || !isOrderActual(id)) {
-            LOG.warn("bookingRequest with id:" + id + " is null or it\'s expired");
+        if(!isOrderActual(orderId, bookingRequestId)) {
             return null;
         }
 
         Order order = bookingRequest.getOrder();
         BookingResponse bookingResponse = new BookingResponse(bookingRequest,
-                BookingResponse.BookingResponseStatus.ACCEPTED);
+                BookingRequestEnum.Status.ACCEPTED);
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(order);
         return order.getCustomer();
     }
 
     @Override
-    public Boolean rejectOrder(Long id) {
-        BookingRequest bookingRequest = orderDao.findBookingRequest(id);
+    public BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId) {
+        BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if (bookingRequest == null || !isOrderActual(id)) {
-            LOG.warn("bookingRequest with id:" + id + " is null or it\'s expired");
-            return false;
+        if (!isOrderActual(orderId, bookingRequestId)) {
+            return BookingRequestEnum.Status.EXPIRED;
         }
 
         Order order = bookingRequest.getOrder();
         BookingResponse bookingResponse = new BookingResponse(bookingRequest,
-                BookingResponse.BookingResponseStatus.REJECTED);
+                BookingRequestEnum.Status.REJECTED);
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(order);
-        return true;
+        return BookingRequestEnum.Status.REJECTED;
     }
 
     @Override
-    public Boolean refuseOrder(Long id, String reason) {
-        BookingRequest bookingRequest = orderDao.findBookingRequest(id);
+    public BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason) {
+        BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if (bookingRequest == null || !isOrderActual(id)) {
-            LOG.warn("bookingRequest with id:" + id + " is null or it\'s expired");
-            return false;
+        if (!isOrderActual(orderId, bookingRequestId)) {
+            return BookingRequestEnum.Status.EXPIRED;
         }
 
         Order order = bookingRequest.getOrder();
         BookingResponse bookingResponse = new BookingResponse(bookingRequest,
-                BookingResponse.BookingResponseStatus.REFUSED, reason);
+                BookingRequestEnum.Status.REFUSED, reason);
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(order);
-        return true;
+        return BookingRequestEnum.Status.REFUSED;
     }
 
     @Override

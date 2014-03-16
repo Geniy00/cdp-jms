@@ -43,7 +43,7 @@ public class BookingRequest implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime expiryTime;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private TaxiDispatcher taxiDispatcher;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -80,7 +80,7 @@ public class BookingRequest implements Serializable {
 
     public void applyBookingResponse(BookingResponse bookingResponse){
         this.bookingResponse = bookingResponse;
-        BookingResponse.BookingResponseStatus status = bookingResponse.getBookingResponseStatus();
+        BookingRequestEnum.Status status = bookingResponse.getStatus();
         switch (status){
             case ACCEPTED:
                 order.setOrderStatus(Order.OrderStatus.PROCESSED);
@@ -94,8 +94,8 @@ public class BookingRequest implements Serializable {
             case EXPIRED:
                 order.setOrderStatus(Order.OrderStatus.EXPIRED);
                 break;
-            case FAILURE:
-                order.setOrderStatus(Order.OrderStatus.FAILURE);
+            case FAILED:
+                order.setOrderStatus(Order.OrderStatus.FAILED);
                 break;
             default:
                 throw new RuntimeException("Unknown bookingResponse status");

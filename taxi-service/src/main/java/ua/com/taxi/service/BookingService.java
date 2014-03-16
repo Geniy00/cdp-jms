@@ -1,6 +1,5 @@
 package ua.com.taxi.service;
 
-import com.epam.cdp.core.entity.Customer;
 import org.joda.time.DateTime;
 import ua.com.taxi.entity.Booking;
 
@@ -23,9 +22,9 @@ public interface BookingService {
 
     Booking acceptBooking(Long bookingId);
 
-    Boolean rejectBooking(Booking booking);
+    Booking rejectBooking(Long bookingId);
 
-    Boolean refuseBooking(Booking booking, String reason);
+    Boolean refuseBooking(Long bookingId, String reason);
 
     Boolean sendTextMessageToFailQueue(String xmlBookingRequestMessage);
 

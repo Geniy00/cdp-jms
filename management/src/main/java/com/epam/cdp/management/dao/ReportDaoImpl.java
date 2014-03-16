@@ -1,7 +1,7 @@
 package com.epam.cdp.management.dao;
 
+import com.epam.cdp.core.entity.BookingRequestEnum.Status;
 import com.epam.cdp.core.entity.BookingResponse;
-import com.epam.cdp.core.entity.BookingResponse.BookingResponseStatus;
 import com.epam.cdp.core.entity.Report;
 import org.springframework.stereotype.Repository;
 
@@ -58,7 +58,7 @@ public class ReportDaoImpl implements ReportDao {
     }
 
     @Override
-    public List<Report> findReportWithStatus(BookingResponseStatus bookingResponseStatus) {
+    public List<Report> findReportWithStatus(Status status) {
         TypedQuery<Report> query =
                 em.createQuery("SELECT r FROM Report r JOIN r.history hi  WHERE r.id = hi.report.id AND hi.reportStatus = 'failure'", Report.class);
         return query.getResultList();

@@ -15,9 +15,9 @@ import java.io.Serializable;
 
 //TODO: move this package to gateway and fix spring context
 @Component
-public class InputOrderListener implements MessageListener {
+public class ReservationRequestListener implements MessageListener {
 
-    public static final Logger LOG = Logger.getLogger(InputOrderListener.class);
+    public static final Logger LOG = Logger.getLogger(ReservationRequestListener.class);
 
     @Autowired
     OrderService orderService;
@@ -36,7 +36,7 @@ public class InputOrderListener implements MessageListener {
         if (reservationRequestObject instanceof ReservationRequest) {
             ReservationRequest reservationRequest = (ReservationRequest) reservationRequestObject;
             Order order = orderService.createAndSaveNewOrder(reservationRequest);
-            LOG.info("Order with id: " + order.getId() + " was created successfully");
+            LOG.info("Order[id:" + order.getId() + "] was created successfully");
         } else {
             LOG.error("Unknown JMS message type. It must be of ReservationRequest type");
             throw new IllegalArgumentException("Unknown JMS message type");

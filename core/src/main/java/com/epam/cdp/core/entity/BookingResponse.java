@@ -22,8 +22,8 @@ public class BookingResponse implements Serializable {
     private BookingRequest bookingRequest;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "bookingResponseStatus", nullable = false)
-    private BookingResponseStatus bookingResponseStatus;
+    @Column(name = "status", nullable = false)
+    private BookingRequestEnum.Status status;
 
     @Column(name = "reason")
     private String reason;
@@ -33,24 +33,20 @@ public class BookingResponse implements Serializable {
     private DateTime created;
 
 
-    public enum BookingResponseStatus {
-        ACCEPTED, REJECTED, REFUSED, EXPIRED, FAILURE
-    }
-
     public BookingResponse() {
         created = new DateTime();
     }
 
-    public BookingResponse(BookingRequest bookingRequest, BookingResponseStatus status){
+    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status){
         this.bookingRequest = bookingRequest;
-        this.bookingResponseStatus = status;
+        this.status = status;
         this.reason = "";
         created = new DateTime();
     }
 
-    public BookingResponse(BookingRequest bookingRequest, BookingResponseStatus status, String reason){
+    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status, String reason){
         this.bookingRequest = bookingRequest;
-        this.bookingResponseStatus = status;
+        this.status = status;
         this.reason = reason;
         created = new DateTime();
     }
@@ -71,12 +67,12 @@ public class BookingResponse implements Serializable {
         this.bookingRequest = bookingRequest;
     }
 
-    public BookingResponseStatus getBookingResponseStatus() {
-        return bookingResponseStatus;
+    public BookingRequestEnum.Status getStatus() {
+        return status;
     }
 
-    public void setBookingResponseStatus(BookingResponseStatus bookingResponseStatus) {
-        this.bookingResponseStatus = bookingResponseStatus;
+    public void setStatus(BookingRequestEnum.Status status) {
+        this.status = status;
     }
 
     public String getReason() {
@@ -103,7 +99,7 @@ public class BookingResponse implements Serializable {
         BookingResponse that = (BookingResponse) o;
 
         if (!bookingRequest.equals(that.bookingRequest)) return false;
-        if (bookingResponseStatus != that.bookingResponseStatus) return false;
+        if (status != that.status) return false;
         if (!id.equals(that.id)) return false;
 
         return true;
@@ -113,7 +109,7 @@ public class BookingResponse implements Serializable {
     public int hashCode() {
         int result = id.hashCode();
         result = 31 * result + bookingRequest.hashCode();
-        result = 31 * result + bookingResponseStatus.hashCode();
+        result = 31 * result + status.hashCode();
         return result;
     }
 }

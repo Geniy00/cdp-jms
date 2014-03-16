@@ -43,8 +43,7 @@ public class Report implements Serializable {
         }
     }
 
-    public BookingResponse.BookingResponseStatus getReportStatus() {
-
+    public BookingRequestEnum.Status getReportStatus() {
         return null;
     }
 

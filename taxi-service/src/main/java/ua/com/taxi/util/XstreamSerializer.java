@@ -1,8 +1,8 @@
 package ua.com.taxi.util;
 
-import com.epam.cdp.core.entity.Customer;
 import com.epam.cdp.core.xml.BookingRequestMessage;
 import com.thoughtworks.xstream.XStream;
+import ua.com.taxi.entity.ClientDetails;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class XstreamSerializer {
     public XstreamSerializer() {
         this.xStream = new XStream();
         xStream.aliasType("BookingRequestMessage", BookingRequestMessage.class);
-        xStream.aliasType("Customer", Customer.class);
+        xStream.aliasType("Customer", ClientDetails.class);
         xStream.registerConverter(new JodaTimeConverter());
     }
 

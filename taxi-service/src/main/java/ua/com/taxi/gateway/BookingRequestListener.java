@@ -51,7 +51,7 @@ public class BookingRequestListener implements MessageListener {
         booking.setBookingRequest(bookingRequestDetails);
 
         bookingService.saveOrUpdate(booking);
-        LOG.info("New booking request message with id:" + booking.getBookingRequest().getOrderId() + " is received.");
+        LOG.info("New bookingRequestMessage[id:" + booking.getBookingRequest().getOrderId() + "] is received.");
     }
 
     protected boolean isCorrect(BookingRequestMessage bookingRequestMessage) {

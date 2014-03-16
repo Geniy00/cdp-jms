@@ -1,5 +1,6 @@
 package com.epam.cdp.router.controller;
 
+import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.Customer;
 import com.epam.cdp.router.service.OrderService;
 import com.epam.cdp.router.service.XmlSerializer;
@@ -31,28 +32,33 @@ public class OrderController {
     @RequestMapping(value = "/execute")
     @ResponseBody
     public String execute(@RequestParam String action,
-                          @RequestParam Long id,
+                          @RequestParam String orderId,
+                          @RequestParam Long bookingRequestId,
                           @RequestParam(required = false) String reason) {
 
         switch (action) {
             case "ACCEPT":
-                Customer customer = orderService.acceptOrder(id);
+                /*
+                TODO: May we need to split acceptance request onto two:
+                - accept (get error code in case of expired, wrong ids, ..)
+                - getCustomer info (get customer info by some tokens)
+                */
+                Customer customer = orderService.acceptOrder(orderId, bookingRequestId);
                 return xmlSerializer.serialize(customer);
 
             case "REJECT":
-                orderService.rejectOrder(id);
-                break;
+                BookingRequestEnum.Status status = orderService.rejectOrder(orderId, bookingRequestId);
+                return xmlSerializer.serialize(status);
 
             case "REFUSE":
-                orderService.refuseOrder(id, reason);
-                break;
+                //TODO: why should we you status1?
+                BookingRequestEnum.Status status1 = orderService.refuseOrder(orderId, bookingRequestId, reason);
+                return xmlSerializer.serialize(status1);
 
             default:
                 return "You can't execute [" + action + "] action.";
 
         }
-
-        return "OK";
     }
 
 

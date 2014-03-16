@@ -22,6 +22,7 @@ public class XstreamSerializer {
         this.xStream = new XStream();
         xStream.aliasType("BookingRequestMessage", BookingRequestMessage.class);
         xStream.aliasType("Customer", Customer.class);
+        xStream.omitField(Customer.class, "id");
         xStream.registerConverter(new JodaTimeConverter());
     }
 

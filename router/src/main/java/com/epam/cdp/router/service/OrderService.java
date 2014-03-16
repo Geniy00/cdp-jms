@@ -1,9 +1,6 @@
 package com.epam.cdp.router.service;
 
-import com.epam.cdp.core.entity.BookingRequest;
-import com.epam.cdp.core.entity.Customer;
-import com.epam.cdp.core.entity.Order;
-import com.epam.cdp.core.entity.ReservationRequest;
+import com.epam.cdp.core.entity.*;
 
 import java.util.List;
 
@@ -22,11 +19,11 @@ public interface OrderService {
 
     BookingRequest updateBookingRequest(BookingRequest bookingRequest);
 
-    Boolean isOrderActual(Long id);
+    Boolean isOrderActual(String orderId, Long bookingRequestId);
 
-    Customer acceptOrder(Long id);
+    Customer acceptOrder(String orderId, Long bookingRequestId);
 
-    Boolean rejectOrder(Long id);
+    BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId);
 
-    Boolean refuseOrder(Long id, String reason);
+    BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason);
 }
