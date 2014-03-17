@@ -4,6 +4,6 @@
 </body>
 
 	<br/><br/>
-	<a href="booking">Show orders</a> <br/>
+	<a href="bookings">Show orders</a> <br/>
 	<a href="history">Show history</a>
 </html>

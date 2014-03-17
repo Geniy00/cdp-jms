@@ -46,7 +46,8 @@ public class BookingRequest implements Serializable {
     @ManyToOne(optional = false)
     private TaxiDispatcher taxiDispatcher;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    //TODO: there is posibility where several responses have to linked to a BookingRequest (i.e. ACCEPT, REFUSE)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BookingResponse bookingResponse;
 
     //TODO: check if we can use @PrePersist and @PreUpdate annotation for such fields

@@ -43,6 +43,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
+        return orderDao.findAllByOrderStatus(status);
+    }
+
+    @Override
     public void updateOrder(Order order) {
         orderDao.saveOrUpdate(order);
     }
@@ -52,8 +57,7 @@ public class OrderServiceImpl implements OrderService {
         return orderDao.updateBookingRequest(bookingRequest);
     }
 
-    @Override
-    public Boolean isOrderActual(String orderId, Long bookingRequestId) {
+    private Boolean isOrderActual(String orderId, Long bookingRequestId) {
         BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
         if (bookingRequest == null) {
@@ -75,11 +79,33 @@ public class OrderServiceImpl implements OrderService {
         return true;
     }
 
+    private Boolean canExecuteAction(BookingRequest bookingRequest, BookingRequestEnum.Action action){
+        Order.OrderStatus orderStatus = bookingRequest.getOrder().getOrderStatus();
+
+        Boolean isNotExpired = bookingRequest.getExpiryTime().isAfter(new DateTime())
+                && bookingRequest.getOrder().getReservationRequest().getDeliveryTime().isAfter(new DateTime());
+
+        switch (action) {
+            case ACCEPT:
+            case REJECT:
+            case REFUSE:
+                return orderStatus == Order.OrderStatus.SENT && isNotExpired;
+
+            case FAIL:
+                return true;
+
+            default:
+                LOG.error("Unexpected action can't be executed on bookingRequest[" + bookingRequest.getId() + "]");
+                return false;
+        }
+    }
+
     @Override
     public Customer acceptOrder(String orderId, Long bookingRequestId) {
         BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if(!isOrderActual(orderId, bookingRequestId)) {
+        if (!isOrderActual(orderId, bookingRequestId)
+                || !canExecuteAction(bookingRequest, BookingRequestEnum.Action.ACCEPT)) {
             return null;
         }
 
@@ -95,7 +121,8 @@ public class OrderServiceImpl implements OrderService {
     public BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId) {
         BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if (!isOrderActual(orderId, bookingRequestId)) {
+        if (!isOrderActual(orderId, bookingRequestId)
+                || !canExecuteAction(bookingRequest, BookingRequestEnum.Action.REJECT)) {
             return BookingRequestEnum.Status.EXPIRED;
         }
 
@@ -111,7 +138,8 @@ public class OrderServiceImpl implements OrderService {
     public BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason) {
         BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
-        if (!isOrderActual(orderId, bookingRequestId)) {
+        if (!isOrderActual(orderId, bookingRequestId)
+                || !canExecuteAction(bookingRequest, BookingRequestEnum.Action.ACCEPT)) {
             return BookingRequestEnum.Status.EXPIRED;
         }
 
@@ -124,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
-        return orderDao.findAllByOrderStatus(status);
+    public Order loadOrderEager(String id) {
+        return orderDao.loadOrderEager(id);
     }
 }

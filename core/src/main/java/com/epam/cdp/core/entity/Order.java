@@ -25,7 +25,7 @@ public class Order implements Serializable {
     private ReservationRequest reservationRequest;
 
     // TODO: check orphanRemoval = true!!!
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookingRequest> bookingRequests;
 
     @Enumerated(EnumType.STRING)

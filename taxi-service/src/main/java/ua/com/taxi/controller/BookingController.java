@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class BookingController {
 
@@ -22,12 +24,12 @@ public class BookingController {
         return "index";
     }
 
-    @RequestMapping(value = "/booking")
+    @RequestMapping(value = "/bookings")
     public String getRandomBooking(Model model) {
         Booking booking = bookingService.findFreeBooking();
         model.addAttribute("booking", booking);
         model.addAttribute("bookingCount", bookingService.countActualBookings());
-        return "booking";
+        return "bookings";
     }
 
     @RequestMapping(value = "/booking/{id}", method = RequestMethod.GET)
@@ -38,8 +40,9 @@ public class BookingController {
     }
 
     @RequestMapping(value = "/booking/{id}", method = RequestMethod.POST)
-    public String acceptOrRejectBooking(@PathVariable Long id,
+    public String executeBookingAction(@PathVariable Long id,
                                         @RequestParam BookingRequestEnum.Action action,
+                                        @RequestParam(required = false) String reason,
                                         Model model) {
 
         Booking booking = null;
@@ -51,6 +54,11 @@ public class BookingController {
             case REJECT:
                 booking = bookingService.rejectBooking(id);
                 break;
+
+            case REFUSE:
+                if(reason == null) reason = "DEFAULT REFUSE REASON";
+                booking = bookingService.refuseBooking(id, reason);
+                break;
         }
 
 
@@ -61,14 +69,41 @@ public class BookingController {
         return "bookingDetails";
     }
 
-//    @RequestMapping(value = "/booking/{id}/refuse", method = RequestMethod.POST)
-//    public String refuseBooking(@PathVariable String id,
-//                              @RequestParam(value = "reason") String reason, Model model) {
-////        bookingService.refuseBooking(id, reason);
-//
-//        return "redirect:/history";
-//    }
-//
+    @RequestMapping(value = "/booking/{id}/assigned")
+    public String assignOrUnassignBooking(@PathVariable Long id,
+                                          @RequestParam(required = false) String action,
+                                          HttpServletRequest request,
+                                          Model model) {
+
+        Booking booking = null;
+        switch (action == null ? "" : action) {
+            case "ASSIGN_TO_ME":
+                booking = bookingService.assignBooking(id);
+                if(booking == null) {
+                    return "redirect:/bookings";
+                }
+                break;
+
+            case "UNASSIGN":
+                booking = bookingService.unassignBooking(id);
+                if(booking.getStatus() == Booking.BookingStatus.UNASSIGNED) {
+                    return "redirect:/bookings";
+                }
+                break;
+            case "":
+                booking = bookingService.find(id);
+                break;
+        }
+
+        if (action != null) {
+            String message = "booking[id:" + booking.getId() + "] is " + action;
+            model.addAttribute("message", message);
+        }
+
+        model.addAttribute("booking", booking);
+        return "bookingDetails";
+    }
+
 //    @RequestMapping(value = "/history")
 //    public String showHistory(Model model) {
 ////        model.addAttribute("reportList", historyList.getReportHistory());

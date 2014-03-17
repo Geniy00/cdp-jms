@@ -18,7 +18,11 @@ public interface OrderDao {
 
     BookingRequest findBookingRequest(Long id);
 
+    List<BookingRequest> findExpiredBookingRequests();
+
     void delete(Order order);
 
     List<Order> findAllByOrderStatus(Order.OrderStatus status);
+
+    Order loadOrderEager(String id);
 }

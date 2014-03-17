@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static ua.com.taxi.entity.Booking.BookingStatus;
+
 /**
  * @author Geniy00
  */
@@ -35,6 +37,8 @@ public class BookingServiceImpl implements BookingService {
     private String ROUTER_REST_URL;
 
     private String REST_URL_PARAMETERS = "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
+
+    private Integer ASSIGN_EXPIRY_TIME = 3;         //3 mins
 
     private XstreamSerializer xstreamSerializer = new XstreamSerializer();
 
@@ -65,8 +69,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking findFreeBooking() {
         //TODO: fix this stub method
-        List<Booking> bookings = bookingDao.findBookingByStatus(Booking.BookingStatus.NEW);
-        bookings.addAll(bookingDao.findBookingByStatus(Booking.BookingStatus.UNASSIGNED));
+        List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW);
+        bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.UNASSIGNED));
 
         int size = bookings.size() - 1;
         if (size >= 0) {
@@ -77,24 +81,96 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    private Boolean isNotExpired(Booking booking){
+        return booking.getBookingRequest().getExpiryTime().isAfter(new DateTime());
+    }
+
+    private Boolean canChangeStatusTo(Booking booking, Booking.BookingStatus newStatus) {
+        Booking.BookingStatus currentStatus = booking.getStatus();
+        switch (newStatus) {
+            case NEW:    
+                return false;
+            case ASSIGNED:
+                return (currentStatus == BookingStatus.NEW
+                        || currentStatus == BookingStatus.UNASSIGNED)
+                        && isNotExpired(booking);
+
+            case UNASSIGNED:
+                return currentStatus == BookingStatus.ASSIGNED
+                        && isNotExpired(booking);
+
+            case ACCEPTED:
+                return currentStatus == BookingStatus.ASSIGNED
+                        && isNotExpired(booking);
+
+            case REJECTED:
+                return currentStatus == BookingStatus.ASSIGNED
+                        && isNotExpired(booking);
+
+            case REFUSED:
+                return currentStatus == BookingStatus.ACCEPTED
+                        || currentStatus == BookingStatus.REJECTED;
+
+            case EXPIRED:
+                return !isNotExpired(booking);
+
+            default:
+                LOG.error("Unexpected new status");
+                throw new RuntimeException("Unexpected new status");
+        }
+    }
+    
+    /**
+     * Assign booking to an dispatcher to prevent possibility to process booking concurrently 
+     * @param bookingId
+     * @return updated booking object from DB
+     *  null - action can't be executed
+     *  
+     */
     @Override
-    public void assignBooking(Booking booking, DateTime dateTime) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public Booking assignBooking(Long bookingId) {
+        Booking booking = bookingDao.find(bookingId);
+
+        if(!canChangeStatusTo(booking, BookingStatus.ASSIGNED)){
+            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to ASSIGNED");
+            //return booking;
+            //TODO: null means that we can't execute assign action. It should be fixed to not null object
+            return null;
+        }
+        
+        DateTime assignToExpiryTime = new DateTime().plusMinutes(ASSIGN_EXPIRY_TIME);
+        booking.setStatus(BookingStatus.ASSIGNED);
+        booking.setAssignToExpiryTime(assignToExpiryTime);
+        return bookingDao.update(booking);
     }
 
     @Override
-    public void unassignBooking(Booking booking) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public Booking unassignBooking(Long bookingId) {
+        Booking booking = bookingDao.find(bookingId);
+
+        if(!canChangeStatusTo(booking, BookingStatus.UNASSIGNED)){
+            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to UNASSIGNED");
+            return booking;
+        }
+
+        booking.setStatus(BookingStatus.UNASSIGNED);
+        booking.setAssignToExpiryTime(null);
+        return bookingDao.update(booking);
     }
 
     @Override
     public Booking acceptBooking(Long bookingId) {
         Booking booking = bookingDao.find(bookingId);
 
+        if(!canChangeStatusTo(booking, BookingStatus.ACCEPTED)){
+            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to ACCEPTED");
+            return booking;
+        }
+
         Map<String, String> mapVariables = new HashMap<>();
         mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
         mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
-        mapVariables.put("action", "ACCEPT");
+        mapVariables.put("action", BookingRequestEnum.Action.ACCEPT.toString());
         mapVariables.put("reason", "");
         String response = restTemplate.getForObject(
                 ROUTER_REST_URL + REST_URL_PARAMETERS,
@@ -110,7 +186,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (clientDetails != null) {
             booking.setClient(clientDetails);
-            booking.setStatus(Booking.BookingStatus.ACCEPTED);
+            booking.setStatus(BookingStatus.ACCEPTED);
             bookingDao.update(booking);
         }
 
@@ -121,10 +197,15 @@ public class BookingServiceImpl implements BookingService {
     public Booking rejectBooking(Long bookingId) {
         Booking booking = bookingDao.find(bookingId);
 
+        if(!canChangeStatusTo(booking, BookingStatus.REJECTED)){
+            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + "  to REJECTED");
+            return booking;
+        }
+
         Map<String, String> mapVariables = new HashMap<>();
         mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
         mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
-        mapVariables.put("action", "REJECT");
+        mapVariables.put("action", BookingRequestEnum.Action.REJECT.toString());
         mapVariables.put("reason", "");
         String response = restTemplate.getForObject(
                 ROUTER_REST_URL + REST_URL_PARAMETERS,
@@ -140,13 +221,13 @@ public class BookingServiceImpl implements BookingService {
 
         switch (status) {
             case REJECTED:
-                booking.setStatus(Booking.BookingStatus.REJECTED);
+                booking.setStatus(BookingStatus.REJECTED);
                 break;
             case EXPIRED:
-                booking.setStatus(Booking.BookingStatus.EXPIRED);
+                booking.setStatus(BookingStatus.EXPIRED);
                 break;
             default:
-                LOG.error("Unexpected response status [" + status + "] for reject quest");
+                LOG.error("Unexpected response status [" + status + "] for reject request");
                 return null;
         }
 
@@ -155,8 +236,40 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Boolean refuseBooking(Long bookingId, String reason) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Booking refuseBooking(Long bookingId, String reason) {
+        Booking booking = bookingDao.find(bookingId);
+
+        if(!canChangeStatusTo(booking, BookingStatus.REFUSED)){
+            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to REFUSED");
+            return booking;
+        }
+
+        Map<String, String> mapVariables = new HashMap<>();
+        mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
+        mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
+        mapVariables.put("action", BookingRequestEnum.Action.REFUSE.toString());
+        mapVariables.put("reason", reason);
+        String response = restTemplate.getForObject(
+                ROUTER_REST_URL + REST_URL_PARAMETERS,
+                String.class,
+                mapVariables);
+
+        BookingRequestEnum.Status status = null;
+        try {
+            status = xstreamSerializer.deserialize(response, BookingRequestEnum.Status.class);
+        } catch (Exception e) {
+            LOG.error("Can't parse response:\n" + response);
+        }
+
+        if(status == BookingRequestEnum.Status.REFUSED) {
+            booking.setStatus(BookingStatus.REFUSED);
+        } else {
+            LOG.error("Unexpected response status [" + status + "] for refuse request");
+            return null;
+        }
+
+        bookingDao.update(booking);
+        return booking;
     }
 
     @Override
@@ -174,8 +287,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Long countActualBookings() {
-        long newCount = bookingDao.countBookingByStatus(Booking.BookingStatus.NEW);
-        long unassignedCount = bookingDao.countBookingByStatus(Booking.BookingStatus.UNASSIGNED);
+        long newCount = bookingDao.countBookingByStatus(BookingStatus.NEW);
+        long unassignedCount = bookingDao.countBookingByStatus(BookingStatus.UNASSIGNED);
         return newCount + unassignedCount;
     }
 }

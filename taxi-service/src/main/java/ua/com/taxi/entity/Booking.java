@@ -1,5 +1,8 @@
 package ua.com.taxi.entity;
 
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
 import javax.persistence.*;
 
 /**
@@ -23,6 +26,10 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private BookingStatus status;
+
+    @Column(name = "assignToExpiryTime")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime assignToExpiryTime;
 
     @Column(name = "reason")
     private String reason;
@@ -70,6 +77,14 @@ public class Booking {
 
     public void setStatus(BookingStatus status) {
         this.status = status;
+    }
+
+    public DateTime getAssignToExpiryTime() {
+        return assignToExpiryTime;
+    }
+
+    public void setAssignToExpiryTime(DateTime assignToExpiryTime) {
+        this.assignToExpiryTime = assignToExpiryTime;
     }
 
     public String getReason() {

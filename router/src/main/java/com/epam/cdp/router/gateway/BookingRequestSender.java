@@ -1,8 +1,6 @@
 package com.epam.cdp.router.gateway;
 
-import com.epam.cdp.core.entity.BookingRequest;
-import com.epam.cdp.core.entity.Order;
-import com.epam.cdp.core.entity.TaxiDispatcher;
+import com.epam.cdp.core.entity.*;
 import com.epam.cdp.core.xml.BookingRequestMessage;
 import com.epam.cdp.router.service.CostService;
 import com.epam.cdp.router.service.OrderService;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,10 +45,34 @@ public class BookingRequestSender {
 
     public void execute() {
         List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
+        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.DECLINED));
+
+        //check if order is expired
+        Iterator<Order> iterator = newOrders.iterator();
+        while (iterator.hasNext()) {
+            Order order = iterator.next();
+
+            //if expired
+            if (new DateTime().isAfter(order.getReservationRequest().getDeliveryTime())) {
+                order = orderService.loadOrderEager(order.getId());
+
+                for (BookingRequest bookingRequest : order.getBookingRequests()) {
+                    if (bookingRequest.getBookingResponse() == null) {
+                        BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.EXPIRED);
+                        bookingRequest.applyBookingResponse(bookingResponse);
+                    }
+                }
+
+                order.setOrderStatus(Order.OrderStatus.EXPIRED);
+                orderService.updateOrder(order);
+                iterator.remove();
+            }
+        }
 
         for (Order order : newOrders) {
-            if(order.getOrderStatus() != Order.OrderStatus.NEW) {
-                throw new RuntimeException("Order can't has status NEW. concurrent exception.");
+            if (order.getOrderStatus() != Order.OrderStatus.NEW
+                    && order.getOrderStatus() != Order.OrderStatus.DECLINED) {
+                throw new RuntimeException("Order must has status NEW or DECLINE. concurrent exception.");
             }
 
             //Select taxi dispatcher

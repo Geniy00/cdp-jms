@@ -10,6 +10,7 @@
 
     <task:scheduled-tasks scheduler="scheduler">
         <task:scheduled ref="bookingRequestSender" method="execute" fixed-delay="10000"/>
+        <task:scheduled ref="periodicTasks" method="handleExpiredOrdersWithoutResponse" fixed-delay="10000"/>
     </task:scheduled-tasks>
 
     <!--<bean name="bookingRequestSender" class="com.epam.cdp.router.gateway.BookingRequestSender"/>-->

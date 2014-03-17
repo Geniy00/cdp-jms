@@ -1,6 +1,5 @@
 package ua.com.taxi.service;
 
-import org.joda.time.DateTime;
 import ua.com.taxi.entity.Booking;
 
 /**
@@ -16,15 +15,15 @@ public interface BookingService {
 
     Booking findFreeBooking();
 
-    void assignBooking(Booking booking, DateTime dateTime);
+    Booking assignBooking(Long bookingId);
 
-    void unassignBooking(Booking booking);
+    Booking unassignBooking(Long bookingId);
 
     Booking acceptBooking(Long bookingId);
 
     Booking rejectBooking(Long bookingId);
 
-    Boolean refuseBooking(Long bookingId, String reason);
+    Booking refuseBooking(Long bookingId, String reason);
 
     Boolean sendTextMessageToFailQueue(String xmlBookingRequestMessage);
 

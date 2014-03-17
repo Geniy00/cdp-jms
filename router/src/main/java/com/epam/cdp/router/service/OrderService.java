@@ -19,11 +19,11 @@ public interface OrderService {
 
     BookingRequest updateBookingRequest(BookingRequest bookingRequest);
 
-    Boolean isOrderActual(String orderId, Long bookingRequestId);
-
     Customer acceptOrder(String orderId, Long bookingRequestId);
 
     BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId);
 
     BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason);
+
+    Order loadOrderEager(String id);
 }

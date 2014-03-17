@@ -6,9 +6,7 @@
 
 <html>
 <body>
-<h2>Booking</h2>
-
-<br/><br/>
+<br/>
 
 <c:if test="${booking != null}">
 
@@ -53,38 +51,35 @@
         </table>
     </div>
     <br/>
-    <c:if test="${booking.client == null}">
-        <div style="border: solid 1px green; margin: 15px; display:inline-block;">Resolution:
+    <c:if test="${booking != null}">
+        <div style="border: solid 1px green; margin: 15px; display:inline-block;">
+            Actions:
             <table>
+                <c:if test="${booking.status == 'NEW' || booking.status == 'UNASSIGNED'}">
                 <tr>
                     <td width="100px">
-                        <form action="booking/${booking.id}" method="post">
-                            <input type="hidden" name="action" value="ACCEPT" />
-                            <input type="submit" value="Accept"/>
-                        </form>
-                    </td>
-                    <td width="100px">
-                        <form action="booking/${booking.id}" method="post">
-                            <input type="hidden" name="action" value="REJECT" />
-                            <input type="submit" value="Reject"/>
+                        <form action="booking/${booking.id}/assigned" method="post">
+                            <input type="hidden" name="action" value="ASSIGN_TO_ME" />
+                            <input type="submit" value="Assign to me"/>
                         </form>
                     </td>
                 </tr>
+                </c:if>
             </table>
-
-            <c:if test="${message != null}">
-                <strong>Message: ${message}</strong>
-            </c:if>
-
         </div>
     </c:if>
 </c:if>
+
+<c:if test="${message != null}">
+    <span style="color: #ff4500; ">Message: ${message}</span>
+</c:if>
+
 <c:if test="${booking == null}">
     <span style="color: red; ">The queue is empty or all request are in processing</span>
 </c:if>
 
 <br/><br/>
-<input type="button" value="Reload Page" onClick="location.href='${pageContext.request.contextPath}/booking'">
+<input type="button" value="Reload Page" onClick="location.href='${pageContext.request.contextPath}/bookings'">
 
 <br/><br/>
 <span style="color: green; ">The queue has ${bookingCount} bookings</span>

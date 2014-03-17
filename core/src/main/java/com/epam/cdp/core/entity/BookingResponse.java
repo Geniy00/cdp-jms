@@ -18,7 +18,7 @@ public class BookingResponse implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(optional = false)
+    @OneToOne
     private BookingRequest bookingRequest;
 
     @Enumerated(EnumType.STRING)
