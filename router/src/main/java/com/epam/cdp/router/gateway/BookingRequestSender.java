@@ -26,7 +26,7 @@ import java.util.List;
 public class BookingRequestSender {
 
     public static final Logger LOG = Logger.getLogger(BookingRequestSender.class);
-    public static final int BOOKING_REQUEST_MINUTES_EXPIRATION = 15;                 // 15 mins
+    public static final int BOOKING_REQUEST_MINUTES_EXPIRATION = 2;                 // 15 mins
 
     @Autowired
     JmsTemplate jmsTemplate;
@@ -46,6 +46,7 @@ public class BookingRequestSender {
     public void execute() {
         List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
         newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.DECLINED));
+        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.CANCELED));
 
         //check if order is expired
         Iterator<Order> iterator = newOrders.iterator();
@@ -70,10 +71,6 @@ public class BookingRequestSender {
         }
 
         for (Order order : newOrders) {
-            if (order.getOrderStatus() != Order.OrderStatus.NEW
-                    && order.getOrderStatus() != Order.OrderStatus.DECLINED) {
-                throw new RuntimeException("Order must has status NEW or DECLINE. concurrent exception.");
-            }
 
             //Select taxi dispatcher
             TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);

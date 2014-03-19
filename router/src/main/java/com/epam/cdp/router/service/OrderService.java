@@ -11,9 +11,17 @@ public interface OrderService {
 
     Order createAndSaveNewOrder(ReservationRequest reservationRequest);
 
+    Order update(Order order);
+
+    void delete(Order order);
+
     Order find(String id);
 
     List<Order> findAllByOrderStatus(Order.OrderStatus status);
+
+    void terminateExpiredOrders();
+
+    void terminateExpiredBookingRequests();
 
     void updateOrder(Order order);
 

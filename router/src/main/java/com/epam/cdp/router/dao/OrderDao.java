@@ -18,6 +18,8 @@ public interface OrderDao {
 
     BookingRequest findBookingRequest(Long id);
 
+    List<Order> findExpiredOrders();
+
     List<BookingRequest> findExpiredBookingRequests();
 
     void delete(Order order);

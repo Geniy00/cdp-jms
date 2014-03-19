@@ -29,7 +29,7 @@ public class ReservationRequestGenerator {
         reservationRequest.setCustomerPhone("+38063" + generate(7, NUMBERS));
         reservationRequest.setStartPosition(random.nextInt(100));
         reservationRequest.setFinishPosition(random.nextInt(100));
-        reservationRequest.setDeliveryTime(new DateTime().plusDays(1));
+        reservationRequest.setDeliveryTime(new DateTime().plusMinutes(20));
         VehicleType vehicleType = VehicleType.values()[random.nextInt(VehicleType.values().length)];
         reservationRequest.setVehicleType(vehicleType);
         return reservationRequest;

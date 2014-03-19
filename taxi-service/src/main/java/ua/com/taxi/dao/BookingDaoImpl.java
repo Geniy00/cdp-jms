@@ -1,5 +1,6 @@
 package ua.com.taxi.dao;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 import ua.com.taxi.entity.Booking;
 
@@ -16,6 +17,8 @@ public class BookingDaoImpl implements BookingDao {
 
     private static final String SELECT_BOOKING_BY_STATUS = "SELECT b FROM Booking b WHERE b.status=:status";
     private static final String COUNT_BOOKING_BY_STATUS = "SELECT count(b.id) FROM Booking b WHERE b.status=:status";
+    private static final String SELECT_EXPIRED_BOOKINGS = "SELECT b FROM Booking b  WHERE b.bookingRequest.expiryTime < :dateTime " +
+            "AND (b.status = 'NEW' OR b.status = 'ASSIGNED' OR b.status = 'UNASSIGNED' )";
 
     @PersistenceContext
     EntityManager em;
@@ -52,5 +55,13 @@ public class BookingDaoImpl implements BookingDao {
         TypedQuery<Long> query = em.createQuery(COUNT_BOOKING_BY_STATUS, Long.class);
         query.setParameter("status", status);
         return query.getSingleResult();
+    }
+
+    @Override
+    public List<Booking> findExpiredBookings() {
+        TypedQuery<Booking> query = em.createQuery(SELECT_EXPIRED_BOOKINGS, Booking.class);
+        query.setParameter("dateTime", new DateTime());
+        List<Booking> resultList = query.getResultList();
+        return resultList;
     }
 }

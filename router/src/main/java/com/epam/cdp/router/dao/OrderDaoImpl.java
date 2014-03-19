@@ -20,7 +20,11 @@ public class OrderDaoImpl implements OrderDao {
     private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord WHERE ord.orderStatus=:status";
 
     private static final String SELECT_EXPIRED_BOOKING_REQUEST = "SELECT br FROM BookingRequest br " +
-            "WHERE br.expiryTime > :currentTime AND br.bookingResponse = null";
+            "WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
+
+    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord WHERE " +
+            "ord.reservationRequest.deliveryTime < :dateTime AND " +
+            "(ord.orderStatus = 'NEW' OR ord.orderStatus = 'SENT' OR ord.orderStatus = 'DECLINED')";
 
     @PersistenceContext
     EntityManager em;
@@ -46,15 +50,19 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
+    public List<Order> findExpiredOrders() {
+        TypedQuery<Order> query =
+                em.createQuery(SELECT_EXPIRED_ORDER, Order.class);
+        query.setParameter("dateTime", new DateTime());
+        return query.getResultList();
+    }
+
+    @Override
     public List<BookingRequest> findExpiredBookingRequests() {
         TypedQuery<BookingRequest> query =
                 em.createQuery(SELECT_EXPIRED_BOOKING_REQUEST, BookingRequest.class);
         query.setParameter("currentTime", new DateTime());
-        List<BookingRequest> result = query.getResultList();
-        if(result.size() > 0){
-            System.out.println("TEST");
-        }
-        return result;
+        return query.getResultList();
     }
 
     @Override

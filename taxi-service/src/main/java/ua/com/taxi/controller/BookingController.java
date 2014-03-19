@@ -53,7 +53,7 @@ public class BookingController {
 
             case REJECT:
                 booking = bookingService.rejectBooking(id);
-                break;
+                return "redirect:/bookings";
 
             case REFUSE:
                 if(reason == null) reason = "DEFAULT REFUSE REASON";

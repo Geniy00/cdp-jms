@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
         Booking.BookingStatus currentStatus = booking.getStatus();
         switch (newStatus) {
             case NEW:    
-                return false;
+                return isNotExpired(booking);
             case ASSIGNED:
                 return (currentStatus == BookingStatus.NEW
                         || currentStatus == BookingStatus.UNASSIGNED)
@@ -290,5 +290,10 @@ public class BookingServiceImpl implements BookingService {
         long newCount = bookingDao.countBookingByStatus(BookingStatus.NEW);
         long unassignedCount = bookingDao.countBookingByStatus(BookingStatus.UNASSIGNED);
         return newCount + unassignedCount;
+    }
+
+    @Override
+    public List<Booking> findExpiredBookings() {
+        return bookingDao.findExpiredBookings();
     }
 }

@@ -2,6 +2,8 @@ package ua.com.taxi.service;
 
 import ua.com.taxi.entity.Booking;
 
+import java.util.List;
+
 /**
  * @author Geniy00
  */
@@ -28,5 +30,7 @@ public interface BookingService {
     Boolean sendTextMessageToFailQueue(String xmlBookingRequestMessage);
 
     public Long countActualBookings();
+
+    public List<Booking> findExpiredBookings();
 
 }

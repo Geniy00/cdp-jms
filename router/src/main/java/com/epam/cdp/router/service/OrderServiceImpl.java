@@ -38,6 +38,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Order update(Order order) {
+        return orderDao.saveOrUpdate(order);
+    }
+
+    @Override
+    public void delete(Order order) {
+        orderDao.delete(order);
+    }
+
+    @Override
     public Order find(String id) {
         return orderDao.find(id);
     }
@@ -45,6 +55,30 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
         return orderDao.findAllByOrderStatus(status);
+    }
+
+    @Override
+    public void terminateExpiredOrders() {
+        List<Order> expiredOrders = orderDao.findExpiredOrders();
+        for (Order expiredOrder : expiredOrders) {
+            expiredOrder.setOrderStatus(Order.OrderStatus.EXPIRED);
+            orderDao.saveOrUpdate(expiredOrder);
+            LOG.info("Order[id:" + expiredOrder.getId() + "] expired");
+        }
+    }
+
+    @Override
+    public void terminateExpiredBookingRequests() {
+        List<BookingRequest> expiredBookingRequests = orderDao.findExpiredBookingRequests();
+        for (BookingRequest expiredBookingRequest : expiredBookingRequests) {
+            BookingResponse bookingResponse = new BookingResponse(expiredBookingRequest, BookingRequestEnum.Status.EXPIRED, "automatically expired");
+            expiredBookingRequest.applyBookingResponse(bookingResponse);
+
+            expiredBookingRequest.getOrder().setOrderStatus(Order.OrderStatus.DECLINED);
+
+            orderDao.updateBookingRequest(expiredBookingRequest);
+            LOG.info("BookingRequest[id:" + expiredBookingRequest.getId() + "] expired");
+        }
     }
 
     @Override
@@ -147,6 +181,7 @@ public class OrderServiceImpl implements OrderService {
         BookingResponse bookingResponse = new BookingResponse(bookingRequest,
                 BookingRequestEnum.Status.REFUSED, reason);
         bookingRequest.applyBookingResponse(bookingResponse);
+        order.setOrderStatus(Order.OrderStatus.CANCELED);
         orderDao.saveOrUpdate(order);
         return BookingRequestEnum.Status.REFUSED;
     }

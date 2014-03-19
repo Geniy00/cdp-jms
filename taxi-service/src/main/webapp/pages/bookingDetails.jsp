@@ -60,7 +60,7 @@
 </div>
 <br/>
 
-<c:if test="${booking != null && booking.status != 'EXPIRED' && booking.status != 'REFUSED'}">
+<c:if test="${booking != null && booking.status != 'EXPIRED' && booking.status != 'REJECTED' && booking.status != 'REFUSED'}">
     <div style="border: solid 1px green; margin: 15px; display:inline-block;">
         Actions:
         <table>
