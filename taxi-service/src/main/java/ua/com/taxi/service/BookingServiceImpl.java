@@ -32,6 +32,7 @@ import static ua.com.taxi.entity.Booking.BookingStatus;
 public class BookingServiceImpl implements BookingService {
 
     public static final Logger LOG = Logger.getLogger(BookingServiceImpl.class);
+    private static final int MAX_BOOKING_COUNT_BATCH = 100;     //Max count of bookings that can be processed for one DB request
 
     @Value("${router.rest.url}")
     private String ROUTER_REST_URL;
@@ -69,8 +70,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking findFreeBooking() {
         //TODO: fix this stub method
-        List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW);
-        bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.UNASSIGNED));
+        List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW, MAX_BOOKING_COUNT_BATCH);
+        bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.UNASSIGNED, MAX_BOOKING_COUNT_BATCH));
 
         int size = bookings.size() - 1;
         if (size >= 0) {
@@ -295,5 +296,15 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> findExpiredBookings() {
         return bookingDao.findExpiredBookings();
+    }
+
+    @Override
+    public List<Booking> findBookings(int limit) {
+        return bookingDao.findBooking(limit);
+    }
+
+    @Override
+    public List<Booking> findBookingByStatus(BookingStatus status, int limit) {
+        return bookingDao.findBookingByStatus(status, limit);
     }
 }

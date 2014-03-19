@@ -15,7 +15,8 @@ import java.util.List;
 @Repository
 public class BookingDaoImpl implements BookingDao {
 
-    private static final String SELECT_BOOKING_BY_STATUS = "SELECT b FROM Booking b WHERE b.status=:status";
+    private static final String SELECT_BOOKING = "SELECT b FROM Booking b ORDER BY b.bookingRequest.deliveryTime desc";
+    private static final String SELECT_BOOKING_BY_STATUS = "SELECT b FROM Booking b WHERE b.status=:status ORDER BY b.bookingRequest.deliveryTime desc";
     private static final String COUNT_BOOKING_BY_STATUS = "SELECT count(b.id) FROM Booking b WHERE b.status=:status";
     private static final String SELECT_EXPIRED_BOOKINGS = "SELECT b FROM Booking b  WHERE b.bookingRequest.expiryTime < :dateTime " +
             "AND (b.status = 'NEW' OR b.status = 'ASSIGNED' OR b.status = 'UNASSIGNED' )";
@@ -44,9 +45,17 @@ public class BookingDaoImpl implements BookingDao {
     }
 
     @Override
-    public List<Booking> findBookingByStatus(Booking.BookingStatus status) {
+    public List<Booking> findBooking(int limit) {
+        TypedQuery<Booking> query = em.createQuery(SELECT_BOOKING, Booking.class);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit) {
         TypedQuery<Booking> query = em.createQuery(SELECT_BOOKING_BY_STATUS, Booking.class);
         query.setParameter("status", status);
+        query.setMaxResults(limit);
         return query.getResultList();
     }
 

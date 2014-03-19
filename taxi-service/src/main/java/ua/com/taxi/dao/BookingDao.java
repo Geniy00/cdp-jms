@@ -17,7 +17,9 @@ public interface BookingDao {
 
     Booking find(Long id);
 
-    List<Booking> findBookingByStatus(Booking.BookingStatus status);
+    List<Booking> findBooking(int limit);
+
+    List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit);
 
     Long countBookingByStatus(Booking.BookingStatus status);
 

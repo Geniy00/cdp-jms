@@ -12,6 +12,7 @@ import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class BookingController {
@@ -104,9 +105,19 @@ public class BookingController {
         return "bookingDetails";
     }
 
-//    @RequestMapping(value = "/history")
-//    public String showHistory(Model model) {
-////        model.addAttribute("reportList", historyList.getReportHistory());
-//        return "history";
-//    }
+    @RequestMapping(value = "/history")
+    public String showGeneralHistory(Model model) {
+        List<Booking> bookings = bookingService.findBookings(100);
+
+        model.addAttribute("bookings", bookings);
+        return "history";
+    }
+
+    @RequestMapping(value = "/filtered")
+    public String showFilteredHistory(@RequestParam Booking.BookingStatus status, Model model) {
+        List<Booking> bookings = bookingService.findBookingByStatus(status, 100);
+
+        model.addAttribute("bookings", bookings);
+        return "history";
+    }
 }
