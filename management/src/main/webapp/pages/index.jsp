@@ -3,11 +3,10 @@
 
 <html>
 <head>
-    <title>Managment</title>
+    <title>Management</title>
 </head>
 <body>
 <br/><br/>
-<a href="reports">Report history</a> <br/>
-<a href="error">Errors</a>
+<a href="history">Order history</a> <br/>
 </body>
 </html>

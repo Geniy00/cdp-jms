@@ -14,7 +14,7 @@
 		<module>sender</module>
 		<module>core</module>
         <module>router</module>
-		<!--<module>management</module>-->
+		<module>management</module>
         <module>taxi-service</module>
     </modules>
 

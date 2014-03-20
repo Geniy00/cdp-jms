@@ -32,7 +32,7 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    <!-- Check why it doesn't work -->
+    <!--TODO: Check why it doesn't work -->
     <filter>
         <filter-name>OpenEntityManagerInViewFilter</filter-name>
         <filter-class>

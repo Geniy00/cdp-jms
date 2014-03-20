@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -10,74 +10,38 @@
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
        http://www.springframework.org/schema/tx 
-       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
-       http://www.springframework.org/schema/jms
-       http://www.springframework.org/schema/jms/spring-jms.xsd">
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
-    <context:component-scan base-package="com.epam.cdp.management.test"/>
     <context:component-scan base-package="com.epam.cdp.management.dao"/>
     <context:component-scan base-package="com.epam.cdp.management.service"/>
     <context:component-scan base-package="com.epam.cdp.management.controller"/>
-    <context:component-scan base-package="com.epam.cdp.management.listener"/>
 
     <!-- DataBase -->
-
-    <!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-        destroy-method="close" p:driverClassName="${jdbc.driverClassName}"
-        p:url="${jdbc.databaseurl}" p:username="${jdbc.username}"
-        p:maxActive="1000" p:password="${jdbc.password}" p:testOnBorrow="false"
-        p:validationQuery="SELECT 1" />
-     -->
-    <bean id="dataSource"
-          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/cdp_management"/>
-        <property name="username" value="root"/>
-        <property name="password" value="12345"/>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <bean id="emf"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="persistenceUnitName" value="MANAGEPU"/>
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
-
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="dataSource" ref="dataSource"/>
         <property name="entityManagerFactory" ref="emf"/>
     </bean>
 
-
-    <!-- JMS -->
-    <bean id="connectionFactory"
-          class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${jms.url}"/>
-    </bean>
-
-
-    <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.reportQueue.name}"
-                      ref="reportListener" method="onMessage"/>
-
-        <jms:listener destination="${jms.errorQueue.name}"
-                      ref="errorListener" method="onMessage"/>
-    </jms:listener-container>
-
-
-    <bean id="jmsTemplate"
-          class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="connectionFactory"/>
-    </bean>
-
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:config.properties</value>
                 <value>classpath:jdbc.properties</value>
+                <value>classpath:config.properties</value>
             </list>
         </property>
     </bean>

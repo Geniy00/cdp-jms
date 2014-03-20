@@ -16,26 +16,26 @@
 <h3>
     <a href="history" style="color: #00008b; text-decoration: none; background-color: white">All</a> --
     <a href="filtered?status=NEW" style="color: #00008b; text-decoration: none; background-color: #dbffaa">New</a> --
-    <a href="filtered?status=ASSIGNED" style="color: #00008b; text-decoration: none; background-color: #dbffaa">Assigned</a> --
-    <a href="filtered?status=UNASSIGNED" style="color: #00008b; text-decoration: none; background-color: #dbffaa">Unassigned</a> --
-    <a href="filtered?status=ACCEPTED" style="color: #00008b; text-decoration: none; background-color: #58FF58">Accepted</a> --
-    <a href="filtered?status=REJECTED" style="color: #00008b; text-decoration: none; background-color: #FF9494">Rejected</a> --
-    <a href="filtered?status=REFUSED" style="color: #00008b; text-decoration: none; background-color: #FF7878">Refused</a> --
+    <a href="filtered?status=SENT" style="color: #00008b; text-decoration: none; background-color: #dbffaa">Sent</a> --
+    <a href="filtered?status=DECLINED" style="color: #00008b; text-decoration: none; background-color: #FF9494">Declined</a> --
+    <a href="filtered?status=PROCESSED" style="color: #00008b; text-decoration: none; background-color: #58FF58">Processed</a> --
+    <a href="filtered?status=FINISHED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Finished</a>
     <a href="filtered?status=EXPIRED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Expired</a>
+    <a href="filtered?status=CANCELED" style="color: #00008b; text-decoration: none; background-color: #FF7878">Canceled</a>
 </h3>
 <c:set var="i" value="${0}"/>
-<c:forEach var="order" items="${bookings}">
+<c:forEach var="order" items="${orders}">
     <c:set var="i" value="${i+1}"/>
-    <c:if test="${order.status == 'NEW' || order.status == 'UNASSIGNED' || order.status == 'ASSIGNED'}">
+    <c:if test="${order.status == 'NEW' || order.status == 'SENT'}">
         <c:set var="color" value="#dbffaa"/>
     </c:if>
-    <c:if test="${order.status == 'ACCEPTED'}">
+    <c:if test="${order.status == 'PROCESSED'}">
         <c:set var="color" value="#58FF58"/>
     </c:if>
-    <c:if test="${order.status == 'REJECTED'}">
+    <c:if test="${order.status == 'DECLINED'}">
         <c:set var="color" value="#FF9494"/>
     </c:if>
-    <c:if test="${order.status == 'REFUSED'}">
+    <c:if test="${order.status == 'CANCELED'}">
         <c:set var="color" value="#FF7878"/>
     </c:if>
     <c:if test="${order.status == 'EXPIRED'}">
@@ -45,8 +45,7 @@
         <table>
             <tr>
                 <td width="50px">${i}.</td>
-                <td width="400px"><a href="booking/${order.id}">id: ${order.id}</a>
-                    orderId:${order.bookingRequest.orderId}
+                <td width="400px">id: <a href="order/${order.id}">${order.id}</a>
                 </td>
                 <td width="400px">from ${order.bookingRequest.startPosition}
                     to ${order.bookingRequest.finishPosition}</td>

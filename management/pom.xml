@@ -60,12 +60,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>3.6.10.Final</version>
-        </dependency>
-
-        <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>transaction-api</artifactId>
             <version>1.1-rev-1</version>
@@ -95,18 +89,11 @@
             <version>2.2</version>
         </dependency>
 
-        <!-- Spring JMS -->
+        <!-- JodaTime JSP tags -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <version>2.5</version>
-        </dependency>
-
-        <!-- ActiveMQ -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>5.7.0</version>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time-jsptags</artifactId>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- JSTL -->

@@ -32,8 +32,6 @@ public class Order implements Serializable {
     @Column(name = "orderStatus", nullable = false)
     private OrderStatus orderStatus;
 
-
-    //TODO: check if EXPIRED status is needed
     public enum OrderStatus {
         /**
          * Order status meaning

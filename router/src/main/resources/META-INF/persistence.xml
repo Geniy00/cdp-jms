@@ -9,7 +9,6 @@
         <class>com.epam.cdp.core.entity.BookingResponse</class>
         <class>com.epam.cdp.core.entity.Customer</class>
         <class>com.epam.cdp.core.entity.Order</class>
-        <!--<class>com.epam.cdp.core.entity.Report</class>-->
         <class>com.epam.cdp.core.entity.ReservationRequest</class>
         <class>com.epam.cdp.core.entity.TaxiDispatcher</class>
         <properties>
