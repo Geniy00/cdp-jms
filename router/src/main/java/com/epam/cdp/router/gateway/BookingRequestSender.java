@@ -46,7 +46,8 @@ public class BookingRequestSender {
     public void execute() {
         List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
         newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.DECLINED));
-        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.CANCELED));
+        //TODO: realize mechanism of manual sending of canceled orders
+//        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.CANCELED));
 
         //check if order is expired
         Iterator<Order> iterator = newOrders.iterator();

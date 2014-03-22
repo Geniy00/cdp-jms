@@ -14,8 +14,8 @@ import java.util.List;
 @Repository
 public class OrderDaoImpl implements OrderDao {
 
-    private static final String SELECT_ALL_ORDERS = "SELECT ord FROM Order ord ORDER BY b.bookingRequest.deliveryTime desc";
-    private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord WHERE ord.status=:status ORDER BY b.bookingRequest.deliveryTime desc";
+    private static final String SELECT_ALL_ORDERS = "SELECT ord FROM Order ord ORDER BY ord.reservationRequest.deliveryTime desc";
+    private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord WHERE ord.orderStatus=:status ORDER BY ord.reservationRequest.deliveryTime desc";
 
     @PersistenceContext
     EntityManager em;

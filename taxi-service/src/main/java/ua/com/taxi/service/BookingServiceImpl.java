@@ -73,8 +73,8 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW, MAX_BOOKING_COUNT_BATCH);
         bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.UNASSIGNED, MAX_BOOKING_COUNT_BATCH));
 
-        int size = bookings.size() - 1;
-        if (size >= 0) {
+        int size = bookings.size();
+        if (size > 0) {
             int index = (int) (Math.random() * size);
             return bookings.get(index);
         } else {

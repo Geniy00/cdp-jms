@@ -105,11 +105,6 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
 
-        if (new DateTime().isAfter(bookingRequest.getExpiryTime())) {
-            LOG.warn("bookingRequestId:" + bookingRequestId + " is expired");
-            return false;
-        }
-
         return true;
     }
 
@@ -122,8 +117,10 @@ public class OrderServiceImpl implements OrderService {
         switch (action) {
             case ACCEPT:
             case REJECT:
-            case REFUSE:
                 return orderStatus == Order.OrderStatus.SENT && isNotExpired;
+
+            case REFUSE:
+                return orderStatus == Order.OrderStatus.PROCESSED;
 
             case FAIL:
                 return true;
@@ -173,7 +170,8 @@ public class OrderServiceImpl implements OrderService {
         BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
         if (!isOrderActual(orderId, bookingRequestId)
-                || !canExecuteAction(bookingRequest, BookingRequestEnum.Action.ACCEPT)) {
+                || !canExecuteAction(bookingRequest, BookingRequestEnum.Action.REFUSE)) {
+            //TODO: It shouldn't return EXPIRED!
             return BookingRequestEnum.Status.EXPIRED;
         }
 

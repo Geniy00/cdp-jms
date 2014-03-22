@@ -8,5 +8,6 @@
 <body>
 <br/><br/>
 <a href="history">Order history</a> <br/>
+<a href="dispatchers">Taxi dispatcher list</a> <br/>
 </body>
 </html>

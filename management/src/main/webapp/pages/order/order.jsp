@@ -25,23 +25,19 @@
             </tr>
             <tr>
                 <td>Start position:</td>
-                <td>${order.startPosition}</td>
+                <td>${order.reservationRequest.startPosition}</td>
             </tr>
             <tr>
                 <td>Finish position:</td>
-                <td>${order.finishPosition}</td>
+                <td>${order.reservationRequest.finishPosition}</td>
             </tr>
             <tr>
-                <td>Date&time:</td>
-                <td>${order.dateTime}</td>
+                <td>Delivery time:</td>
+                <td>${order.reservationRequest.deliveryTime}</td>
             </tr>
             <tr>
                 <td>Order type:</td>
-                <td>${order.orderType}</td>
-            </tr>
-            <tr>
-                <td>Price:</td>
-                <td>${order.price}</td>
+                <td>${order.reservationRequest.vehicleType}</td>
             </tr>
         </table>
     </div>

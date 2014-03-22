@@ -26,7 +26,7 @@ public class OrderController {
     @RequestMapping(value = "/index")
     @ResponseBody
     public String index() {
-        return "Router service is turn on";
+        return "Router service is turned on";
     }
 
     @RequestMapping(value = "/execute")

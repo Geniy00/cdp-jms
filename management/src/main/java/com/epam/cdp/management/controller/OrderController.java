@@ -26,19 +26,23 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/history")
-    public String showHistory(Model model) {
-        List<Order> orders = orderService.findAllOrders(400);
+    public String showHistory(@RequestParam(required = false) Order.OrderStatus status, Model model) {
+        List<Order> orders = null;
+        if(status == null){
+            orders = orderService.findAllOrders(400);
+        } else {
+            orders = orderService.findOrderByStatus(status, 400);
+        }
 
         model.addAttribute("orders", orders);
         return "order/list";
     }
 
     @RequestMapping(value = "/order/{id}")
-    public String showOrderDetails(@PathVariable String id, @RequestParam Order.OrderStatus status, Model model) {
-        List<Order> orders = orderService.findOrderByStatus(status, 400);
-
-        model.addAttribute("orders", orders);
-        return "order/list";
+    public String showOrderDetails(@PathVariable String id,  Model model) {
+        Order order = orderService.find(id);
+        model.addAttribute("order", order);
+        return "order/order";
     }
 
 }
