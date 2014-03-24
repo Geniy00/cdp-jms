@@ -19,11 +19,10 @@ public class TaxiDispatcher implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    //TODO: change naming to jmsQueue
-    @Column(name = "jms_queue", nullable = false)
+    @Column(name = "jmsQueue", nullable = false)
     private String jmsQueue;
 
-    @Column(name = "jms_queue_capacity", nullable = false)
+    @Column(name = "jmsQueueCapacity", nullable = false)
     private Integer jmsQueueCapacity;
 
     @Column(name = "email", nullable = false)
