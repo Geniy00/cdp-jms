@@ -20,7 +20,7 @@
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
-    <context:component-scan base-package="ua.com.taxi.bean"/>
+    <context:component-scan base-package="ua.com.taxi.mock"/>
     <context:component-scan base-package="ua.com.taxi.dao"/>
     <context:component-scan base-package="ua.com.taxi.gateway"/>
     <context:component-scan base-package="ua.com.taxi.service"/>
