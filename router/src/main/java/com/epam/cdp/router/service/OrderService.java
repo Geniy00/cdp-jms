@@ -34,4 +34,6 @@ public interface OrderService {
     BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason);
 
     Order loadOrderEager(String id);
+
+    void persistFailQueueMessage(FailQueueMessage failQueueMessage);
 }

@@ -33,7 +33,7 @@
 
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.inputQueue.name}" ref="bookingRequestListener"/>
+        <jms:listener destination="${jms.taxi.input.queue.name}" ref="bookingRequestListener"/>
     </jms:listener-container>
 
     <!-- JmsTemplate for sending messages to fail queue-->

@@ -1,6 +1,7 @@
 package com.epam.cdp.router.dao;
 
 import com.epam.cdp.core.entity.BookingRequest;
+import com.epam.cdp.core.entity.FailQueueMessage;
 import com.epam.cdp.core.entity.Order;
 import org.hibernate.Hibernate;
 import org.joda.time.DateTime;
@@ -87,6 +88,12 @@ public class OrderDaoImpl implements OrderDao {
         Order order = em.find(Order.class, id);
         Hibernate.initialize(order.getBookingRequests());
         return order;
+    }
+
+    @Override
+    public void persistFailQueueMessage(FailQueueMessage failQueueMessage) {
+        //TODO: move this method to right class
+        em.persist(failQueueMessage);
     }
 
 }

@@ -32,14 +32,20 @@ public class BookingRequestListener implements MessageListener {
         TextMessage textMessage = (TextMessage) message;
         String xmlMessage = null;
 
+        BookingRequestMessage bookingRequestMessage = null;
         try {
             xmlMessage = textMessage.getText();
+            bookingRequestMessage = xstreamSerializer.deserialize(xmlMessage, BookingRequestMessage.class);
         } catch (JMSException e) {
-            LOG.error("Can't get object from received message");
+            LOG.error("Can't get xml from received message");
             e.printStackTrace();
+            return;
+        } catch (Exception e) {
+            LOG.error("Can't deserialize TextMessage.");
+            e.printStackTrace();
+            bookingService.sendTextMessageToFailQueue(xmlMessage);
+            return;
         }
-
-        BookingRequestMessage bookingRequestMessage = xstreamSerializer.deserialize(xmlMessage, BookingRequestMessage.class);
 
         if (!isCorrect(bookingRequestMessage)) {
             bookingService.sendTextMessageToFailQueue(xmlMessage);

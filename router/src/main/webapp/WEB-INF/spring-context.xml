@@ -49,14 +49,13 @@
 
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.input.order.queue}" ref="reservationRequestListener"/>
+        <jms:listener destination="${jms.input.order.queue.name}" ref="reservationRequestListener"/>
+        <jms:listener destination="${jms.fail.queue.name}" ref="failQueueListener"/>
+        <!-- Default ActiveMQ fail queue -->
+        <jms:listener destination="ActiveMQ.DLQ" ref="failQueueListener"/>
     </jms:listener-container>
 
-
-    <!--<bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">-->
-    <!--<constructor-arg value="${jms.orderQueue.name}"/>-->
-    <!--</bean>-->
-    <!---->
+    <!-- Jms Template-->
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory"/>
         <!--<property name="defaultDestination" ref="orderQueue" />-->

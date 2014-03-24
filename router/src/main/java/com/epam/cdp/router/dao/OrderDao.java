@@ -1,6 +1,7 @@
 package com.epam.cdp.router.dao;
 
 import com.epam.cdp.core.entity.BookingRequest;
+import com.epam.cdp.core.entity.FailQueueMessage;
 import com.epam.cdp.core.entity.Order;
 
 import java.util.List;
@@ -27,4 +28,6 @@ public interface OrderDao {
     List<Order> findAllByOrderStatus(Order.OrderStatus status);
 
     Order loadOrderEager(String id);
+
+    void persistFailQueueMessage(FailQueueMessage failQueueMessage);
 }

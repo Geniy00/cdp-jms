@@ -188,4 +188,10 @@ public class OrderServiceImpl implements OrderService {
     public Order loadOrderEager(String id) {
         return orderDao.loadOrderEager(id);
     }
+
+    @Override
+    public void persistFailQueueMessage(FailQueueMessage failQueueMessage) {
+        //TODO: move this method to right place
+        orderDao.persistFailQueueMessage(failQueueMessage);
+    }
 }

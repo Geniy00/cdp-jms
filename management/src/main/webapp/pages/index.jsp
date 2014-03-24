@@ -9,5 +9,6 @@
 <br/><br/>
 <a href="history">Order history</a> <br/>
 <a href="dispatchers">Taxi dispatcher list</a> <br/>
+<a href="failQueue">Fail queue messages</a> <br/>
 </body>
 </html>

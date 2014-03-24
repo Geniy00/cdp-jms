@@ -37,6 +37,9 @@ public class BookingServiceImpl implements BookingService {
     @Value("${router.rest.url}")
     private String ROUTER_REST_URL;
 
+    @Value("${jms.fail.queue.name}")
+    private String JMS_FAIL_QUEUE_NAME;
+
     private String REST_URL_PARAMETERS = "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
 
     private Integer ASSIGN_EXPIRY_TIME = 3;         //3 mins
@@ -276,7 +279,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Boolean sendTextMessageToFailQueue(final String xmlBookingRequestMessage) {
         LOG.error("JMS destination isn't set");
-        jmsTemplate.send("", new MessageCreator() {
+        jmsTemplate.send(JMS_FAIL_QUEUE_NAME, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
                 return session.createTextMessage(xmlBookingRequestMessage);
