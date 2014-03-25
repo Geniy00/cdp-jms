@@ -33,6 +33,8 @@ public interface BookingService {
 
     public List<Booking> findExpiredBookings();
 
+    public List<Booking> findBookingWithExpiredAssignedStatus();
+
     public List<Booking> findBookings(int limit);
 
     public List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit);

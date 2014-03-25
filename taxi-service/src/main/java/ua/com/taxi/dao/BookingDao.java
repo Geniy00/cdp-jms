@@ -24,4 +24,6 @@ public interface BookingDao {
     Long countBookingByStatus(Booking.BookingStatus status);
 
     List<Booking> findExpiredBookings();
+
+    List<Booking> findBookingWithExpiredAssignedStatus();
 }

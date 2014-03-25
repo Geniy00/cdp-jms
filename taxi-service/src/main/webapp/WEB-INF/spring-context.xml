@@ -67,6 +67,7 @@
 
     <task:scheduled-tasks scheduler="scheduler">
         <task:scheduled ref="periodicTasks" method="moveBookingsToExpired" fixed-delay="10000"/>
+        <task:scheduled ref="periodicTasks" method="unassignAutomatically" fixed-delay="10000"/>
     </task:scheduled-tasks>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

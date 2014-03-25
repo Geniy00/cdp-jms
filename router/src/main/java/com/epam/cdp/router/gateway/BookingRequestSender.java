@@ -9,6 +9,7 @@ import com.epam.cdp.router.service.XmlSerializer;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,9 @@ import java.util.List;
 public class BookingRequestSender {
 
     public static final Logger LOG = Logger.getLogger(BookingRequestSender.class);
-    public static final int BOOKING_REQUEST_MINUTES_EXPIRATION = 2;                 // 15 mins
+
+    @Value("${booking.request.expiration}")
+    public int BOOKING_REQUEST_MINUTES_EXPIRATION;
 
     @Autowired
     JmsTemplate jmsTemplate;
@@ -75,6 +78,10 @@ public class BookingRequestSender {
 
             //Select taxi dispatcher
             TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);
+            if(taxiDispatcher == null){
+                LOG.warn("Can't find any active taxi dispatcher. BookingRequest sending was postponed");
+                return;
+            }
 
             //Create xml message from BookingRequest attribute of Order
             BookingRequest bookingRequest = createBookingRequest(order, taxiDispatcher);

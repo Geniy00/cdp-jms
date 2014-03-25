@@ -5,7 +5,6 @@ import com.epam.cdp.core.entity.VehicleType;
 import org.joda.time.DateTime;
 
 import java.util.Random;
-import java.util.UUID;
 
 public class ReservationRequestGenerator {
 
@@ -24,7 +23,6 @@ public class ReservationRequestGenerator {
 
     public static ReservationRequest generateRandomReservationRequest() {
         ReservationRequest reservationRequest = new ReservationRequest();
-        reservationRequest.setId(UUID.randomUUID().toString());
         reservationRequest.setCustomerName(generate(7, SYMBOLS));
         reservationRequest.setCustomerPhone("+38063" + generate(7, NUMBERS));
         reservationRequest.setStartPosition(random.nextInt(100));

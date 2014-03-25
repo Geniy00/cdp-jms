@@ -18,8 +18,9 @@ public class ReservationRequest implements Serializable {
     private static final long serialVersionUID = 1820235672221505291L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private String id;
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String customerName;
@@ -44,7 +45,7 @@ public class ReservationRequest implements Serializable {
     public ReservationRequest() {
     }
 
-    public ReservationRequest(String id, String customerName, String customerPhone, Integer startPosition, Integer finishPosition, DateTime deliveryTime, VehicleType vehicleType) {
+    public ReservationRequest(Long id, String customerName, String customerPhone, Integer startPosition, Integer finishPosition, DateTime deliveryTime, VehicleType vehicleType) {
         this.id = id;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
@@ -54,11 +55,11 @@ public class ReservationRequest implements Serializable {
         this.vehicleType = vehicleType;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

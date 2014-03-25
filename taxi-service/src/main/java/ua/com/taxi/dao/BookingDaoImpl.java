@@ -18,8 +18,11 @@ public class BookingDaoImpl implements BookingDao {
     private static final String SELECT_BOOKING = "SELECT b FROM Booking b ORDER BY b.bookingRequest.deliveryTime desc";
     private static final String SELECT_BOOKING_BY_STATUS = "SELECT b FROM Booking b WHERE b.status=:status ORDER BY b.bookingRequest.deliveryTime desc";
     private static final String COUNT_BOOKING_BY_STATUS = "SELECT count(b.id) FROM Booking b WHERE b.status=:status";
+
     private static final String SELECT_EXPIRED_BOOKINGS = "SELECT b FROM Booking b  WHERE b.bookingRequest.expiryTime < :dateTime " +
             "AND (b.status = 'NEW' OR b.status = 'ASSIGNED' OR b.status = 'UNASSIGNED' )";
+    private static final String SELECT_BOOKING_WITH_EXPIRED_ASSIGNED_STATUS = "SELECT b FROM Booking b WHERE b.status = 'ASSIGNED' " +
+            "AND b.assignToExpiryTime < :dateTime";
 
     @PersistenceContext
     EntityManager em;
@@ -70,7 +73,13 @@ public class BookingDaoImpl implements BookingDao {
     public List<Booking> findExpiredBookings() {
         TypedQuery<Booking> query = em.createQuery(SELECT_EXPIRED_BOOKINGS, Booking.class);
         query.setParameter("dateTime", new DateTime());
-        List<Booking> resultList = query.getResultList();
-        return resultList;
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Booking> findBookingWithExpiredAssignedStatus() {
+        TypedQuery<Booking> query = em.createQuery(SELECT_BOOKING_WITH_EXPIRED_ASSIGNED_STATUS, Booking.class);
+        query.setParameter("dateTime", new DateTime());
+        return query.getResultList();
     }
 }

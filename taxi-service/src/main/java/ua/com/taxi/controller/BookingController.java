@@ -54,7 +54,11 @@ public class BookingController {
 
             case REJECT:
                 booking = bookingService.rejectBooking(id);
-                return "redirect:/bookings";
+                if(booking != null){
+                    return "redirect:/bookings";
+                } else {
+                    break;
+                }
 
             case REFUSE:
                 if(reason == null) reason = "DEFAULT REFUSE REASON";
@@ -62,8 +66,13 @@ public class BookingController {
                 break;
         }
 
+        String message = booking == null
+                ? "Router module is unavailable that's why action can't be executed"
+                : "booking[id:" + booking.getId() + "] is " + booking.getStatus();
 
-        String message = "booking[id:" + booking.getId() + "] is " + booking.getStatus();
+        if(booking == null) {
+            booking = bookingService.find(id);
+        }
 
         model.addAttribute("booking", booking);
         model.addAttribute("message", message);

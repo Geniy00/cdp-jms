@@ -4,13 +4,14 @@ import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Geniy00
  */
 @Entity
 @Table(name = "fail_queue_message")
-public class FailQueueMessage {
+public class FailQueueMessage implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

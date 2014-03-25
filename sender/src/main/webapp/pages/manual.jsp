@@ -12,14 +12,7 @@
 <sf:form action="${pageContext.request.contextPath}/send" method="post" modelAttribute="reservationRequest">
     <table>
         <tr>
-            <td>Id:</td>
-            <td><sf:input path="id"/></td>
-        </tr>
-        <tr>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="2">Customer</td>
+            <td colspan="2">Customer:</td>
         </tr>
         <tr>
             <td>Name:</td>
@@ -30,7 +23,7 @@
             <td><sf:input path="customerPhone"/></td>
         </tr>
         <tr>
-            <td></td>
+            <td colspan="2"><br/></td>
         </tr>
         <tr>
             <td>Start:</td>

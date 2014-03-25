@@ -27,7 +27,9 @@ public class ReservationServiceImpl implements ReservationService {
                 return session.createObjectMessage(reservationRequest);
             }
         });
-        LOG.info("It has been created new ReservationRequest[id: " + reservationRequest.getId() + "]");
+        LOG.info("New ReservationRequest[deliveryTime:" + reservationRequest.getDeliveryTime().toString("dd-MMM-yyyy, HH:mm")
+                + ", from " + reservationRequest.getStartPosition()
+                + " to " + reservationRequest.getFinishPosition() + "] ");
     }
 
 }

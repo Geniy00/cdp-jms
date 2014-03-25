@@ -23,12 +23,6 @@ public class OrderController {
     @Autowired
     XmlSerializer xmlSerializer;
 
-    @RequestMapping(value = "/index")
-    @ResponseBody
-    public String index() {
-        return "Router service is turned on";
-    }
-
     @RequestMapping(value = "/execute")
     @ResponseBody
     public String execute(@RequestParam BookingRequestEnum.Action action,

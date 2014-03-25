@@ -9,6 +9,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ua.com.taxi.dao.BookingDao;
 import ua.com.taxi.entity.Booking;
@@ -42,7 +43,8 @@ public class BookingServiceImpl implements BookingService {
 
     private String REST_URL_PARAMETERS = "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
 
-    private Integer ASSIGN_EXPIRY_TIME = 3;         //3 mins
+    @Value("${local.assign.expiry.time}")
+    private Integer ASSIGN_EXPIRY_TIME;
 
     private XstreamSerializer xstreamSerializer = new XstreamSerializer();
 
@@ -142,9 +144,8 @@ public class BookingServiceImpl implements BookingService {
             return null;
         }
         
-        DateTime assignToExpiryTime = new DateTime().plusMinutes(ASSIGN_EXPIRY_TIME);
         booking.setStatus(BookingStatus.ASSIGNED);
-        booking.setAssignToExpiryTime(assignToExpiryTime);
+        booking.setAssignToExpiryTime(new DateTime().plusMinutes(ASSIGN_EXPIRY_TIME));
         return bookingDao.update(booking);
     }
 
@@ -176,10 +177,17 @@ public class BookingServiceImpl implements BookingService {
         mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
         mapVariables.put("action", BookingRequestEnum.Action.ACCEPT.toString());
         mapVariables.put("reason", "");
-        String response = restTemplate.getForObject(
-                ROUTER_REST_URL + REST_URL_PARAMETERS,
-                String.class,
-                mapVariables);
+
+        String response;
+        try {
+            response = restTemplate.getForObject(
+                    ROUTER_REST_URL + REST_URL_PARAMETERS,
+                    String.class,
+                    mapVariables);
+        } catch (HttpClientErrorException e) {
+            LOG.error("Can't execute GET request to router module");
+            return null;
+        }
 
         ClientDetails clientDetails = null;
         try {
@@ -211,10 +219,17 @@ public class BookingServiceImpl implements BookingService {
         mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
         mapVariables.put("action", BookingRequestEnum.Action.REJECT.toString());
         mapVariables.put("reason", "");
-        String response = restTemplate.getForObject(
-                ROUTER_REST_URL + REST_URL_PARAMETERS,
-                String.class,
-                mapVariables);
+
+        String response;
+        try {
+            response = restTemplate.getForObject(
+                    ROUTER_REST_URL + REST_URL_PARAMETERS,
+                    String.class,
+                    mapVariables);
+        } catch (HttpClientErrorException e) {
+            LOG.error("Can't execute GET request to router module");
+            return null;
+        }
 
         BookingRequestEnum.Status status = null;
         try {
@@ -253,10 +268,17 @@ public class BookingServiceImpl implements BookingService {
         mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
         mapVariables.put("action", BookingRequestEnum.Action.REFUSE.toString());
         mapVariables.put("reason", reason);
-        String response = restTemplate.getForObject(
-                ROUTER_REST_URL + REST_URL_PARAMETERS,
-                String.class,
-                mapVariables);
+
+        String response;
+        try {
+            response = restTemplate.getForObject(
+                    ROUTER_REST_URL + REST_URL_PARAMETERS,
+                    String.class,
+                    mapVariables);
+        } catch (HttpClientErrorException e) {
+            LOG.error("Can't execute GET request to router module");
+            return null;
+        }
 
         BookingRequestEnum.Status status = null;
         try {
@@ -299,6 +321,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> findExpiredBookings() {
         return bookingDao.findExpiredBookings();
+    }
+
+    @Override
+    public List<Booking> findBookingWithExpiredAssignedStatus() {
+        return bookingDao.findBookingWithExpiredAssignedStatus();
     }
 
     @Override

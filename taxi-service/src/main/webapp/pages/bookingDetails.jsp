@@ -59,6 +59,11 @@
     </table>
 </div>
 <br/>
+<c:if test="${booking.status == 'ASSIGNED' && booking.assignToExpiryTime != null}">
+    <span style="color: orange; ">Assigned till <joda:format value="${booking.assignToExpiryTime}"
+                                                             pattern="HH:mm, dd MMM"/> </span>
+</c:if>
+<br/>
 
 <c:if test="${booking != null && booking.status != 'EXPIRED' && booking.status != 'REJECTED' && booking.status != 'REFUSED'}">
     <div style="border: solid 1px green; margin: 15px; display:inline-block;">

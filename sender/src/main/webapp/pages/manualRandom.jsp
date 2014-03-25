@@ -8,18 +8,12 @@
     <title>New reservation request</title>
 </head>
 <body>
+<br/><br/>
 
 <sf:form action="${pageContext.request.contextPath}/send" method="post" modelAttribute="reservationRequest">
     <table>
         <tr>
-            <td>Id:</td>
-            <td><sf:input path="id"/></td>
-        </tr>
-        <tr>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="2">Customer</td>
+            <td colspan="2">Customer:</td>
         </tr>
         <tr>
             <td>Name:</td>
@@ -30,7 +24,7 @@
             <td><sf:input path="customerPhone"/></td>
         </tr>
         <tr>
-            <td></td>
+            <td colspan="2"><br/></td>
         </tr>
         <tr>
             <td>Start:</td>
@@ -60,8 +54,9 @@
 <br/>
 <br/>
 <br/>
-<c:if test="${sentReservationRequest.id != null}">
-    <span style="color: green; ">Reservation request with id <b>${sentReservationRequest.id}</b> was sent successfully</span>
+<c:if test="${sentReservationRequest.customerName != null}">
+    <span style="color: green; ">ReservationRequest with name <b>${sentReservationRequest.customerName}</b>
+        and from <b>${sentReservationRequest.startPosition} to ${sentReservationRequest.finishPosition}</b> was sent successfully</span>
 </c:if>
 
 <br/>
