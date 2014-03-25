@@ -50,7 +50,6 @@ public class BookingRequest implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BookingResponse bookingResponse;
 
-    //TODO: check if we can use @PrePersist and @PreUpdate annotation for such fields
     @Column(name = "created", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime created;
@@ -62,7 +61,6 @@ public class BookingRequest implements Serializable {
     private Order order;
 
     public BookingRequest() {
-        created = new DateTime();
     }
 
     public BookingRequest(Order order, TaxiDispatcher taxiDispatcher, Double payment, DateTime expiryTime) {
@@ -76,7 +74,11 @@ public class BookingRequest implements Serializable {
         this.taxiDispatcher = taxiDispatcher;
         this.order = order;
         this.customer = order.getCustomer();
-        this.created = new DateTime();
+    }
+
+    @PrePersist
+    protected void updateDates() {
+        created = new DateTime();
     }
 
     public void applyBookingResponse(BookingResponse bookingResponse){
@@ -180,8 +182,8 @@ public class BookingRequest implements Serializable {
         return created;
     }
 
-    public void setCreated(DateTime updated) {
-        this.created = updated;
+    public void setCreated(DateTime created) {
+        this.created = created;
     }
 
     public Customer getCustomer() {

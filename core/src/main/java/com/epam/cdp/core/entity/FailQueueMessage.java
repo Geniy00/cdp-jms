@@ -26,11 +26,14 @@ public class FailQueueMessage implements Serializable {
     private DateTime created;
 
     public FailQueueMessage() {
-        created = new DateTime();
     }
 
     public FailQueueMessage(String message) {
         this.message = message;
+    }
+
+    @PrePersist
+    protected void updateDates() {
         created = new DateTime();
     }
 

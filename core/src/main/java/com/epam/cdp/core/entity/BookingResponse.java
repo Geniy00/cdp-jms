@@ -34,13 +34,16 @@ public class BookingResponse implements Serializable {
 
 
     public BookingResponse() {
-        created = new DateTime();
     }
 
     public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status){
         this.bookingRequest = bookingRequest;
         this.status = status;
         this.reason = "";
+    }
+
+    @PrePersist
+    protected void updateDates() {
         created = new DateTime();
     }
 

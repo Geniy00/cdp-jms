@@ -29,7 +29,7 @@ public class ReservationServiceImpl implements ReservationService {
         });
         LOG.info("New ReservationRequest[deliveryTime:" + reservationRequest.getDeliveryTime().toString("dd-MMM-yyyy, HH:mm")
                 + ", from " + reservationRequest.getStartPosition()
-                + " to " + reservationRequest.getFinishPosition() + "] ");
+                + " to " + reservationRequest.getFinishPosition() + "] was sent");
     }
 
 }
