@@ -1,48 +1,66 @@
 package ua.com.taxi.mock;
 
+import org.apache.log4j.Logger;
 import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
 
 public class MockAutoReceiver implements Runnable {
 
+    private static final Logger LOG = Logger.getLogger(MockAutoReceiver.class);
+
     /**
      * Delay between  receiving orders
      */
-    private int DELAY = 1000;
+    private int delay;
 
     /**
      * Nth booking will be rejected automatically
      */
-    private int REJECT_EVERY_NTH_ORDER = 10;
+    private int rejectEveryNthOrder;
 
     private boolean enabled;
 
     BookingService bookingService;
 
-    public MockAutoReceiver(BookingService bookingService) {
+    public MockAutoReceiver(BookingService bookingService, int delay, int rejectEveryNthOrder) {
         super();
         this.bookingService = bookingService;
+        this.delay = delay;
+        this.rejectEveryNthOrder = rejectEveryNthOrder;
         enabled = false;
     }
 
     @Override
     public void run() {
+        enabled = true;
         int currentNumberOfOrder = 0;
+
         do {
             try {
-                Thread.sleep(DELAY);
+                Thread.sleep(delay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             Booking booking = bookingService.findFreeBooking();
+            if(booking == null){
+                continue;
+            }
+
             currentNumberOfOrder++;
             //Accept booking
-            if (currentNumberOfOrder < REJECT_EVERY_NTH_ORDER) {
+            if (currentNumberOfOrder < rejectEveryNthOrder) {
+                bookingService.assignBooking(booking.getId());
                 bookingService.acceptBooking(booking.getId());
+                LOG.info("Booking[id:" + booking.getId() + "] for orderId[" + booking.getBookingRequest().getOrderId()
+                        + "] was automatically accepted");
             } else {
                 //Reject booking
+                currentNumberOfOrder = 0;
+                bookingService.assignBooking(booking.getId());
                 bookingService.rejectBooking(booking.getId());
+                LOG.info("Booking[id:" + booking.getId() + "] for orderId[" + booking.getBookingRequest().getOrderId()
+                        + "] was automatically rejected");
             }
 
         } while (enabled);
@@ -50,27 +68,15 @@ public class MockAutoReceiver implements Runnable {
     }
 
     public int getDelay() {
-        return DELAY;
-    }
-
-    public void setDelay(int delay) {
-        this.DELAY = delay;
+        return delay;
     }
 
     public int getRejectEveryNthOrder() {
-        return REJECT_EVERY_NTH_ORDER;
-    }
-
-    public void setRejectEveryNthOrder(int rejectEveryNthOrder) {
-        REJECT_EVERY_NTH_ORDER = rejectEveryNthOrder;
+        return rejectEveryNthOrder;
     }
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public void enable() {
-        enabled = true;
     }
 
     public void disable() {

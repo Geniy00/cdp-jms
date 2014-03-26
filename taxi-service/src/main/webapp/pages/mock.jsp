@@ -12,16 +12,26 @@
 
 
 Current status is ${status}
-<form method="post">
-    Delay: <input type="text" name="delay" value="${delay}"
-                  disabled="${status == 'enabled'}"> ms <br/>
-    Reject every <input type="text" name="rejectEveryNthOrder"
-                        value="${rejectEveryNthOrder} disabled="${status == 'enabled'}"> order <br/>
+<c:if test="${status == 'disabled'}">
+    <form method="post">
+        Delay: <input type="text" name="delay" value="${delay}" /> ms <br/>
+        Reject every <input type="text" name="rejectEveryNthOrder" value="${rejectEveryNthOrder}" /> order <br/>
 
-    <input type="hidden" name="action" value="${action}">
-    <input type="submit" value="${action}">
-</form>
+        <input type="hidden" name="action" value="Enable">
+        <input type="submit" value="Run">
+    </form>
+</c:if>
 
+<c:if test="${status != 'disabled'}">
+    <form method="post">
+        Delay: <input type="text" name="delay" value="${delay}" disabled /> ms <br/>
+        Reject every <input type="text" name="rejectEveryNthOrder" value="${rejectEveryNthOrder}"
+                            <c:if test="${status != 'disabled'}">disabled</c:if> /> order <br/>
+
+        <input type="hidden" name="action" value="Disable">
+        <input type="submit" value="Stop">
+    </form>
+</c:if>
 
 <br/><br/>
 <a href="${pageContext.request.contextPath}">Back</a>

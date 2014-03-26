@@ -16,20 +16,18 @@ public class MockController {
     @RequestMapping(value = "/mock", method = RequestMethod.GET)
     public String mock(Model model) {
         String status = autoReceiverBean.isEnabled() ? "enabled" : "disabled";
-        String action = autoReceiverBean.isEnabled() ? "Disable" : "Enable";
 
         model.addAttribute("delay", 1000);
-        model.addAttribute("rejectEveryNthOrder", 10);
+        model.addAttribute("rejectEveryNthOrder", 5);
         model.addAttribute("status", status);
-        model.addAttribute("action", action);
         return "mock";
     }
 
 
     @RequestMapping(value = "/mock", method = RequestMethod.POST)
     public String mockAction(@RequestParam String action,
-                             @RequestParam(required = false) int delay,
-                             @RequestParam(required = false) int rejectEveryNthOrder,
+                             @RequestParam(required = false) Integer delay,
+                             @RequestParam(required = false) Integer rejectEveryNthOrder,
                              Model model) {
 
         if ("Enable".equals(action)) {

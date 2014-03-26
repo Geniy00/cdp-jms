@@ -300,14 +300,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Boolean sendTextMessageToFailQueue(final String xmlBookingRequestMessage) {
-        LOG.error("JMS destination isn't set");
         jmsTemplate.send(JMS_FAIL_QUEUE_NAME, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
                 return session.createTextMessage(xmlBookingRequestMessage);
             }
         });
-        LOG.warn("Booking request " + xmlBookingRequestMessage + " was sent to fail queue");
+        LOG.warn("Booking request  was sent to fail queue\n" + xmlBookingRequestMessage);
         return true;
     }
 
