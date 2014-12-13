@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Request that is created by router and was sent to taxi service through TaxiInputQueue
@@ -46,7 +47,7 @@ public class BookingRequest implements Serializable {
     @ManyToOne(optional = false)
     private TaxiDispatcher taxiDispatcher;
 
-    //TODO: there is posibility where several responses have to linked to a BookingRequest (i.e. ACCEPT, REFUSE)
+    //TODO: there is possibility where several responses have to linked to a BookingRequest (i.e. ACCEPT, REFUSE)
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BookingResponse bookingResponse;
 
@@ -81,10 +82,10 @@ public class BookingRequest implements Serializable {
         created = new DateTime();
     }
 
-    public void applyBookingResponse(BookingResponse bookingResponse){
+    public void applyBookingResponse(BookingResponse bookingResponse) {
         this.bookingResponse = bookingResponse;
         BookingRequestEnum.Status status = bookingResponse.getStatus();
-        switch (status){
+        switch (status) {
             case ACCEPTED:
                 order.setOrderStatus(Order.OrderStatus.PROCESSED);
                 break;
@@ -203,28 +204,21 @@ public class BookingRequest implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        BookingRequest that = (BookingRequest) o;
+        BookingRequest that = (BookingRequest) obj;
 
-        if (!deliveryTime.equals(that.deliveryTime)) return false;
-        if (!finishPosition.equals(that.finishPosition)) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (!startPosition.equals(that.startPosition)) return false;
-        if (vehicleType != that.vehicleType) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.startPosition, that.startPosition)
+                && Objects.equals(this.finishPosition, that.finishPosition)
+                && Objects.equals(this.deliveryTime, that.deliveryTime)
+                && Objects.equals(this.vehicleType, that.vehicleType);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + startPosition.hashCode();
-        result = 31 * result + finishPosition.hashCode();
-        result = 31 * result + deliveryTime.hashCode();
-        result = 31 * result + vehicleType.hashCode();
-        return result;
+        return Objects.hash(id, startPosition, finishPosition, deliveryTime, vehicleType);
     }
 }

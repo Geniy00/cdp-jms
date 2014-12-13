@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author Geniy00
@@ -68,18 +69,13 @@ public class FailQueueMessage implements Serializable {
 
         FailQueueMessage that = (FailQueueMessage) o;
 
-        if (!created.equals(that.created)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!message.equals(that.message)) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.message, that.message)
+                && Objects.equals(this.created, that.created);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + message.hashCode();
-        result = 31 * result + created.hashCode();
-        return result;
+        return Objects.hash(id, message, created);
     }
 }

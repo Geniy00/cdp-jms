@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Request that is created by sender and was sent to Router through InputQueue
@@ -112,32 +113,23 @@ public class ReservationRequest implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        ReservationRequest that = (ReservationRequest) o;
+        ReservationRequest that = (ReservationRequest) obj;
 
-        if (!customerName.equals(that.customerName)) return false;
-        if (!customerPhone.equals(that.customerPhone)) return false;
-        if (!deliveryTime.equals(that.deliveryTime)) return false;
-        if (!finishPosition.equals(that.finishPosition)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!startPosition.equals(that.startPosition)) return false;
-        if (vehicleType != that.vehicleType) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.customerName, that.customerName)
+                && Objects.equals(this.customerPhone, that.customerPhone)
+                && Objects.equals(this.startPosition, that.startPosition)
+                && Objects.equals(this.finishPosition, that.finishPosition)
+                && Objects.equals(this.deliveryTime, that.deliveryTime)
+                && Objects.equals(this.vehicleType, that.vehicleType);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + customerName.hashCode();
-        result = 31 * result + customerPhone.hashCode();
-        result = 31 * result + startPosition.hashCode();
-        result = 31 * result + finishPosition.hashCode();
-        result = 31 * result + deliveryTime.hashCode();
-        result = 31 * result + vehicleType.hashCode();
-        return result;
+        return Objects.hash(customerName, customerPhone, startPosition, finishPosition, deliveryTime, vehicleType);
     }
 }

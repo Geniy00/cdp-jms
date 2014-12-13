@@ -4,6 +4,8 @@ import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.VehicleType;
 import org.joda.time.DateTime;
 
+import java.util.Objects;
+
 /**
  * @author Geniy00
  */
@@ -97,32 +99,23 @@ public class BookingRequestMessage {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        BookingRequestMessage that = (BookingRequestMessage) o;
+        BookingRequestMessage that = (BookingRequestMessage) obj;
 
-        if (!deliveryTime.equals(that.deliveryTime)) return false;
-        if (!finishPosition.equals(that.finishPosition)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!orderId.equals(that.orderId)) return false;
-        if (!payment.equals(that.payment)) return false;
-        if (!startPosition.equals(that.startPosition)) return false;
-        if (vehicleType != that.vehicleType) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.orderId, that.orderId)
+                && Objects.equals(this.startPosition, that.startPosition)
+                && Objects.equals(this.finishPosition, that.finishPosition)
+                && Objects.equals(this.deliveryTime, that.deliveryTime)
+                && Objects.equals(this.vehicleType, that.vehicleType)
+                && Objects.equals(this.payment, that.payment);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + orderId.hashCode();
-        result = 31 * result + startPosition.hashCode();
-        result = 31 * result + finishPosition.hashCode();
-        result = 31 * result + deliveryTime.hashCode();
-        result = 31 * result + vehicleType.hashCode();
-        result = 31 * result + payment.hashCode();
-        return result;
+        return Objects.hash(id, orderId, startPosition, finishPosition, deliveryTime, vehicleType, payment);
     }
 }

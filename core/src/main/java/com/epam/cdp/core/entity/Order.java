@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Geniy00
@@ -32,6 +33,7 @@ public class Order implements Serializable {
     @Column(name = "orderStatus", nullable = false)
     private OrderStatus orderStatus;
 
+    //TODO: maybe extract from this class
     public enum OrderStatus {
         /**
          * Order status meaning
@@ -60,6 +62,7 @@ public class Order implements Serializable {
         orderStatus = OrderStatus.NEW;
     }
 
+    //TODO: check if I can use some external class to change status
     public void applyBookingRequest(BookingRequest bookingRequest) {
         this.bookingRequests.add(bookingRequest);
         bookingRequest.setOrder(this);
@@ -107,27 +110,21 @@ public class Order implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        Order order = (Order) o;
+        Order that = (Order) obj;
 
-        if (!customer.equals(order.customer)) return false;
-        if (!id.equals(order.id)) return false;
-        if (orderStatus != order.orderStatus) return false;
-        if (!reservationRequest.equals(order.reservationRequest)) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.customer, that.customer)
+                && Objects.equals(this.orderStatus, that.orderStatus)
+                && Objects.equals(this.reservationRequest, that.reservationRequest);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + customer.hashCode();
-        result = 31 * result + reservationRequest.hashCode();
-        result = 31 * result + orderStatus.hashCode();
-        return result;
+        return Objects.hash(id, customer, orderStatus, reservationRequest);
     }
 
     @Override
@@ -137,6 +134,7 @@ public class Order implements Serializable {
                 ", customer=" + customer +
                 ", reservationRequest=" + reservationRequest +
                 ", bookingRequests=" + bookingRequests +
+                ", orderStatus=" + orderStatus +
                 '}';
     }
 }

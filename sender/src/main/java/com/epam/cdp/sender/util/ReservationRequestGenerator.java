@@ -1,4 +1,4 @@
-package com.epam.cdp.core.util;
+package com.epam.cdp.sender.util;
 
 import com.epam.cdp.core.entity.ReservationRequest;
 import com.epam.cdp.core.entity.VehicleType;

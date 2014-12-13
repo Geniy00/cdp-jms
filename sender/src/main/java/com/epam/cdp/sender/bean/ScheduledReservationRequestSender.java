@@ -1,7 +1,7 @@
 package com.epam.cdp.sender.bean;
 
-import com.epam.cdp.core.util.ReservationRequestGenerator;
 import com.epam.cdp.sender.service.ReservationService;
+import com.epam.cdp.sender.util.ReservationRequestGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

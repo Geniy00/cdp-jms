@@ -2,6 +2,7 @@ package com.epam.cdp.core.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author Geniy00
@@ -97,31 +98,21 @@ public class TaxiDispatcher implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        TaxiDispatcher that = (TaxiDispatcher) o;
+        TaxiDispatcher that = (TaxiDispatcher) obj;
 
-        if (!disabled.equals(that.disabled)) return false;
-        if (!email.equals(that.email)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!jmsQueue.equals(that.jmsQueue)) return false;
-        if (!jmsQueueCapacity.equals(that.jmsQueueCapacity)) return false;
-        if (!name.equals(that.name)) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.name, that.name)
+                && Objects.equals(this.email, that.email)
+                && Objects.equals(this.disabled, that.disabled);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + jmsQueue.hashCode();
-        result = 31 * result + jmsQueueCapacity.hashCode();
-        result = 31 * result + email.hashCode();
-        result = 31 * result + disabled.hashCode();
-        return result;
+        return Objects.hash(id, name, email, disabled);
     }
 
     @Override

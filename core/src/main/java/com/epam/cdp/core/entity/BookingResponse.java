@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author Geniy00
@@ -36,7 +37,7 @@ public class BookingResponse implements Serializable {
     public BookingResponse() {
     }
 
-    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status){
+    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status) {
         this.bookingRequest = bookingRequest;
         this.status = status;
         this.reason = "";
@@ -47,7 +48,7 @@ public class BookingResponse implements Serializable {
         created = new DateTime();
     }
 
-    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status, String reason){
+    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status, String reason) {
         this.bookingRequest = bookingRequest;
         this.status = status;
         this.reason = reason;
@@ -95,24 +96,19 @@ public class BookingResponse implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        BookingResponse that = (BookingResponse) o;
+        BookingResponse that = (BookingResponse) obj;
 
-        if (!bookingRequest.equals(that.bookingRequest)) return false;
-        if (status != that.status) return false;
-        if (!id.equals(that.id)) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id)
+                && Objects.equals(this.bookingRequest, that.bookingRequest)
+                && Objects.equals(this.status, that.status);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + bookingRequest.hashCode();
-        result = 31 * result + status.hashCode();
-        return result;
+        return Objects.hash(id, bookingRequest, status);
     }
 }
