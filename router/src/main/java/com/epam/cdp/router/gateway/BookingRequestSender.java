@@ -123,11 +123,16 @@ public class BookingRequestSender {
         return new BookingRequest(order, taxiDispatcher, payment, requestExpirationTime);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     private void sendBookingRequest(final TaxiDispatcher taxiDispatcher, final BookingRequest persistedBookingRequest) {
         final String xmlMessage = serializeBookingRequest(persistedBookingRequest);
         final String destination = taxiDispatcher.getJmsQueue();
 
-        jmsTemplate.send(destination, new JmsMessageCreator(xmlMessage));
+        jmsTemplate.send(destination, new MessageCreator() {
+            public Message createMessage(final Session session) throws JMSException {
+                return session.createTextMessage(xmlMessage);
+            }
+        });
     }
 
     private String serializeBookingRequest(final BookingRequest persistedBookingRequest) {
@@ -135,16 +140,4 @@ public class BookingRequestSender {
         return xmlSerializer.serialize(bookingRequestMessage);
     }
 
-    private static class JmsMessageCreator implements MessageCreator {
-        private final String xmlMessage;
-
-        public JmsMessageCreator(final String xmlMessage) {
-            this.xmlMessage = xmlMessage;
-        }
-
-        @Override
-        public Message createMessage(final Session session) throws JMSException {
-            return session.createTextMessage(xmlMessage);
-        }
-    }
 }

@@ -53,6 +53,8 @@ public class BookingServiceImpl implements BookingService {
     @Value("${local.assign.expiry.time}")
     private Integer ASSIGN_EXPIRY_TIME;
 
+    private final Random random = new Random();
+
     @Override
     public Booking saveOrUpdate(Booking booking) {
         return bookingDao.update(booking);
@@ -77,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
 
         final int size = bookings.size();
         if (size > 0) {
-            final int index = new Random().nextInt(size);
+            final int index = random.nextInt(size);
             return bookings.get(index);
         } else {
             return null;
@@ -196,6 +198,7 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     @Override
     public Boolean sendTextMessageToFailQueue(final String xmlBookingRequestMessage) {
         jmsTemplate.send(JMS_FAIL_QUEUE_NAME, new MessageCreator() {
@@ -249,11 +252,7 @@ public class BookingServiceImpl implements BookingService {
                     booking);
 
         case REVOKED:
-            return currentStatus == BookingStatus.ASSIGNED && isNotExpired(booking);
-
         case ACCEPTED:
-            return currentStatus == BookingStatus.ASSIGNED && isNotExpired(booking);
-
         case REJECTED:
             return currentStatus == BookingStatus.ASSIGNED && isNotExpired(booking);
 

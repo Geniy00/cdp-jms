@@ -20,24 +20,17 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     JmsTemplate jmsTemplate;
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     @Override
     public void sendReservationRequest(final ReservationRequest reservationRequest) {
-        jmsTemplate.send(new JmsMessageCreator(reservationRequest));
+        jmsTemplate.send(new MessageCreator() {
+            public Message createMessage(Session session) throws JMSException {
+                return session.createObjectMessage(reservationRequest);
+            }
+        });
         final String deliveryTime = reservationRequest.getDeliveryTime().toString("dd-MMM-yyyy, HH:mm");
         LOG.info(String.format("New ReservationRequest[deliveryTime: %s, from %s to %s] was sent", deliveryTime,
                 reservationRequest.getStartPosition(), reservationRequest.getFinishPosition()));
     }
 
-    private static class JmsMessageCreator implements MessageCreator {
-
-        private final ReservationRequest reservationRequest;
-
-        public JmsMessageCreator(ReservationRequest reservationRequest) {
-            this.reservationRequest = reservationRequest;
-        }
-
-        public Message createMessage(Session session) throws JMSException {
-            return session.createObjectMessage(reservationRequest);
-        }
-    }
 }

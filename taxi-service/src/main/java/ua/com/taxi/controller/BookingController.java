@@ -65,6 +65,9 @@ public class BookingController {
             final String refuseReason = (reason == null) ? DEFAULT_REFUSE_REASON : reason;
             booking = bookingService.refuseBooking(id, refuseReason);
             break;
+
+        default:
+            throw new RuntimeException("Can't execute action" + action);
         }
 
         //TODO: Check this code
@@ -105,12 +108,8 @@ public class BookingController {
             break;
         }
 
-        //TODO: check how it's possible
-        if (action != null) {
-            final String message = String.format("booking[id: %s] is %s", booking.getId(), action);
-            model.addAttribute("message", message);
-        }
-
+        final String message = String.format("booking[id: %s] is %s", booking.getId(), action);
+        model.addAttribute("message", message);
         model.addAttribute("booking", booking);
         return "bookingDetails";
     }
