@@ -23,24 +23,32 @@ public class ReservationRequestListener implements MessageListener {
     OrderService orderService;
 
     @Override
-    public void onMessage(Message message) {
-        ObjectMessage objectMessage = (ObjectMessage) message;
-        Serializable reservationRequestObject = null;
-        try {
-            reservationRequestObject = objectMessage.getObject();
-        } catch (JMSException e) {
-            LOG.error("Can't get object from received message");
-            e.printStackTrace();
-        }
+    public void onMessage(final Message message) {
+        final Serializable reservationRequestObject = extractReservationRequestObject(message);
 
         if (reservationRequestObject instanceof ReservationRequest) {
-            ReservationRequest reservationRequest = (ReservationRequest) reservationRequestObject;
-            Order order = orderService.createAndSaveNewOrder(reservationRequest);
-            LOG.info("Order[id:" + order.getId() + "] was created successfully");
+            final ReservationRequest reservationRequest = (ReservationRequest) reservationRequestObject;
+            final Order order = orderService.createAndSaveNewOrder(reservationRequest);
+            LOG.info(String.format("Order[id: %s] was created successfully", order.getId()));
         } else {
             LOG.error("Unknown JMS message type. It must be of ReservationRequest type");
+            //TODO: custom exception
             throw new IllegalArgumentException("Unknown JMS message type");
         }
 
+    }
+
+    private Serializable extractReservationRequestObject(final Message message) {
+        final ObjectMessage objectMessage = (ObjectMessage) message;
+        final Serializable reservationRequestObject;
+        try {
+            reservationRequestObject = objectMessage.getObject();
+        } catch (final JMSException ex) {
+            final String failMessage = "Can't get object from received message";
+            LOG.error(message, ex);
+            //TODO: look at custom checked exceptions
+            throw new RuntimeException(failMessage, ex);
+        }
+        return reservationRequestObject;
     }
 }

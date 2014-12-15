@@ -8,6 +8,7 @@ import javax.persistence.*;
 /**
  * @author Geniy00
  */
+//TODO: rename this class to have better self description
 @Entity
 @Table(name = "booking")
 public class Booking {
@@ -35,7 +36,7 @@ public class Booking {
     private String reason;
 
     public enum BookingStatus {
-        NEW, ASSIGNED, UNASSIGNED, ACCEPTED, REJECTED, REFUSED, EXPIRED
+        NEW, ASSIGNED, REVOKED, ACCEPTED, REJECTED, REFUSED, EXPIRED
     }
 
     public Booking() {

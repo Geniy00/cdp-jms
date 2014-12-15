@@ -1,92 +1,106 @@
 package com.epam.cdp.sender.bean;
 
+import com.epam.cdp.core.entity.ReservationRequest;
 import com.epam.cdp.sender.service.ReservationService;
 import com.epam.cdp.sender.util.ReservationRequestGenerator;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-@Component
+@ThreadSafe
 public class ScheduledReservationRequestSender {
 
     private static final Logger LOG = Logger.getLogger(ScheduledReservationRequestSender.class);
+    private static final int INITIAL_DELAY = 0;
+    private static final int CORE_THREAD_POOL_SIZE = 1;
 
-    @Autowired
-    ReservationService reservationService;
+    private final ReservationService reservationService;
 
-    private Status status;
-    private long messageCount;
-    private long delay;
+    private final AtomicLong messageCount = new AtomicLong();
+    private final AtomicLong delay = new AtomicLong();
 
-    private ScheduledExecutorService service;
+    private final ScheduledExecutorService service;
+    private final Runnable runnableSender;
 
-    public enum Status {
-        SENDING, STOPPED
+    private final Lock lock = new ReentrantLock();
+    @GuardedBy("lock")
+    @CheckForNull
+    private ScheduledFuture scheduledFuture;
+
+    public ScheduledReservationRequestSender(ReservationService reservationService) {
+        this.reservationService = reservationService;
+        service = Executors.newScheduledThreadPool(CORE_THREAD_POOL_SIZE);
+        runnableSender = createRunnableSender();
     }
 
-    public ScheduledReservationRequestSender() {
-        status = Status.STOPPED;
-        delay = 5000;
-    }
+    public void startSending(final long delay) {
+        lock.lock();
+        try {
+            if (isSenderScheduled())
+                return;
 
-    public void startSending(long delay) {
-        this.delay = delay;
-        if (status == Status.SENDING) return;
+            this.delay.set(delay);
+            this.messageCount.set(0);
 
-        messageCount = 0;
-
-        service = Executors.newScheduledThreadPool(1);
-        Runnable runnableSender = new Runnable() {
-            public void run() {
-                reservationService.sendReservationRequest(ReservationRequestGenerator.generateRandomReservationRequest());
-                messageCount++;
-            }
-        };
-        service.scheduleWithFixedDelay(runnableSender, 0, this.delay, TimeUnit.MILLISECONDS);
-        status = Status.SENDING;
-        LOG.info("Scheduled reservation request sender was started");
+            scheduledFuture = service.scheduleWithFixedDelay(runnableSender, INITIAL_DELAY, this.delay.get(),
+                    TimeUnit.MILLISECONDS);
+            LOG.info("Scheduled reservation request sender was started");
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void stopSending() {
-        if (status == Status.STOPPED) return;
-
-        service.shutdown();
+        lock.lock();
         try {
-            service.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            LOG.warn("Stop message sending was broken. It took more than 10 seconds.");
-            e.printStackTrace();
+            if (!isSenderScheduled())
+                return;
+
+            assert scheduledFuture != null;
+            scheduledFuture.cancel(false);
+
+            LOG.info("Scheduled reservation request sender was stopped");
+        } finally {
+            lock.unlock();
         }
-        status = Status.STOPPED;
-        LOG.info("Scheduled reservation request sender was stopped");
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public long getMessageCount() {
-        return messageCount;
-    }
-
-    public void setMessageCount(long messageCount) {
-        this.messageCount = messageCount;
+    public boolean isSending() {
+        return isSenderScheduled();
     }
 
     public long getDelay() {
-        return delay;
+        return delay.get();
     }
 
-    public void setDelay(long delay) {
-        this.delay = delay;
+    public long getMessageCount() {
+        return messageCount.get();
+    }
+
+    private Runnable createRunnableSender() {
+        return new Runnable() {
+            public void run() {
+                ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
+                reservationService.sendReservationRequest(reservationRequest);
+                messageCount.incrementAndGet();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Reservation request was sent[id:%s]", reservationRequest.getId()));
+                }
+            }
+        };
+    }
+
+    private boolean isSenderScheduled() {
+        return scheduledFuture != null;
     }
 
 }

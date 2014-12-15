@@ -13,54 +13,60 @@
 <h2>History:</h2>
 <a href="${pageContext.request.contextPath}">Back</a>
 <br/><br/>
+
 <h3>
     <a href="history" style="color: #00008b; text-decoration: none; background-color: white">All</a> --
     <a href="history?status=NEW" style="color: #00008b; text-decoration: none; background-color: #dbffaa">New</a> --
     <a href="history?status=SENT" style="color: #00008b; text-decoration: none; background-color: #dbffaa">Sent</a> --
-    <a href="history?status=DECLINED" style="color: #00008b; text-decoration: none; background-color: #FF9494">Declined</a> --
-    <a href="history?status=PROCESSED" style="color: #00008b; text-decoration: none; background-color: #58FF58">Processed</a> --
-    <a href="history?status=FINISHED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Finished</a> --
-    <a href="history?status=EXPIRED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Expired</a>  --
+    <a href="history?status=DECLINED" style="color: #00008b; text-decoration: none; background-color: #FF9494">Declined</a>
+    --
+    <a href="history?status=PROCESSED" style="color: #00008b; text-decoration: none; background-color: #58FF58">Processed</a>
+    --
+    <a href="history?status=FINISHED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Finished</a>
+    --
+    <a href="history?status=EXPIRED" style="color: #00008b; text-decoration: none; background-color: #C3C3FF">Expired</a>
+    --
     <a href="history?status=CANCELED" style="color: #00008b; text-decoration: none; background-color: #FF7878">Canceled</a>
 </h3>
 <c:set var="i" value="${0}"/>
-<c:forEach var="order" items="${orders}">
+<c:forEach var="booking" items="${orders}">
     <c:set var="i" value="${i+1}"/>
-    <c:if test="${order.orderStatus == 'NEW' || order.orderStatus == 'SENT'}">
+    <c:if test="${booking.orderStatus == 'NEW' || booking.orderStatus == 'SENT'}">
         <c:set var="color" value="#dbffaa"/>
     </c:if>
-    <c:if test="${order.orderStatus == 'PROCESSED'}">
+    <c:if test="${booking.orderStatus == 'PROCESSED'}">
         <c:set var="color" value="#58FF58"/>
     </c:if>
-    <c:if test="${order.orderStatus == 'DECLINED'}">
+    <c:if test="${booking.orderStatus == 'DECLINED'}">
         <c:set var="color" value="#FF9494"/>
     </c:if>
-    <c:if test="${order.orderStatus == 'CANCELED'}">
+    <c:if test="${booking.orderStatus == 'CANCELED'}">
         <c:set var="color" value="#FF7878"/>
     </c:if>
-    <c:if test="${order.orderStatus == 'EXPIRED'}">
+    <c:if test="${booking.orderStatus == 'EXPIRED'}">
         <c:set var="color" value="#C3C3FF"/>
     </c:if>
     <div style='background-color: ${color}; border: solid 1px black; display:inline-block; margin: 8px;'>
         <table>
             <tr>
                 <td width="50px">${i}.</td>
-                <td width="400px">id: <a href="order/${order.id}">${order.id}</a>
+                <td width="400px">id: <a href="order/${booking.id}">${booking.id}</a>
                 </td>
-                <td width="400px">from ${order.reservationRequest.startPosition}
-                    to ${order.reservationRequest.finishPosition}</td>
+                <td width="400px">from ${booking.reservationRequest.startPosition}
+                    to ${booking.reservationRequest.finishPosition}</td>
             </tr>
             <tr>
                 <td></td>
-                <td>Delivery time: <joda:format value="${order.reservationRequest.deliveryTime}" pattern="HH:mm, dd MMM"/></td>
+                <td>Delivery time:
+                    <joda:format value="${booking.reservationRequest.deliveryTime}" pattern="HH:mm, dd MMM"/></td>
                 <td>
-                    Status: ${order.orderStatus}
+                    Status: ${booking.orderStatus}
                 </td>
             </tr>
             <tr>
                 <td></td>
                 <td>
-                    Vechicle type: ${order.reservationRequest.vehicleType}
+                    Vechicle type: ${booking.reservationRequest.vehicleType}
                 </td>
                 <td>
                     Payment: <%--\$${order.reservationRequest.payment}--%>

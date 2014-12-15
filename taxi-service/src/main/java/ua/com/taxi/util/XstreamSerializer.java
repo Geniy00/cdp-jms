@@ -16,32 +16,30 @@ import java.nio.charset.Charset;
 public class XstreamSerializer {
 
     //TODO: add XML validator. example here http://eminmamedov.org/?p=269
-    private XStream xStream;
+    private final XStream xStream = new XStream();
 
     public XstreamSerializer() {
-        this.xStream = new XStream();
         xStream.aliasType("BookingRequestMessage", BookingRequestMessage.class);
         xStream.aliasType("Customer", ClientDetails.class);
         xStream.registerConverter(new JodaTimeConverter());
     }
 
-    public <T> String serialize(T objectToSerialize) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            Writer writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
+    public <T> String serialize(final T objectToSerialize) {
+        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            final Writer writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             xStream.toXML(objectToSerialize, writer);
             return outputStream.toString("UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException();
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    public <T> T deserialize(String fromXML, Class<T> clazzType) {
+    public <T> T deserialize(final String fromXML, final Class<T> clazzType) {
         try {
             return clazzType.cast(xStream.fromXML(fromXML));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
         }
 
     }

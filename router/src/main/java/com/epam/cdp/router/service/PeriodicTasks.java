@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class PeriodicTasks {
 
-//    @Autowired
-//    OrderDao orderDao;
-
     @Autowired
     OrderService orderService;
 

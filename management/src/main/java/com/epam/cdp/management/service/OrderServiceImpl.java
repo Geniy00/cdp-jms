@@ -17,17 +17,17 @@ public class OrderServiceImpl implements OrderService {
     OrderDao orderDao;
 
     @Override
-    public Order find(String id) {
+    public Order find(final String id) {
         return orderDao.find(id);
     }
 
     @Override
-    public List<Order> findAllOrders(int limit) {
+    public List<Order> findAllOrders(final int limit) {
         return orderDao.findAllOrders(limit);
     }
 
     @Override
-    public List<Order> findOrderByStatus(Order.OrderStatus status, int limit) {
+    public List<Order> findOrderByStatus(final Order.OrderStatus status, final int limit) {
         return orderDao.findOrderByStatus(status, limit);
     }
 }

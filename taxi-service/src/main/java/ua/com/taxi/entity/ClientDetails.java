@@ -1,14 +1,13 @@
 package ua.com.taxi.entity;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * @author Geniy00
  */
 @Entity
 @Table(name = "client_details")
-public class ClientDetails implements Serializable {
+public class ClientDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

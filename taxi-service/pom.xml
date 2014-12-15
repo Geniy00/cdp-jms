@@ -55,7 +55,6 @@
             <artifactId>activemq-core</artifactId>
         </dependency>
 
-
         <!-- JSTL -->
         <dependency>
             <groupId>jstl</groupId>
@@ -78,7 +77,7 @@
         </dependency>
 
         <dependency>
-        <groupId>mysql</groupId>
+            <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
@@ -97,13 +96,15 @@
             <artifactId>joda-time-jsptags</artifactId>
         </dependency>
 
-
         <!-- XStream XML parser -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>net.sourceforge.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

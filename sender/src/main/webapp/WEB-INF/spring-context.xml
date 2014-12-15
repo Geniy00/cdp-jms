@@ -11,9 +11,12 @@
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
-    <context:component-scan base-package="com.epam.cdp.sender.bean"/>
     <context:component-scan base-package="com.epam.cdp.sender.controller"/>
     <context:component-scan base-package="com.epam.cdp.sender.service"/>
+
+    <bean id="scheduledReservationRequestSender" class="com.epam.cdp.sender.bean.ScheduledReservationRequestSender">
+        <constructor-arg ref="reservationServiceImpl"/>
+    </bean>
 
     <bean id="connectionFactory"
           class="org.apache.activemq.spring.ActiveMQConnectionFactory">

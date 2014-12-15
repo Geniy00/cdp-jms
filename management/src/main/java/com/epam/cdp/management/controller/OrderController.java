@@ -17,6 +17,7 @@ import java.util.List;
 @Controller
 public class OrderController {
 
+    public static final int ORDER_COUNT_LIMIT = 400;
     @Autowired
     OrderService orderService;
 
@@ -26,12 +27,12 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/history")
-    public String showHistory(@RequestParam(required = false) Order.OrderStatus status, Model model) {
-        List<Order> orders = null;
-        if(status == null){
-            orders = orderService.findAllOrders(400);
+    public String showHistory(@RequestParam(required = false) final Order.OrderStatus status, final Model model) {
+        final List<Order> orders;
+        if (status == null) {
+            orders = orderService.findAllOrders(ORDER_COUNT_LIMIT);
         } else {
-            orders = orderService.findOrderByStatus(status, 400);
+            orders = orderService.findOrderByStatus(status, ORDER_COUNT_LIMIT);
         }
 
         model.addAttribute("orders", orders);
@@ -39,8 +40,8 @@ public class OrderController {
     }
 
     @RequestMapping(value = "/order/{id}")
-    public String showOrderDetails(@PathVariable String id,  Model model) {
-        Order order = orderService.find(id);
+    public String showOrderDetails(@PathVariable final String id, final Model model) {
+        final Order order = orderService.find(id);
         model.addAttribute("order", order);
         return "order/order";
     }

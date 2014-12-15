@@ -19,18 +19,18 @@ public class FailQueueServiceImpl implements FailQueueService {
     FailQueueDao failQueueDao;
 
     @Override
-    public FailQueueMessage update(FailQueueMessage failQueueMessage) {
+    public FailQueueMessage update(final FailQueueMessage failQueueMessage) {
         return failQueueDao.saveOrUpdate(failQueueMessage);
     }
 
     @Override
-    public void delete(Long id) {
-        FailQueueMessage failQueueMessage = failQueueDao.find(id);
+    public void delete(final Long id) {
+        final FailQueueMessage failQueueMessage = failQueueDao.find(id);
         failQueueDao.delete(failQueueMessage);
     }
 
     @Override
-    public FailQueueMessage find(Long id) {
+    public FailQueueMessage find(final Long id) {
         return failQueueDao.find(id);
     }
 

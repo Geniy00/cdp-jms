@@ -19,18 +19,18 @@ public class TaxiDispatcherServiceImpl implements TaxiDispatcherService {
     TaxiDispatcherDao taxiDispatcherDao;
 
     @Override
-    public TaxiDispatcher update(TaxiDispatcher taxiDispatcher) {
+    public TaxiDispatcher update(final TaxiDispatcher taxiDispatcher) {
         return taxiDispatcherDao.saveOrUpdate(taxiDispatcher);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(final Long id) {
         TaxiDispatcher taxiDispatcher = taxiDispatcherDao.find(id);
         taxiDispatcherDao.delete(taxiDispatcher);
     }
 
     @Override
-    public TaxiDispatcher find(Long id) {
+    public TaxiDispatcher find(final Long id) {
         return taxiDispatcherDao.find(id);
     }
 

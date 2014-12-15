@@ -19,7 +19,7 @@ public interface BookingService {
 
     Booking assignBooking(Long bookingId);
 
-    Booking unassignBooking(Long bookingId);
+    Booking revokeBooking(Long bookingId);
 
     Booking acceptBooking(Long bookingId);
 

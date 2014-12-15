@@ -21,20 +21,20 @@ public class FailQueueController {
     FailQueueService failQueueService;
 
     @RequestMapping("/failQueue")
-    public String list(Model model) {
-        List<FailQueueMessage> messages = failQueueService.findAll();
+    public String list(final Model model) {
+        final List<FailQueueMessage> messages = failQueueService.findAll();
         model.addAttribute("messages", messages);
         return "failQueue/list";
     }
 
     @RequestMapping(value = "/failQueue/resend/{id}", method = RequestMethod.POST)
-    public String resend(@PathVariable Long id, Model model) {
+    public String resend(@PathVariable final Long id) {
         failQueueService.delete(id);
         return "redirect:/failQueue";
     }
 
     @RequestMapping(value = "/failQueue/remove/{id}", method = RequestMethod.POST)
-    public String remove(@PathVariable Long id, Model model) {
+    public String remove(@PathVariable final Long id) {
         failQueueService.delete(id);
         return "redirect:/failQueue";
     }

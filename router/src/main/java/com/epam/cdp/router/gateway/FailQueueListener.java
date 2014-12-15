@@ -24,18 +24,18 @@ public class FailQueueListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        TextMessage textMessage = (TextMessage) message;
-        String xmlMessage = null;
+        final TextMessage textMessage = (TextMessage) message;
+        final String xmlMessage;
         try {
             xmlMessage = textMessage.getText();
-        } catch (JMSException e) {
-            LOG.error("Can't get xml from received message");
-            e.printStackTrace();
+        } catch (final JMSException ex) {
+            LOG.error("Can't get xml from received message", ex);
+            return;
         }
 
-        FailQueueMessage failQueueMessage = new FailQueueMessage(xmlMessage);
+        final FailQueueMessage failQueueMessage = new FailQueueMessage(xmlMessage);
         orderService.persistFailQueueMessage(failQueueMessage);
 
-        LOG.info("New FailQueueMessage:\n" + xmlMessage);
+        LOG.warn("New FailQueueMessage:\n" + xmlMessage);
     }
 }

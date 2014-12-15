@@ -134,20 +134,31 @@ public class BookingRequestDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         BookingRequestDetails that = (BookingRequestDetails) o;
 
-        if (!bookingRequestId.equals(that.bookingRequestId)) return false;
-        if (!deliveryTime.equals(that.deliveryTime)) return false;
-        if (!expiryTime.equals(that.expiryTime)) return false;
-        if (!finishPosition.equals(that.finishPosition)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!orderId.equals(that.orderId)) return false;
-        if (!payment.equals(that.payment)) return false;
-        if (!startPosition.equals(that.startPosition)) return false;
-        if (vehicleType != that.vehicleType) return false;
+        if (!bookingRequestId.equals(that.bookingRequestId))
+            return false;
+        if (!deliveryTime.equals(that.deliveryTime))
+            return false;
+        if (!expiryTime.equals(that.expiryTime))
+            return false;
+        if (!finishPosition.equals(that.finishPosition))
+            return false;
+        if (!id.equals(that.id))
+            return false;
+        if (!orderId.equals(that.orderId))
+            return false;
+        if (!payment.equals(that.payment))
+            return false;
+        if (!startPosition.equals(that.startPosition))
+            return false;
+        if (vehicleType != that.vehicleType)
+            return false;
 
         return true;
     }

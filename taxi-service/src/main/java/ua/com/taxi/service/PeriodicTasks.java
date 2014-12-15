@@ -40,7 +40,7 @@ public class PeriodicTasks {
     public void unassignAutomatically() {
         List<Booking> assignedStatusExpired = bookingService.findBookingWithExpiredAssignedStatus();
         for (Booking booking : assignedStatusExpired) {
-            booking.setStatus(Booking.BookingStatus.UNASSIGNED);
+            booking.setStatus(Booking.BookingStatus.REVOKED);
             booking.setAssignToExpiryTime(null);
             bookingService.saveOrUpdate(booking);
         }

@@ -12,8 +12,8 @@ import java.util.List;
 public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
 
     private static final String SELECT_ALL_TAXI_DISPATCHERS = "SELECT td FROM TaxiDispatcher td";
-    private static final String SELECT_ACTIVE_TAXI_DISPATCHERS = "SELECT td FROM TaxiDispatcher td WHERE td.disabled=false";
-
+    private static final String SELECT_ACTIVE_TAXI_DISPATCHERS =
+            "SELECT td FROM TaxiDispatcher td WHERE td.disabled=false";
 
     @PersistenceContext
     EntityManager em;
@@ -25,15 +25,13 @@ public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
 
     @Override
     public List<TaxiDispatcher> findAllTaxiDispatchers() {
-        TypedQuery<TaxiDispatcher> query =
-                em.createQuery(SELECT_ALL_TAXI_DISPATCHERS, TaxiDispatcher.class);
+        final TypedQuery<TaxiDispatcher> query = em.createQuery(SELECT_ALL_TAXI_DISPATCHERS, TaxiDispatcher.class);
         return query.getResultList();
     }
 
     @Override
     public List<TaxiDispatcher> findActiveTaxiDispatchers() {
-        TypedQuery<TaxiDispatcher> query =
-                em.createQuery(SELECT_ACTIVE_TAXI_DISPATCHERS, TaxiDispatcher.class);
+        final TypedQuery<TaxiDispatcher> query = em.createQuery(SELECT_ACTIVE_TAXI_DISPATCHERS, TaxiDispatcher.class);
         return query.getResultList();
     }
 }

@@ -79,30 +79,31 @@ public class BookingRequest implements Serializable {
 
     @PrePersist
     protected void updateDates() {
-        created = new DateTime();
+        this.created = new DateTime();
     }
 
+    //TODO: refactor it
     public void applyBookingResponse(BookingResponse bookingResponse) {
         this.bookingResponse = bookingResponse;
-        BookingRequestEnum.Status status = bookingResponse.getStatus();
+        final BookingRequestEnum.Status status = bookingResponse.getStatus();
         switch (status) {
-            case ACCEPTED:
-                order.setOrderStatus(Order.OrderStatus.PROCESSED);
-                break;
-            case REJECTED:
-                order.setOrderStatus(Order.OrderStatus.DECLINED);
-                break;
-            case REFUSED:
-                order.setOrderStatus(Order.OrderStatus.CANCELED);
-                break;
-            case EXPIRED:
-                order.setOrderStatus(Order.OrderStatus.EXPIRED);
-                break;
-            case FAILED:
-                order.setOrderStatus(Order.OrderStatus.FAILED);
-                break;
-            default:
-                throw new RuntimeException("Unknown bookingResponse status");
+        case ACCEPTED:
+            order.setOrderStatus(Order.OrderStatus.PROCESSED);
+            break;
+        case REJECTED:
+            order.setOrderStatus(Order.OrderStatus.DECLINED);
+            break;
+        case REFUSED:
+            order.setOrderStatus(Order.OrderStatus.CANCELED);
+            break;
+        case EXPIRED:
+            order.setOrderStatus(Order.OrderStatus.EXPIRED);
+            break;
+        case FAILED:
+            order.setOrderStatus(Order.OrderStatus.FAILED);
+            break;
+        default:
+            throw new RuntimeException("Unknown bookingResponse status");
         }
         this.bookingResponse = bookingResponse;
     }
@@ -205,16 +206,16 @@ public class BookingRequest implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
         BookingRequest that = (BookingRequest) obj;
 
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.startPosition, that.startPosition)
-                && Objects.equals(this.finishPosition, that.finishPosition)
-                && Objects.equals(this.deliveryTime, that.deliveryTime)
-                && Objects.equals(this.vehicleType, that.vehicleType);
+        return Objects.equals(this.id, that.id) && Objects.equals(this.startPosition, that.startPosition) && Objects
+                .equals(this.finishPosition, that.finishPosition) && Objects.equals(this.deliveryTime,
+                that.deliveryTime) && Objects.equals(this.vehicleType, that.vehicleType);
     }
 
     @Override

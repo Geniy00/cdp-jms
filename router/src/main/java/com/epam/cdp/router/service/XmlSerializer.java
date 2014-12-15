@@ -9,14 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class XmlSerializer {
 
-    XstreamSerializer serializer = new XstreamSerializer();
+    final XstreamSerializer serializer = new XstreamSerializer();
 
-    public <T> String serialize(T objectToSerialize) {
+    public <T> String serialize(final T objectToSerialize) {
         return serializer.serialize(objectToSerialize);
-    }
-
-    public <T> T deserialize(String fromXML, Class<T> clazzType) {
-        return deserialize(fromXML, clazzType);
     }
 
 }

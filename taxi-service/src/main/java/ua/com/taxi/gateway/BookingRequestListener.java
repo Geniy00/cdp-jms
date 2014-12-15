@@ -18,9 +18,9 @@ import javax.jms.TextMessage;
 @Component
 public class BookingRequestListener implements MessageListener {
 
-    public static final Logger LOG = Logger.getLogger(BookingRequestListener.class);
+    private static final Logger LOG = Logger.getLogger(BookingRequestListener.class);
 
-    XstreamSerializer xstreamSerializer = new XstreamSerializer();
+    private final XstreamSerializer xstreamSerializer = new XstreamSerializer();
 
     @Autowired
     BookingDao bookingDao;
@@ -28,21 +28,18 @@ public class BookingRequestListener implements MessageListener {
     @Autowired
     BookingService bookingService;
 
-    public void onMessage(Message message) {
-        TextMessage textMessage = (TextMessage) message;
+    public void onMessage(final Message message) {
+        final TextMessage textMessage = (TextMessage) message;
         String xmlMessage = null;
-
-        BookingRequestMessage bookingRequestMessage = null;
+        BookingRequestMessage bookingRequestMessage;
         try {
             xmlMessage = textMessage.getText();
             bookingRequestMessage = xstreamSerializer.deserialize(xmlMessage, BookingRequestMessage.class);
-        } catch (JMSException e) {
-            LOG.error("Can't get xml from received message");
-            e.printStackTrace();
+        } catch (final JMSException ex) {
+            LOG.error("Can't get xml from received message", ex);
             return;
-        } catch (Exception e) {
-            LOG.error("Can't deserialize TextMessage.");
-            e.printStackTrace();
+        } catch (final Exception ex) {
+            LOG.error("Can't deserialize TextMessage.", ex);
             bookingService.sendTextMessageToFailQueue(xmlMessage);
             return;
         }
@@ -52,16 +49,17 @@ public class BookingRequestListener implements MessageListener {
             return;
         }
 
-        BookingRequestDetails bookingRequestDetails = new BookingRequestDetails(bookingRequestMessage);
-        Booking booking = new Booking();
+        final BookingRequestDetails bookingRequestDetails = new BookingRequestDetails(bookingRequestMessage);
+        final Booking booking = new Booking();
         booking.setBookingRequest(bookingRequestDetails);
 
         bookingService.saveOrUpdate(booking);
-        LOG.info("New bookingRequestMessage[id:" + booking.getBookingRequest().getOrderId() + "] is received.");
+        LOG.info(String.format("New bookingRequestMessage[id: %s] is received.",
+                booking.getBookingRequest().getOrderId()));
     }
 
     protected boolean isCorrect(BookingRequestMessage bookingRequestMessage) {
-        return true;
+        return bookingRequestMessage != null;
     }
 
 }

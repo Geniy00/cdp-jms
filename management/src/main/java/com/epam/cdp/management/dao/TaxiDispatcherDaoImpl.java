@@ -20,23 +20,23 @@ public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
     EntityManager em;
 
     @Override
-    public TaxiDispatcher saveOrUpdate(TaxiDispatcher taxiDispatcher) {
+    public TaxiDispatcher saveOrUpdate(final TaxiDispatcher taxiDispatcher) {
         return em.merge(taxiDispatcher);
     }
 
     @Override
-    public void delete(TaxiDispatcher taxiDispatcher) {
+    public void delete(final TaxiDispatcher taxiDispatcher) {
         em.remove(em.merge(taxiDispatcher));
     }
 
     @Override
-    public TaxiDispatcher find(Long id) {
+    public TaxiDispatcher find(final Long id) {
         return em.find(TaxiDispatcher.class, id);
     }
 
     @Override
     public List<TaxiDispatcher> findAll() {
-        TypedQuery<TaxiDispatcher> query = em.createQuery(SELECT_ALL_TAXI_DISPATCHER, TaxiDispatcher.class);
+        final TypedQuery<TaxiDispatcher> query = em.createQuery(SELECT_ALL_TAXI_DISPATCHER, TaxiDispatcher.class);
         return query.getResultList();
     }
 }

@@ -69,7 +69,7 @@
     <div style="border: solid 1px green; margin: 15px; display:inline-block;">
         Actions:
         <table>
-            <c:if test="${booking.status == 'NEW' || booking.status == 'UNASSIGNED'}">
+            <c:if test="${booking.status == 'NEW' || booking.status == 'REVOKED'}">
                 <tr>
                     <td width="100px">
                         <form action="booking/${booking.id}/assigned" method="post">

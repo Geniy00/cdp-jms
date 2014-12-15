@@ -22,52 +22,50 @@ public class TaxiDispatcherController {
     TaxiDispatcherService taxiDispatcherService;
 
     @RequestMapping("/dispatchers")
-    public String list(Model model) {
-        List<TaxiDispatcher> dispatchers = taxiDispatcherService.findAll();
+    public String list(final Model model) {
+        final List<TaxiDispatcher> dispatchers = taxiDispatcherService.findAll();
         model.addAttribute("dispatchers", dispatchers);
         return "dispatcher/list";
     }
 
     @RequestMapping(value = "/dispatcher/new", method = RequestMethod.GET)
-    public String newTaxiDispatcher(Model model) {
-        TaxiDispatcher dispatcher = new TaxiDispatcher();
+    public String newTaxiDispatcher(final Model model) {
+        final TaxiDispatcher dispatcher = new TaxiDispatcher();
         model.addAttribute("action", "Create");
         model.addAttribute("dispatcher", dispatcher);
         return "dispatcher/new";
     }
 
     @RequestMapping(value = "/dispatcher/new", method = RequestMethod.POST)
-    public String processNewTaxiDispatcher(@ModelAttribute("dispatcher") TaxiDispatcher taxiDispatcher,
-                                           Model model) {
-        TaxiDispatcher dispatcher = taxiDispatcherService.update(taxiDispatcher);
+    public String processNewTaxiDispatcher(@ModelAttribute("dispatcher") final TaxiDispatcher taxiDispatcher) {
+        final TaxiDispatcher dispatcher = taxiDispatcherService.update(taxiDispatcher);
         return "redirect:/dispatcher/show/" + dispatcher.getId();
     }
 
     @RequestMapping("/dispatcher/show/{id}")
-    public String showTaxiDispatcher(@PathVariable Long id, Model model) {
-        TaxiDispatcher dispatcher = taxiDispatcherService.find(id);
+    public String showTaxiDispatcher(@PathVariable final Long id, final Model model) {
+        final TaxiDispatcher dispatcher = taxiDispatcherService.find(id);
         model.addAttribute("dispatcher", dispatcher);
         return "dispatcher/dispatcher";
     }
 
     @RequestMapping(value = "/dispatcher/edit/{id}", method = RequestMethod.GET)
-    public String editTaxiDispatcher(@PathVariable Long id, Model model) {
-        TaxiDispatcher dispatcher = taxiDispatcherService.find(id);
+    public String editTaxiDispatcher(@PathVariable final Long id, final Model model) {
+        final TaxiDispatcher dispatcher = taxiDispatcherService.find(id);
         model.addAttribute("action", "Update");
         model.addAttribute("dispatcher", dispatcher);
         return "dispatcher/new";
     }
 
     @RequestMapping(value = "/dispatcher/edit/{id}", method = RequestMethod.POST)
-    public String processEditTaxiDispatcher(@PathVariable Long id,
-                                            @ModelAttribute("dispatcher") TaxiDispatcher taxiDispatcher,
-                                            Model model) {
+    public String processEditTaxiDispatcher(@PathVariable final Long id,
+            @ModelAttribute("dispatcher") final TaxiDispatcher taxiDispatcher) {
         taxiDispatcherService.update(taxiDispatcher);
         return "redirect:/dispatcher/show/" + id;
     }
 
     @RequestMapping(value = "/dispatcher/remove/{id}", method = RequestMethod.POST)
-    public String removeTaxiDispatcher(@PathVariable Long id, Model model) {
+    public String removeTaxiDispatcher(@PathVariable final Long id) {
         taxiDispatcherService.delete(id);
         return "redirect:/dispatchers";
     }

@@ -4,7 +4,6 @@ import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.core.entity.ReservationRequest;
 import com.epam.cdp.core.entity.VehicleType;
 import com.epam.cdp.sender.bean.ScheduledReservationRequestSender;
-import com.epam.cdp.sender.bean.ScheduledReservationRequestSender.Status;
 import com.epam.cdp.sender.service.ReservationService;
 import com.epam.cdp.sender.util.JsonGenerator;
 import com.epam.cdp.sender.util.ReservationRequestGenerator;
@@ -29,7 +28,7 @@ public class MessageController {
     ScheduledReservationRequestSender scheduledOrderSender;
 
     @RequestMapping(value = "/")
-    public String index(Model model) {
+    public String index() {
         return "index";
     }
 
@@ -41,8 +40,7 @@ public class MessageController {
     }
 
     @RequestMapping(value = "/manual/random")
-    public String randomManualSending(Model model,
-                                      @ModelAttribute("sentOrder") Order sentOrder) {
+    public String randomManualSending(Model model, @ModelAttribute("sentOrder") Order sentOrder) {
         ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
         model.addAttribute("reservationRequest", reservationRequest);
         model.addAttribute("vehicleTypeValues", VehicleType.values());
@@ -51,33 +49,31 @@ public class MessageController {
     }
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public String sendReservationRequest(@RequestHeader(value = "referer") final String referer,
-                                         @ModelAttribute ReservationRequest reservationRequest,
-                                         final RedirectAttributes redirectAttributes) {
+    public String sendReservationRequest(@RequestHeader(value = "referrer") final String referrer,
+            @ModelAttribute ReservationRequest reservationRequest, final RedirectAttributes redirectAttributes) {
         reservationService.sendReservationRequest(reservationRequest);
         redirectAttributes.addFlashAttribute("sentReservationRequest", reservationRequest);
-        return "redirect:" + referer;
+        return "redirect:" + referrer;
     }
 
     @RequestMapping(value = "/file")
-    public String fileSending(Model model) {
+    public String fileSending() {
         return "file";
     }
 
     @RequestMapping(value = "/file/send", method = RequestMethod.POST)
-    public String uploadFile(@RequestParam(value = "file") MultipartFile file,
-                             Model model) throws IOException {
+    public String uploadFile(@RequestParam(value = "file") MultipartFile file, Model model) throws IOException {
 
         if (file == null) {
             model.addAttribute("error", "The file can't be received!");
             return "file";
         }
 
-        StringWriter sw = new StringWriter();
-        IOUtils.copy(file.getInputStream(), sw);
-        String json = sw.toString();
+        final StringWriter stringWriter = new StringWriter();
+        IOUtils.copy(file.getInputStream(), stringWriter);
+        final String json = stringWriter.toString();
 
-        ReservationRequest[] reservationRequests = null;
+        final ReservationRequest[] reservationRequests;
         try {
             reservationRequests = new JsonGenerator().parseJson(json);
         } catch (JsonSyntaxException e) {
@@ -85,21 +81,22 @@ public class MessageController {
             return "file";
         }
 
-        for (ReservationRequest reservationRequest : reservationRequests) {
-            reservationService.sendReservationRequest(reservationRequest);
+        if (reservationRequests == null || reservationRequests.length == 0) {
+            model.addAttribute("message", "File can't be read");
+        } else {
+            for (ReservationRequest reservationRequest : reservationRequests) {
+                reservationService.sendReservationRequest(reservationRequest);
+            }
+            model.addAttribute("message", reservationRequests.length + " requests were sent");
+
         }
-
-        String message = (reservationRequests == null || reservationRequests.length == 0) ?
-                "File can't be read" : reservationRequests.length + " requests were sent";
-
-        model.addAttribute("message", message);
-
         return "file";
     }
 
     @RequestMapping(value = "/automatic")
     public String automaticSending(Model model) {
-        model.addAttribute("status", scheduledOrderSender.getStatus());
+        boolean isSending = scheduledOrderSender.isSending();
+        model.addAttribute("status", isSending ? "SENDING" : "STOPPED");
         model.addAttribute("messageCount", scheduledOrderSender.getMessageCount());
         model.addAttribute("delay", scheduledOrderSender.getDelay());
 
@@ -107,24 +104,15 @@ public class MessageController {
     }
 
     @RequestMapping(value = "/automatic/toggle", method = RequestMethod.POST)
-    public String toggleSending(@RequestParam(value = "delay", required = false) String delay, Model model) {
-        if (scheduledOrderSender.getStatus() == Status.STOPPED && delay == null) {
+    public String toggleSending(@RequestParam(value = "delay", required = false) Long delay) {
+        if (!scheduledOrderSender.isSending() && delay == null) {
             return "redirect:";
         }
 
-        Long delayLong = null;
-        if (scheduledOrderSender.getStatus() == Status.STOPPED) {
-            try {
-                delayLong = Long.valueOf(delay);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (scheduledOrderSender.getStatus() == Status.STOPPED) {
-            scheduledOrderSender.startSending(delayLong);
-        } else if (scheduledOrderSender.getStatus() == Status.SENDING) {
+        if (scheduledOrderSender.isSending()) {
             scheduledOrderSender.stopSending();
+        } else {
+            scheduledOrderSender.startSending(delay);
         }
         return "redirect:";
     }

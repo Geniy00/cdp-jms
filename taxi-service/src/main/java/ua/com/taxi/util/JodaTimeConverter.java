@@ -13,7 +13,7 @@ import org.joda.time.format.DateTimeFormatter;
  * @author Geniy00
  */
 public class JodaTimeConverter implements Converter {
-    private final DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
 
     @Override
     @SuppressWarnings("unchecked")
@@ -22,15 +22,14 @@ public class JodaTimeConverter implements Converter {
     }
 
     @Override
-    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-        DateTime dateTime = (DateTime) source;
-        writer.setValue(formatter.print(dateTime));
+    public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context) {
+        final DateTime dateTime = (DateTime) source;
+        writer.setValue(FORMATTER.print(dateTime));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object unmarshal(HierarchicalStreamReader reader,
-                            UnmarshallingContext context) {
-        return formatter.parseDateTime(reader.getValue());
+    public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+        return FORMATTER.parseDateTime(reader.getValue());
     }
 }

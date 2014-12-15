@@ -14,29 +14,29 @@ import java.util.List;
 @Repository
 public class FailQueueDaoImpl implements FailQueueDao {
 
-
     private static final String SELECT_ALL_FAIL_QUEUE = "SELECT fqm FROM FailQueueMessage fqm";
+
     @PersistenceContext
     EntityManager em;
 
     @Override
-    public FailQueueMessage saveOrUpdate(FailQueueMessage failQueueMessage) {
+    public FailQueueMessage saveOrUpdate(final FailQueueMessage failQueueMessage) {
         return em.merge(failQueueMessage);
     }
 
     @Override
-    public void delete(FailQueueMessage failQueueMessage) {
+    public void delete(final FailQueueMessage failQueueMessage) {
         em.remove(em.merge(failQueueMessage));
     }
 
     @Override
-    public FailQueueMessage find(Long id) {
+    public FailQueueMessage find(final Long id) {
         return em.find(FailQueueMessage.class, id);
     }
 
     @Override
     public List<FailQueueMessage> findAll() {
-        TypedQuery<FailQueueMessage> query = em.createQuery(SELECT_ALL_FAIL_QUEUE, FailQueueMessage.class);
+        final TypedQuery<FailQueueMessage> query = em.createQuery(SELECT_ALL_FAIL_QUEUE, FailQueueMessage.class);
         return query.getResultList();
     }
 }

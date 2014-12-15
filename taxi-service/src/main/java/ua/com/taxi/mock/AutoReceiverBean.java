@@ -1,5 +1,6 @@
 package ua.com.taxi.mock;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,22 +14,28 @@ public class AutoReceiverBean {
     @Autowired
     BookingService bookingService;
 
-    MockAutoReceiver mockAutoReceiver;
+    @CheckForNull
+    MockAutoReceiverRunnable mockAutoReceiverRunnable;
 
-    public void start(int delay, int rejectEveryNthOrder) {
-        mockAutoReceiver = new MockAutoReceiver(bookingService, delay, rejectEveryNthOrder);
-        new Thread(mockAutoReceiver).start();
+    public void start(final int delay, final int rejectEveryNthOrder) {
+        if (!isEnabled()) {
+            LOG.info("AutoReceiverBean is already started.");
+            return;
+        }
+        mockAutoReceiverRunnable.disable();
+        mockAutoReceiverRunnable = new MockAutoReceiverRunnable(bookingService, delay, rejectEveryNthOrder);
+        new Thread(mockAutoReceiverRunnable).start();
         LOG.info("Auto receiver bean was started");
     }
 
     public void stop() {
-        if (mockAutoReceiver == null) return;
-        mockAutoReceiver.disable();
-        LOG.info("Auto receiver bean was stopped");
+        if (isEnabled()) {
+            mockAutoReceiverRunnable.disable();
+            LOG.info("Auto receiver bean was stopped");
+        }
     }
 
     public Boolean isEnabled() {
-        if (mockAutoReceiver == null) return false;
-        return mockAutoReceiver.isEnabled();
+        return mockAutoReceiverRunnable != null;
     }
 }

@@ -29,7 +29,7 @@ public class CustomerDaoImpl implements CustomerDao {
             }
         }
 
-        Customer originalCustomer = findCustomerByPhoneNumber(customer.getPhone());
+        final Customer originalCustomer = findCustomerByPhoneNumber(customer.getPhone());
         if (originalCustomer != null) {
             customer.setId(originalCustomer.getId());
             return em.merge(customer);
@@ -49,11 +49,15 @@ public class CustomerDaoImpl implements CustomerDao {
 
     @Override
     public Customer findCustomerByPhoneNumber(String phoneNumber) {
-        TypedQuery<Customer> query = em.createQuery(SELECT_CUSTOMER_BY_PHONE_NUMBER, Customer.class);
+        final TypedQuery<Customer> query = em.createQuery(SELECT_CUSTOMER_BY_PHONE_NUMBER, Customer.class);
         query.setParameter("phone", phoneNumber);
-        List<Customer> results = query.getResultList();
-        if (results.size() == 0) return null;
-        if (results.size() > 1) throw new NonUniqueResultException();
+        final List<Customer> results = query.getResultList();
+        if (results.size() == 0) {
+            return null;
+        }
+        if (results.size() > 1) {
+            throw new NonUniqueResultException();
+        }
         return results.get(0);
     }
 

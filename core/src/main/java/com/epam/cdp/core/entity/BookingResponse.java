@@ -14,6 +14,8 @@ import java.util.Objects;
 @Table(name = "booking_response")
 public class BookingResponse implements Serializable {
 
+    private static final long serialVersionUID = 1820235611121505292L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -52,7 +54,8 @@ public class BookingResponse implements Serializable {
         this.bookingRequest = bookingRequest;
         this.status = status;
         this.reason = reason;
-        created = new DateTime();
+        //TODO: Should we kill off these new DateTime in entity class
+        this.created = new DateTime();
     }
 
     public Long getId() {
@@ -97,14 +100,15 @@ public class BookingResponse implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
         BookingResponse that = (BookingResponse) obj;
 
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.bookingRequest, that.bookingRequest)
-                && Objects.equals(this.status, that.status);
+        return Objects.equals(this.id, that.id) && Objects.equals(this.bookingRequest, that.bookingRequest) && Objects
+                .equals(this.status, that.status);
     }
 
     @Override

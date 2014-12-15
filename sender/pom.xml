@@ -53,6 +53,15 @@
             <artifactId>activemq-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+
         <!-- JSTL -->
         <dependency>
             <groupId>jstl</groupId>
@@ -71,7 +80,7 @@
 
         <!-- Apache commons io -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
+            <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
         <!-- Json parsing -->

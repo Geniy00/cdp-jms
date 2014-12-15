@@ -11,66 +11,67 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
 public class BookingController {
 
+    private static final String DEFAULT_REFUSE_REASON = "DEFAULT REFUSE REASON";
+    private static final int BOOKINGS_COUNT_LIMIT = 100;
+
     @Autowired
     BookingService bookingService;
 
     @RequestMapping(value = "/")
-    public String index(Model model) {
+    public String index() {
         return "index";
     }
 
     @RequestMapping(value = "/bookings")
-    public String getRandomBooking(Model model) {
-        Booking booking = bookingService.findFreeBooking();
+    public String getRandomBooking(final Model model) {
+        final Booking booking = bookingService.findFreeBooking();
         model.addAttribute("booking", booking);
         model.addAttribute("bookingCount", bookingService.countActualBookings());
         return "bookings";
     }
 
     @RequestMapping(value = "/booking/{id}", method = RequestMethod.GET)
-    public String getBookingById(@PathVariable Long id, Model model) {
-        Booking booking = bookingService.find(id);
+    public String getBookingById(@PathVariable final Long id, final Model model) {
+        final Booking booking = bookingService.find(id);
         model.addAttribute("booking", booking);
         return "bookingDetails";
     }
 
     @RequestMapping(value = "/booking/{id}", method = RequestMethod.POST)
-    public String executeBookingAction(@PathVariable Long id,
-                                        @RequestParam BookingRequestEnum.Action action,
-                                        @RequestParam(required = false) String reason,
-                                        Model model) {
+    public String executeBookingAction(@PathVariable final Long id,
+            @RequestParam final BookingRequestEnum.Action action, @RequestParam(required = false) final String reason,
+            final Model model) {
 
         Booking booking = null;
         switch (action) {
-            case ACCEPT:
-                booking = bookingService.acceptBooking(id);
-                break;
+        case ACCEPT:
+            booking = bookingService.acceptBooking(id);
+            break;
 
-            case REJECT:
-                booking = bookingService.rejectBooking(id);
-                if(booking != null){
-                    return "redirect:/bookings";
-                } else {
-                    break;
-                }
-
-            case REFUSE:
-                if(reason == null) reason = "DEFAULT REFUSE REASON";
-                booking = bookingService.refuseBooking(id, reason);
+        case REJECT:
+            booking = bookingService.rejectBooking(id);
+            if (booking != null) {
+                return "redirect:/bookings";
+            } else {
                 break;
+            }
+
+        case REFUSE:
+            final String refuseReason = (reason == null) ? DEFAULT_REFUSE_REASON : reason;
+            booking = bookingService.refuseBooking(id, refuseReason);
+            break;
         }
 
-        String message = booking == null
-                ? "Router module is unavailable that's why action can't be executed"
+        //TODO: Check this code
+        final String message = booking == null ? "Router module is unavailable that's why action can't be executed"
                 : "booking[id:" + booking.getId() + "] is " + booking.getStatus();
 
-        if(booking == null) {
+        if (booking == null) {
             booking = bookingService.find(id);
         }
 
@@ -80,33 +81,33 @@ public class BookingController {
     }
 
     @RequestMapping(value = "/booking/{id}/assigned")
-    public String assignOrUnassignBooking(@PathVariable Long id,
-                                          @RequestParam(required = false) String action,
-                                          HttpServletRequest request,
-                                          Model model) {
+    public String assignOrRevokeBooking(@PathVariable final Long id,
+            @RequestParam(required = false) final String action, final Model model) {
 
-        Booking booking = null;
-        switch (action == null ? "" : action) {
-            case "ASSIGN_TO_ME":
-                booking = bookingService.assignBooking(id);
-                if(booking == null) {
-                    return "redirect:/bookings";
-                }
-                break;
+        final Booking booking;
+        switch (action) {
+        case "ASSIGN_TO_ME":
+            booking = bookingService.assignBooking(id);
+            if (booking == null) {
+                return "redirect:/bookings";
+            }
+            break;
 
-            case "UNASSIGN":
-                booking = bookingService.unassignBooking(id);
-                if(booking.getStatus() == Booking.BookingStatus.UNASSIGNED) {
-                    return "redirect:/bookings";
-                }
-                break;
-            case "":
-                booking = bookingService.find(id);
-                break;
+        //TODO: rename to Revoke
+        case "REVOKE":
+            booking = bookingService.revokeBooking(id);
+            if (booking.getStatus() == Booking.BookingStatus.REVOKED) {
+                return "redirect:/bookings";
+            }
+            break;
+        default:
+            booking = bookingService.find(id);
+            break;
         }
 
+        //TODO: check how it's possible
         if (action != null) {
-            String message = "booking[id:" + booking.getId() + "] is " + action;
+            final String message = String.format("booking[id: %s] is %s", booking.getId(), action);
             model.addAttribute("message", message);
         }
 
@@ -116,16 +117,14 @@ public class BookingController {
 
     @RequestMapping(value = "/history")
     public String showGeneralHistory(Model model) {
-        List<Booking> bookings = bookingService.findBookings(100);
-
+        final List<Booking> bookings = bookingService.findBookings(BOOKINGS_COUNT_LIMIT);
         model.addAttribute("bookings", bookings);
         return "history";
     }
 
     @RequestMapping(value = "/filtered")
     public String showFilteredHistory(@RequestParam Booking.BookingStatus status, Model model) {
-        List<Booking> bookings = bookingService.findBookingByStatus(status, 100);
-
+        List<Booking> bookings = bookingService.findBookingByStatus(status, BOOKINGS_COUNT_LIMIT);
         model.addAttribute("bookings", bookings);
         return "history";
     }

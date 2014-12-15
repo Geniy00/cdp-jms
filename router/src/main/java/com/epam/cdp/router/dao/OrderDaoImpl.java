@@ -3,8 +3,8 @@ package com.epam.cdp.router.dao;
 import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.FailQueueMessage;
 import com.epam.cdp.core.entity.Order;
+import com.epam.cdp.router.service.TimeService;
 import org.hibernate.Hibernate;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,11 +20,12 @@ public class OrderDaoImpl implements OrderDao {
 
     private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord WHERE ord.orderStatus=:status";
 
-    private static final String SELECT_EXPIRED_BOOKING_REQUEST = "SELECT br FROM BookingRequest br " +
-            "WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
+    private static final String SELECT_EXPIRED_BOOKING_REQUEST =
+            "SELECT br FROM BookingRequest br " + "WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
 
-    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord WHERE " +
-            "ord.reservationRequest.deliveryTime < :dateTime AND " +
+    //TODO: rewrite SQL query without NEW, SENT, DECLINED strings. Use Enum Name
+    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord" +
+            "WHERE ord.reservationRequest.deliveryTime < :dateTime AND " +
             "(ord.orderStatus = 'NEW' OR ord.orderStatus = 'SENT' OR ord.orderStatus = 'DECLINED')";
 
     @PersistenceContext
@@ -52,17 +53,15 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findExpiredOrders() {
-        TypedQuery<Order> query =
-                em.createQuery(SELECT_EXPIRED_ORDER, Order.class);
-        query.setParameter("dateTime", new DateTime());
+        final TypedQuery<Order> query = em.createQuery(SELECT_EXPIRED_ORDER, Order.class);
+        query.setParameter("dateTime", TimeService.getCurrentDateTime());
         return query.getResultList();
     }
 
     @Override
     public List<BookingRequest> findExpiredBookingRequests() {
-        TypedQuery<BookingRequest> query =
-                em.createQuery(SELECT_EXPIRED_BOOKING_REQUEST, BookingRequest.class);
-        query.setParameter("currentTime", new DateTime());
+        TypedQuery<BookingRequest> query = em.createQuery(SELECT_EXPIRED_BOOKING_REQUEST, BookingRequest.class);
+        query.setParameter("currentTime", TimeService.getCurrentDateTime());
         return query.getResultList();
     }
 
@@ -73,11 +72,10 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findAllByOrderStatus(Order.OrderStatus status) {
-        TypedQuery<Order> query =
-                em.createQuery(SELECT_ORDER_BY_STATUS, Order.class);
+        final TypedQuery<Order> query = em.createQuery(SELECT_ORDER_BY_STATUS, Order.class);
         query.setParameter("status", status);
-        List<Order> result = query.getResultList();
-        for (Order order : result) {
+        final List<Order> result = query.getResultList();
+        for (final Order order : result) {
             Hibernate.initialize(order.getBookingRequests());
         }
         return result;
@@ -85,14 +83,14 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Order loadOrderEager(String id) {
-        Order order = em.find(Order.class, id);
+        final Order order = em.find(Order.class, id);
         Hibernate.initialize(order.getBookingRequests());
         return order;
     }
 
+    //TODO: move this method to right class
     @Override
     public void persistFailQueueMessage(FailQueueMessage failQueueMessage) {
-        //TODO: move this method to right class
         em.persist(failQueueMessage);
     }
 

@@ -14,6 +14,8 @@ import java.util.Objects;
 @Table(name = "fail_queue_message")
 public class FailQueueMessage implements Serializable {
 
+    private static final long serialVersionUID = 1820235621121505292L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -64,14 +66,15 @@ public class FailQueueMessage implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         FailQueueMessage that = (FailQueueMessage) o;
 
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.message, that.message)
-                && Objects.equals(this.created, that.created);
+        return Objects.equals(this.id, that.id) && Objects.equals(this.message, that.message) && Objects.equals(
+                this.created, that.created);
     }
 
     @Override

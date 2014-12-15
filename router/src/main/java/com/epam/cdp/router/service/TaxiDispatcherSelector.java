@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Geniy00
@@ -14,18 +15,21 @@ import java.util.List;
 @Service
 public class TaxiDispatcherSelector {
 
+    private final Random random = new Random();
+
     @Autowired
     TaxiDispatcherDao taxiDispatcherDao;
 
-    public TaxiDispatcher selectTaxiDispatcher(Order Order) {
-        List<TaxiDispatcher> activeDispatchers = taxiDispatcherDao.findActiveTaxiDispatchers();
-        int activeCount = activeDispatchers.size();
+    public TaxiDispatcher selectTaxiDispatcher(final Order order) {
+        final List<TaxiDispatcher> activeDispatchers = taxiDispatcherDao.findActiveTaxiDispatchers();
+        final int dispatcherCount = activeDispatchers.size();
 
-        if (activeCount == 0) {
+        if (dispatcherCount == 0) {
             return null;
         }
 
-        int index = (int) (Math.random() * activeCount);
+        final Integer startPosition = order.getReservationRequest().getStartPosition();
+        final int index = random.nextInt(dispatcherCount % startPosition);
         return activeDispatchers.get(index);
     }
 

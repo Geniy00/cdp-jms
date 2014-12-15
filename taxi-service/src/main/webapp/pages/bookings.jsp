@@ -19,10 +19,10 @@
                 <td>${booking.bookingRequest.bookingRequestId }</td>
             </tr>
             <c:if test="${booking.client != null}">
-            <tr>
-                <td><b>Customer:</b></td>
-                <td><b>name: ${booking.client.name} <br/>phone: ${booking.client.phone}</b></td>
-            </tr>
+                <tr>
+                    <td><b>Customer:</b></td>
+                    <td><b>name: ${booking.client.name} <br/>phone: ${booking.client.phone}</b></td>
+                </tr>
             </c:if>
             <tr>
                 <td>Start position:</td>
@@ -34,7 +34,7 @@
             </tr>
             <tr>
                 <td>Delivery time:</td>
-                <td><joda:format value="${booking.bookingRequest.deliveryTime}" pattern="HH:mm, dd MMM"/> </td>
+                <td><joda:format value="${booking.bookingRequest.deliveryTime}" pattern="HH:mm, dd MMM"/></td>
             </tr>
             <tr>
                 <td>Vehicle type:</td>
@@ -55,15 +55,15 @@
         <div style="border: solid 1px green; margin: 15px; display:inline-block;">
             Actions:
             <table>
-                <c:if test="${booking.status == 'NEW' || booking.status == 'UNASSIGNED'}">
-                <tr>
-                    <td width="100px">
-                        <form action="booking/${booking.id}/assigned" method="post">
-                            <input type="hidden" name="action" value="ASSIGN_TO_ME" />
-                            <input type="submit" value="Assign to me"/>
-                        </form>
-                    </td>
-                </tr>
+                <c:if test="${booking.status == 'NEW' || booking.status == 'REVOKED'}">
+                    <tr>
+                        <td width="100px">
+                            <form action="booking/${booking.id}/assigned" method="post">
+                                <input type="hidden" name="action" value="ASSIGN_TO_ME"/>
+                                <input type="submit" value="Assign to me"/>
+                            </form>
+                        </td>
+                    </tr>
                 </c:if>
             </table>
         </div>

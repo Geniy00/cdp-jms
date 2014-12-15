@@ -2,10 +2,7 @@ package com.epam.cdp.router.gateway;
 
 import com.epam.cdp.core.entity.*;
 import com.epam.cdp.core.xml.BookingRequestMessage;
-import com.epam.cdp.router.service.CostService;
-import com.epam.cdp.router.service.OrderService;
-import com.epam.cdp.router.service.TaxiDispatcherSelector;
-import com.epam.cdp.router.service.XmlSerializer;
+import com.epam.cdp.router.service.*;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,78 +44,107 @@ public class BookingRequestSender {
     XmlSerializer xmlSerializer;
 
     public void execute() {
-        List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
-        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.DECLINED));
+        List<Order> ordersToProcess = fetchOrdersToProcess();
         //TODO: realize mechanism of manual sending of canceled orders
-//        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.CANCELED));
+        //ordersToProcess.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.CANCELED));
 
-        //check if order is expired
-        Iterator<Order> iterator = newOrders.iterator();
-        while (iterator.hasNext()) {
-            Order order = iterator.next();
+        //TODO: do we really need it
+        removeExpiredOrders(ordersToProcess);
 
-            //if expired
-            if (new DateTime().isAfter(order.getReservationRequest().getDeliveryTime())) {
-                order = orderService.loadOrderEager(order.getId());
-
-                for (BookingRequest bookingRequest : order.getBookingRequests()) {
-                    if (bookingRequest.getBookingResponse() == null) {
-                        BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.EXPIRED);
-                        bookingRequest.applyBookingResponse(bookingResponse);
-                    }
-                }
-
-                order.setOrderStatus(Order.OrderStatus.EXPIRED);
-                orderService.updateOrder(order);
-                iterator.remove();
-            }
-        }
-
-        for (Order order : newOrders) {
+        for (Order order : ordersToProcess) {
 
             //Select taxi dispatcher
-            TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);
-            if(taxiDispatcher == null){
+            final TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);
+            if (taxiDispatcher == null) {
                 LOG.warn("Can't find any active taxi dispatcher. BookingRequest sending was postponed");
                 return;
             }
 
             //Create xml message from BookingRequest attribute of Order
-            BookingRequest bookingRequest = createBookingRequest(order, taxiDispatcher);
-            bookingRequest.setOrder(order);
-            bookingRequest = orderService.updateBookingRequest(bookingRequest);
+            final BookingRequest bookingRequest = createBookingRequest(order, taxiDispatcher);
+            final BookingRequest persistedBookingRequest = orderService.updateBookingRequest(bookingRequest);
 
-            BookingRequestMessage bookingRequestMessage = new BookingRequestMessage(bookingRequest);
-            String xmlMessage = xmlSerializer.serialize(bookingRequestMessage);
+            sendBookingRequest(taxiDispatcher, persistedBookingRequest);
 
-            sendBookingRequest(taxiDispatcher.getJmsQueue(), xmlMessage);
-
-            order.applyBookingRequest(bookingRequest);
+            order.applyBookingRequest(persistedBookingRequest);
             orderService.updateOrder(order);
         }
 
-        if (newOrders.size() > 0) {
-            LOG.info(newOrders.size() + " BookingRequestMessages were sent successfully.");
+        if (ordersToProcess.size() > 0) {
+            LOG.info(ordersToProcess.size() + " BookingRequestMessages were sent successfully.");
         }
     }
 
-    private BookingRequest createBookingRequest(Order order, TaxiDispatcher taxiDispatcher) {
-        Double payment = costService.calculateTaxiServicePayment(order.getReservationRequest());
+    private void removeExpiredOrders(final List<Order> ordersToProcess) {
+        final Iterator<Order> iterator = ordersToProcess.iterator();
+        while (iterator.hasNext()) {
+            final Order order = iterator.next();
 
-        DateTime expiryTime = new DateTime().plusMinutes(BOOKING_REQUEST_MINUTES_EXPIRATION);
-        DateTime deliveryTime = order.getReservationRequest().getDeliveryTime();
-        if (expiryTime.isAfter(deliveryTime)) expiryTime = deliveryTime;
+            final DateTime orderDeliveryTime = order.getReservationRequest().getDeliveryTime();
+            if (isExpired(orderDeliveryTime)) {
+                final Order expiredOrder = orderService.loadOrderEager(order.getId());
 
-        return new BookingRequest(order, taxiDispatcher, payment, expiryTime);
-    }
+                //attach default expired bookingResponse
+                for (BookingRequest bookingRequest : expiredOrder.getBookingRequests()) {
+                    if (bookingRequest.getBookingResponse() == null) {
+                        final BookingResponse expiredBookingResponse = new BookingResponse(bookingRequest,
+                                BookingRequestEnum.Status.EXPIRED);
+                        bookingRequest.applyBookingResponse(expiredBookingResponse);
+                    }
+                }
 
-    private void sendBookingRequest(String destination, final String xmlBookingRequestMessage) {
-        jmsTemplate.send(destination, new MessageCreator() {
-            @Override
-            public Message createMessage(Session session) throws JMSException {
-                return session.createTextMessage(xmlBookingRequestMessage);
+                expiredOrder.setOrderStatus(Order.OrderStatus.EXPIRED);
+                orderService.updateOrder(expiredOrder);
+                iterator.remove();
             }
-        });
+        }
     }
 
+    private boolean isExpired(DateTime orderDeliveryTime) {
+        return TimeService.getCurrentDateTime().isAfter(orderDeliveryTime);
+    }
+
+    private List<Order> fetchOrdersToProcess() {
+        List<Order> newOrders = orderService.findAllByOrderStatus(Order.OrderStatus.NEW);
+        newOrders.addAll(orderService.findAllByOrderStatus(Order.OrderStatus.DECLINED));
+        return newOrders;
+    }
+
+    private BookingRequest createBookingRequest(final Order order, final TaxiDispatcher taxiDispatcher) {
+        final Double payment = CostService.calculateTaxiServicePayment(order.getReservationRequest());
+
+        DateTime requestExpirationTime = TimeService.getCurrentDateTime().plusMinutes(
+                BOOKING_REQUEST_MINUTES_EXPIRATION);
+        DateTime taxiDeliveryTime = order.getReservationRequest().getDeliveryTime();
+        if (requestExpirationTime.isAfter(taxiDeliveryTime)) {
+            requestExpirationTime = taxiDeliveryTime;
+        }
+
+        return new BookingRequest(order, taxiDispatcher, payment, requestExpirationTime);
+    }
+
+    private void sendBookingRequest(final TaxiDispatcher taxiDispatcher, final BookingRequest persistedBookingRequest) {
+        final String xmlMessage = serializeBookingRequest(persistedBookingRequest);
+        final String destination = taxiDispatcher.getJmsQueue();
+
+        jmsTemplate.send(destination, new JmsMessageCreator(xmlMessage));
+    }
+
+    private String serializeBookingRequest(final BookingRequest persistedBookingRequest) {
+        final BookingRequestMessage bookingRequestMessage = new BookingRequestMessage(persistedBookingRequest);
+        return xmlSerializer.serialize(bookingRequestMessage);
+    }
+
+    private static class JmsMessageCreator implements MessageCreator {
+        private final String xmlMessage;
+
+        public JmsMessageCreator(final String xmlMessage) {
+            this.xmlMessage = xmlMessage;
+        }
+
+        @Override
+        public Message createMessage(final Session session) throws JMSException {
+            return session.createTextMessage(xmlMessage);
+        }
+    }
 }
