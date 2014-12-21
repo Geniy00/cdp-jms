@@ -73,7 +73,7 @@ public class Order implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -81,7 +81,7 @@ public class Order implements Serializable {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(final Customer customer) {
         this.customer = customer;
     }
 
@@ -89,7 +89,7 @@ public class Order implements Serializable {
         return reservationRequest;
     }
 
-    public void setReservationRequest(ReservationRequest reservationRequest) {
+    public void setReservationRequest(final ReservationRequest reservationRequest) {
         this.reservationRequest = reservationRequest;
     }
 
@@ -97,7 +97,7 @@ public class Order implements Serializable {
         return bookingRequests;
     }
 
-    public void setBookingRequests(List<BookingRequest> bookingRequests) {
+    public void setBookingRequests(final List<BookingRequest> bookingRequests) {
         this.bookingRequests = bookingRequests;
     }
 
@@ -105,21 +105,21 @@ public class Order implements Serializable {
         return orderStatus;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
+    public void setOrderStatus(final OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
-        Order that = (Order) obj;
+        final Order that = (Order) obj;
 
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.customer, that.customer)
-                && Objects.equals(this.orderStatus, that.orderStatus)
-                && Objects.equals(this.reservationRequest, that.reservationRequest);
+        return Objects.equals(this.id, that.id) && Objects.equals(this.customer, that.customer) && Objects.equals(
+                this.orderStatus, that.orderStatus) && Objects.equals(this.reservationRequest, that.reservationRequest);
     }
 
     @Override

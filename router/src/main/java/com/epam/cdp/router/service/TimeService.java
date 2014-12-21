@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
  */
 public class TimeService {
 
-    public static DateTime getCurrentDateTime() {
+    public static DateTime getCurrentTimestamp() {
         return new DateTime();
     }
 }

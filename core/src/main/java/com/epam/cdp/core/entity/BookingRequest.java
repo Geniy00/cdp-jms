@@ -47,7 +47,7 @@ public class BookingRequest implements Serializable {
     @ManyToOne(optional = false)
     private TaxiDispatcher taxiDispatcher;
 
-    //TODO: there is possibility where several responses have to linked to a BookingRequest (i.e. ACCEPT, REFUSE)
+    //TODO: it's possible that several responses have to linked to a BookingRequest (i.e. ACCEPT, REFUSE)
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BookingResponse bookingResponse;
 
@@ -64,7 +64,8 @@ public class BookingRequest implements Serializable {
     public BookingRequest() {
     }
 
-    public BookingRequest(Order order, TaxiDispatcher taxiDispatcher, Double payment, DateTime expiryTime) {
+    public BookingRequest(final Order order, final TaxiDispatcher taxiDispatcher, final Double payment,
+            final DateTime expiryTime, final DateTime createdTimestamp) {
         this.startPosition = order.getReservationRequest().getStartPosition();
         this.finishPosition = order.getReservationRequest().getFinishPosition();
         this.deliveryTime = order.getReservationRequest().getDeliveryTime();
@@ -75,11 +76,7 @@ public class BookingRequest implements Serializable {
         this.taxiDispatcher = taxiDispatcher;
         this.order = order;
         this.customer = order.getCustomer();
-    }
-
-    @PrePersist
-    protected void updateDates() {
-        this.created = new DateTime();
+        this.created = createdTimestamp;
     }
 
     //TODO: refactor it
@@ -112,7 +109,7 @@ public class BookingRequest implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -120,7 +117,7 @@ public class BookingRequest implements Serializable {
         return startPosition;
     }
 
-    public void setStartPosition(Integer startPosition) {
+    public void setStartPosition(final Integer startPosition) {
         this.startPosition = startPosition;
     }
 
@@ -128,7 +125,7 @@ public class BookingRequest implements Serializable {
         return finishPosition;
     }
 
-    public void setFinishPosition(Integer finishPosition) {
+    public void setFinishPosition(final Integer finishPosition) {
         this.finishPosition = finishPosition;
     }
 
@@ -136,7 +133,7 @@ public class BookingRequest implements Serializable {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(DateTime deliveryTime) {
+    public void setDeliveryTime(final DateTime deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 
@@ -144,7 +141,7 @@ public class BookingRequest implements Serializable {
         return vehicleType;
     }
 
-    public void setVehicleType(VehicleType vehicleType) {
+    public void setVehicleType(final VehicleType vehicleType) {
         this.vehicleType = vehicleType;
     }
 
@@ -152,7 +149,7 @@ public class BookingRequest implements Serializable {
         return payment;
     }
 
-    public void setPayment(Double payment) {
+    public void setPayment(final Double payment) {
         this.payment = payment;
     }
 
@@ -160,7 +157,7 @@ public class BookingRequest implements Serializable {
         return expiryTime;
     }
 
-    public void setExpiryTime(DateTime expiryTime) {
+    public void setExpiryTime(final DateTime expiryTime) {
         this.expiryTime = expiryTime;
     }
 
@@ -168,7 +165,7 @@ public class BookingRequest implements Serializable {
         return taxiDispatcher;
     }
 
-    public void setTaxiDispatcher(TaxiDispatcher taxiDispatcher) {
+    public void setTaxiDispatcher(final TaxiDispatcher taxiDispatcher) {
         this.taxiDispatcher = taxiDispatcher;
     }
 
@@ -176,7 +173,7 @@ public class BookingRequest implements Serializable {
         return bookingResponse;
     }
 
-    public void setBookingResponse(BookingResponse bookingResponse) {
+    public void setBookingResponse(final BookingResponse bookingResponse) {
         this.bookingResponse = bookingResponse;
     }
 
@@ -184,7 +181,7 @@ public class BookingRequest implements Serializable {
         return created;
     }
 
-    public void setCreated(DateTime created) {
+    public void setCreated(final DateTime created) {
         this.created = created;
     }
 
@@ -192,7 +189,7 @@ public class BookingRequest implements Serializable {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(final Customer customer) {
         this.customer = customer;
     }
 
@@ -200,18 +197,18 @@ public class BookingRequest implements Serializable {
         return order;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(final Order order) {
         this.order = order;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
 
-        BookingRequest that = (BookingRequest) obj;
+        final BookingRequest that = (BookingRequest) obj;
 
         return Objects.equals(this.id, that.id) && Objects.equals(this.startPosition, that.startPosition) && Objects
                 .equals(this.finishPosition, that.finishPosition) && Objects.equals(this.deliveryTime,

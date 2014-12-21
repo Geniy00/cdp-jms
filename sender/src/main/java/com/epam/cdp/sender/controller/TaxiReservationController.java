@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 @Controller
-public class MessageController {
+public class TaxiReservationController {
 
     @Autowired
     ReservationService reservationService;
@@ -49,7 +49,7 @@ public class MessageController {
     }
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public String sendReservationRequest(@RequestHeader(value = "referrer") final String referrer,
+    public String sendReservationRequest(@RequestHeader(value = "referer") final String referrer,
             @ModelAttribute ReservationRequest reservationRequest, final RedirectAttributes redirectAttributes) {
         reservationService.sendReservationRequest(reservationRequest);
         redirectAttributes.addFlashAttribute("sentReservationRequest", reservationRequest);

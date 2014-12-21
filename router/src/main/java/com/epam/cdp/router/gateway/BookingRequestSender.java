@@ -88,7 +88,7 @@ public class BookingRequestSender {
                 for (BookingRequest bookingRequest : expiredOrder.getBookingRequests()) {
                     if (bookingRequest.getBookingResponse() == null) {
                         final BookingResponse expiredBookingResponse = new BookingResponse(bookingRequest,
-                                BookingRequestEnum.Status.EXPIRED);
+                                BookingRequestEnum.Status.EXPIRED, TimeService.getCurrentTimestamp());
                         bookingRequest.applyBookingResponse(expiredBookingResponse);
                     }
                 }
@@ -101,7 +101,7 @@ public class BookingRequestSender {
     }
 
     private boolean isExpired(DateTime orderDeliveryTime) {
-        return TimeService.getCurrentDateTime().isAfter(orderDeliveryTime);
+        return TimeService.getCurrentTimestamp().isAfter(orderDeliveryTime);
     }
 
     private List<Order> fetchOrdersToProcess() {
@@ -113,14 +113,15 @@ public class BookingRequestSender {
     private BookingRequest createBookingRequest(final Order order, final TaxiDispatcher taxiDispatcher) {
         final Double payment = CostService.calculateTaxiServicePayment(order.getReservationRequest());
 
-        DateTime requestExpirationTime = TimeService.getCurrentDateTime().plusMinutes(
+        DateTime requestExpirationTime = TimeService.getCurrentTimestamp().plusMinutes(
                 BOOKING_REQUEST_MINUTES_EXPIRATION);
         DateTime taxiDeliveryTime = order.getReservationRequest().getDeliveryTime();
         if (requestExpirationTime.isAfter(taxiDeliveryTime)) {
             requestExpirationTime = taxiDeliveryTime;
         }
 
-        return new BookingRequest(order, taxiDispatcher, payment, requestExpirationTime);
+        final DateTime currentTimestamp = TimeService.getCurrentTimestamp();
+        return new BookingRequest(order, taxiDispatcher, payment, requestExpirationTime, currentTimestamp);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")

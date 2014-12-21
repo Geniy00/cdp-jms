@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         final List<BookingRequest> expiredBookingRequests = orderDao.findExpiredBookingRequests();
         for (final BookingRequest expiredBookingRequest : expiredBookingRequests) {
             final BookingResponse bookingResponse = new BookingResponse(expiredBookingRequest,
-                    BookingRequestEnum.Status.EXPIRED, "automatically expired");
+                    BookingRequestEnum.Status.EXPIRED, "automatically expired", TimeService.getCurrentTimestamp());
             expiredBookingRequest.applyBookingResponse(bookingResponse);
 
             expiredBookingRequest.getOrder().setOrderStatus(Order.OrderStatus.DECLINED);
@@ -90,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
         return orderDao.updateBookingRequest(bookingRequest);
     }
 
+    //TODO: review these 3 methods
     @Override
     public Customer acceptOrder(final String orderId, final Long bookingRequestId) {
         final BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
@@ -100,7 +101,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = bookingRequest.getOrder();
-        BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.ACCEPTED);
+        BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.ACCEPTED,
+                TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(order);
         return order.getCustomer();
@@ -116,7 +118,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         final Order order = bookingRequest.getOrder();
-        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.REJECTED);
+        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.REJECTED,
+                TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(order);
         return BookingRequestEnum.Status.REJECTED;
@@ -135,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
 
         final Order order = bookingRequest.getOrder();
         final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.REFUSED,
-                reason);
+                reason, TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         order.setOrderStatus(Order.OrderStatus.CANCELED);
         orderDao.saveOrUpdate(order);
@@ -164,16 +167,16 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    private Boolean isOrderActual(final String orderId, final Long bookingRequestId) {
-        BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
+    private boolean isOrderActual(final String orderId, final Long bookingRequestId) {
+        final BookingRequest bookingRequest = orderDao.findBookingRequest(bookingRequestId);
 
         if (bookingRequest == null) {
-            LOG.warn("bookingRequest with id:" + bookingRequestId + " is null");
+            LOG.warn(String.format("bookingRequest with id:%d is null", bookingRequestId));
             return false;
         }
 
         if (!bookingRequest.getOrder().getId().equals(orderId) || !bookingRequest.getId().equals(bookingRequestId)) {
-            LOG.warn("orderId:" + orderId + " and bookingRequestId:" + bookingRequestId + " are not linked");
+            LOG.warn(String.format("orderId:%s and bookingRequestId:%d are not linked", orderId, bookingRequestId));
             return false;
         }
 
@@ -181,7 +184,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //TODO: can I extract this method?
-    private Boolean canExecuteAction(final BookingRequest bookingRequest, final BookingRequestEnum.Action action) {
+    private boolean canExecuteAction(final BookingRequest bookingRequest, final BookingRequestEnum.Action action) {
         Order.OrderStatus orderStatus = bookingRequest.getOrder().getOrderStatus();
 
         switch (action) {
@@ -204,7 +207,7 @@ public class OrderServiceImpl implements OrderService {
 
     private Boolean isNotExpiredBookingRequest(final BookingRequest bookingRequest) {
         final DateTime taxiDeliveryTime = bookingRequest.getOrder().getReservationRequest().getDeliveryTime();
-        final DateTime currentTime = TimeService.getCurrentDateTime();
+        final DateTime currentTime = TimeService.getCurrentTimestamp();
         return bookingRequest.getExpiryTime().isAfter(currentTime) && taxiDeliveryTime.isAfter(currentTime);
     }
 }

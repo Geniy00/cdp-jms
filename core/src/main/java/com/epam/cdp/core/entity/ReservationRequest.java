@@ -1,5 +1,6 @@
 package com.epam.cdp.core.entity;
 
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "reservation_request")
+@Immutable
 public class ReservationRequest implements Serializable {
 
     private static final long serialVersionUID = 1820235672221505291L;
@@ -46,7 +48,9 @@ public class ReservationRequest implements Serializable {
     public ReservationRequest() {
     }
 
-    public ReservationRequest(Long id, String customerName, String customerPhone, Integer startPosition, Integer finishPosition, DateTime deliveryTime, VehicleType vehicleType) {
+    public ReservationRequest(final Long id, final String customerName, final String customerPhone,
+            final Integer startPosition, final Integer finishPosition, final DateTime deliveryTime,
+            final VehicleType vehicleType) {
         this.id = id;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
@@ -60,7 +64,7 @@ public class ReservationRequest implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -68,7 +72,7 @@ public class ReservationRequest implements Serializable {
         return customerName;
     }
 
-    public void setCustomerName(String customerName) {
+    public void setCustomerName(final String customerName) {
         this.customerName = customerName;
     }
 
@@ -76,7 +80,7 @@ public class ReservationRequest implements Serializable {
         return customerPhone;
     }
 
-    public void setCustomerPhone(String customerPhone) {
+    public void setCustomerPhone(final String customerPhone) {
         this.customerPhone = customerPhone;
     }
 
@@ -84,7 +88,7 @@ public class ReservationRequest implements Serializable {
         return startPosition;
     }
 
-    public void setStartPosition(Integer startPosition) {
+    public void setStartPosition(final Integer startPosition) {
         this.startPosition = startPosition;
     }
 
@@ -92,7 +96,7 @@ public class ReservationRequest implements Serializable {
         return finishPosition;
     }
 
-    public void setFinishPosition(Integer finishPosition) {
+    public void setFinishPosition(final Integer finishPosition) {
         this.finishPosition = finishPosition;
     }
 
@@ -100,7 +104,7 @@ public class ReservationRequest implements Serializable {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(DateTime deliveryTime) {
+    public void setDeliveryTime(final DateTime deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
 
@@ -108,24 +112,23 @@ public class ReservationRequest implements Serializable {
         return vehicleType;
     }
 
-    public void setVehicleType(VehicleType vehicleType) {
+    public void setVehicleType(final VehicleType vehicleType) {
         this.vehicleType = vehicleType;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
-        ReservationRequest that = (ReservationRequest) obj;
+        final ReservationRequest that = (ReservationRequest) obj;
 
-        return Objects.equals(this.id, that.id)
-                && Objects.equals(this.customerName, that.customerName)
-                && Objects.equals(this.customerPhone, that.customerPhone)
-                && Objects.equals(this.startPosition, that.startPosition)
-                && Objects.equals(this.finishPosition, that.finishPosition)
-                && Objects.equals(this.deliveryTime, that.deliveryTime)
-                && Objects.equals(this.vehicleType, that.vehicleType);
+        return Objects.equals(this.id, that.id) && Objects.equals(this.customerName, that.customerName) && Objects
+                .equals(this.customerPhone, that.customerPhone) && Objects.equals(this.startPosition,
+                that.startPosition) && Objects.equals(this.finishPosition, that.finishPosition) && Objects.equals(
+                this.deliveryTime, that.deliveryTime) && Objects.equals(this.vehicleType, that.vehicleType);
     }
 
     @Override

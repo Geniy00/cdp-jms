@@ -21,10 +21,10 @@ public class OrderDaoImpl implements OrderDao {
     private static final String SELECT_ORDER_BY_STATUS = "SELECT ord FROM Order ord WHERE ord.orderStatus=:status";
 
     private static final String SELECT_EXPIRED_BOOKING_REQUEST =
-            "SELECT br FROM BookingRequest br " + "WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
+            "SELECT br FROM BookingRequest br WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
 
     //TODO: rewrite SQL query without NEW, SENT, DECLINED strings. Use Enum Name
-    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord" +
+    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord " +
             "WHERE ord.reservationRequest.deliveryTime < :dateTime AND " +
             "(ord.orderStatus = 'NEW' OR ord.orderStatus = 'SENT' OR ord.orderStatus = 'DECLINED')";
 
@@ -54,14 +54,14 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public List<Order> findExpiredOrders() {
         final TypedQuery<Order> query = em.createQuery(SELECT_EXPIRED_ORDER, Order.class);
-        query.setParameter("dateTime", TimeService.getCurrentDateTime());
+        query.setParameter("dateTime", TimeService.getCurrentTimestamp());
         return query.getResultList();
     }
 
     @Override
     public List<BookingRequest> findExpiredBookingRequests() {
         TypedQuery<BookingRequest> query = em.createQuery(SELECT_EXPIRED_BOOKING_REQUEST, BookingRequest.class);
-        query.setParameter("currentTime", TimeService.getCurrentDateTime());
+        query.setParameter("currentTime", TimeService.getCurrentTimestamp());
         return query.getResultList();
     }
 

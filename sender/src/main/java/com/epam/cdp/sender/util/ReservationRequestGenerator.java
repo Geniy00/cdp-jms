@@ -9,12 +9,15 @@ import java.util.Random;
 public class ReservationRequestGenerator {
 
     //private static final String NUMBERS_AND_SYMBOLS = "0123456789abcdefghijklmnopqrstuvwxyz";
-    private static final String NUMBERS = "0123456789";
-    private static final String SYMBOLS = "abcdefghijklmnopqrstuvwxyz";
-    private static Random random = new Random();
+    private static final String NUMBER_SET = "0123456789";
+    private static final String SYMBOL_SET = "abcdefghijklmnopqrstuvwxyz";
+    private static final Random random = new Random();
+
+    private static final int MINUTES_TO_PROCESS_ORDER = 20;
+    private static final int ROUTE_DISTANCE = 100;
 
     private static String generate(int size, String symbols) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
             sb.append(symbols.charAt(random.nextInt(symbols.length())));
         }
@@ -22,15 +25,16 @@ public class ReservationRequestGenerator {
     }
 
     public static ReservationRequest generateRandomReservationRequest() {
-        ReservationRequest reservationRequest = new ReservationRequest();
-        reservationRequest.setCustomerName(generate(7, SYMBOLS));
-        reservationRequest.setCustomerPhone("+38063" + generate(7, NUMBERS));
-        reservationRequest.setStartPosition(random.nextInt(100));
-        reservationRequest.setFinishPosition(random.nextInt(100));
-        reservationRequest.setDeliveryTime(new DateTime().plusMinutes(20));
-        VehicleType vehicleType = VehicleType.values()[random.nextInt(VehicleType.values().length)];
-        reservationRequest.setVehicleType(vehicleType);
-        return reservationRequest;
+        final String customerName = generate(7, SYMBOL_SET);
+        final String customerPhone = "+38063" + generate(7, NUMBER_SET);
+        final int startPosition = random.nextInt(ROUTE_DISTANCE);
+        final int finishPosition = random.nextInt(ROUTE_DISTANCE);
+        final DateTime deliveryTime = new DateTime().plusMinutes(MINUTES_TO_PROCESS_ORDER);
+
+        final int randomIndex = random.nextInt(VehicleType.values().length);
+        final VehicleType vehicleType = VehicleType.values()[randomIndex];
+        return new ReservationRequest(null, customerName, customerPhone, startPosition, finishPosition, deliveryTime,
+                vehicleType);
     }
 
 }

@@ -25,32 +25,30 @@ public class OrderController {
 
     @RequestMapping(value = "/execute")
     @ResponseBody
-    public String execute(@RequestParam BookingRequestEnum.Action action,
-                          @RequestParam String orderId,
-                          @RequestParam Long bookingRequestId,
-                          @RequestParam(required = false) String reason) {
+    public String execute(@RequestParam BookingRequestEnum.Action action, @RequestParam String orderId,
+            @RequestParam Long bookingRequestId, @RequestParam(required = false) String reason) {
 
         switch (action) {
-            case ACCEPT:
+        case ACCEPT:
                 /*
                 TODO: May we need to split acceptance request onto two:
                 - accept (get error code in case of expired, wrong ids, ..)
                 - getCustomer info (get customer info by some tokens)
                 */
-                Customer customer = orderService.acceptOrder(orderId, bookingRequestId);
-                return xmlSerializer.serialize(customer);
+            Customer customer = orderService.acceptOrder(orderId, bookingRequestId);
+            return xmlSerializer.serialize(customer);
 
-            case REJECT:
-                BookingRequestEnum.Status status = orderService.rejectOrder(orderId, bookingRequestId);
-                return xmlSerializer.serialize(status);
+        case REJECT:
+            BookingRequestEnum.Status status = orderService.rejectOrder(orderId, bookingRequestId);
+            return xmlSerializer.serialize(status);
 
-            case REFUSE:
-                //TODO: why should we use status1?
-                BookingRequestEnum.Status status1 = orderService.refuseOrder(orderId, bookingRequestId, reason);
-                return xmlSerializer.serialize(status1);
+        case REFUSE:
+            //TODO: why should we use status1?
+            BookingRequestEnum.Status status1 = orderService.refuseOrder(orderId, bookingRequestId, reason);
+            return xmlSerializer.serialize(status1);
 
-            default:
-                return "You can't execute [" + action + "] action.";
+        default:
+            return String.format("You can't execute [%s] action.", action);
 
         }
     }

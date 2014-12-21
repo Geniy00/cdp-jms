@@ -39,30 +39,24 @@ public class BookingResponse implements Serializable {
     public BookingResponse() {
     }
 
-    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status) {
-        this.bookingRequest = bookingRequest;
-        this.status = status;
-        this.reason = "";
+    public BookingResponse(final BookingRequest bookingRequest, final BookingRequestEnum.Status status,
+            final DateTime createdTimestamp) {
+        this(bookingRequest, status, "", createdTimestamp);
     }
 
-    @PrePersist
-    protected void updateDates() {
-        created = new DateTime();
-    }
-
-    public BookingResponse(BookingRequest bookingRequest, BookingRequestEnum.Status status, String reason) {
+    public BookingResponse(final BookingRequest bookingRequest, final BookingRequestEnum.Status status,
+            final String reason, final DateTime createdTimestamp) {
         this.bookingRequest = bookingRequest;
         this.status = status;
         this.reason = reason;
-        //TODO: Should we kill off these new DateTime in entity class
-        this.created = new DateTime();
+        this.created = createdTimestamp;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -70,7 +64,7 @@ public class BookingResponse implements Serializable {
         return bookingRequest;
     }
 
-    public void setBookingRequest(BookingRequest bookingRequest) {
+    public void setBookingRequest(final BookingRequest bookingRequest) {
         this.bookingRequest = bookingRequest;
     }
 
@@ -78,7 +72,7 @@ public class BookingResponse implements Serializable {
         return status;
     }
 
-    public void setStatus(BookingRequestEnum.Status status) {
+    public void setStatus(final BookingRequestEnum.Status status) {
         this.status = status;
     }
 
@@ -86,7 +80,7 @@ public class BookingResponse implements Serializable {
         return reason;
     }
 
-    public void setReason(String reason) {
+    public void setReason(final String reason) {
         this.reason = reason;
     }
 
@@ -94,18 +88,18 @@ public class BookingResponse implements Serializable {
         return created;
     }
 
-    public void setCreated(DateTime created) {
+    public void setCreated(final DateTime created) {
         this.created = created;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
 
-        BookingResponse that = (BookingResponse) obj;
+        final BookingResponse that = (BookingResponse) obj;
 
         return Objects.equals(this.id, that.id) && Objects.equals(this.bookingRequest, that.bookingRequest) && Objects
                 .equals(this.status, that.status);
