@@ -18,6 +18,7 @@
     <mvc:annotation-driven/>
     <context:annotation-config/>
     <context:component-scan base-package="com.epam.cdp.router.dao"/>
+    <context:component-scan base-package="com.epam.cdp.router.handler"/>
     <context:component-scan base-package="com.epam.cdp.router.service"/>
     <context:component-scan base-package="com.epam.cdp.router.controller"/>
     <context:component-scan base-package="com.epam.cdp.router.gateway"/>
@@ -32,7 +33,7 @@
         <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <bean id="emf"  class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="persistenceUnitName" value="ROUTERPU"/>
     </bean>
@@ -47,18 +48,18 @@
         <property name="brokerURL" value="${jms.url}"/>
     </bean>
 
+    <!--TODO: set error handler for all listeners-->
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
-        <jms:listener destination="${jms.input.order.queue.name}" ref="reservationRequestListener"/>
-        <jms:listener destination="${jms.fail.queue.name}" ref="failQueueListener"/>
+        <jms:listener destination="${reservation.request.queue.name.request}" ref="reservationRequestGateway"/>
+        <!--<jms:listener destination="${jms.fail.queue.name}" ref="failQueueListener"/>-->
         <!-- Default ActiveMQ fail queue -->
-        <jms:listener destination="ActiveMQ.DLQ" ref="failQueueListener"/>
+        <!--<jms:listener destination="ActiveMQ.DLQ" ref="failQueueListener"/>-->
     </jms:listener-container>
 
     <!-- Jms Template-->
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory"/>
-        <!--<property name="defaultDestination" ref="orderQueue" />-->
     </bean>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

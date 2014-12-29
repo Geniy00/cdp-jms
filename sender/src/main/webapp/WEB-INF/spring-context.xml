@@ -2,20 +2,33 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jms="http://www.springframework.org/schema/jms"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context-3.0.xsd
        http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms.xsd">
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
+    <context:component-scan base-package="com.epam.cdp.sender.bean"/>
     <context:component-scan base-package="com.epam.cdp.sender.controller"/>
+    <context:component-scan base-package="com.epam.cdp.sender.gateway"/>
     <context:component-scan base-package="com.epam.cdp.sender.service"/>
 
     <bean id="scheduledReservationRequestSender" class="com.epam.cdp.sender.bean.ScheduledReservationRequestSender">
         <constructor-arg ref="reservationServiceImpl"/>
+    </bean>
+
+    <!--Queue list-->
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="${reservation.request.queue.name.request}"/>
+    </bean>
+    <bean id="responseQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="${reservation.request.queue.name.response}"/>
     </bean>
 
     <bean id="connectionFactory"
@@ -23,17 +36,23 @@
         <property name="brokerURL" value="${jms.url}"/>
     </bean>
 
-    <bean id="orderQueue" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="${jms.input.order.queue.name}"/>
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
     </bean>
 
-    <bean id="jmsTemplate"
-          class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="defaultDestination" ref="orderQueue"/>
-    </bean>
+    <!-- Receiving JMS messages -->
+    <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
+        <jms:listener destination="${reservation.request.queue.name.response}" ref="senderGateway"/>
+    </jms:listener-container>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:config.properties"/>
+    </bean>
+
+    <bean id="sourceSystem" class="com.epam.cdp.core.entity.SourceSystem">
+        <constructor-arg>
+            <value type="com.epam.cdp.core.entity.SourceSystem$SystemId">${source.system.id}</value>
+        </constructor-arg>
+        <constructor-arg value="${reservation.request.queue.name.response}"/>
     </bean>
 </beans>

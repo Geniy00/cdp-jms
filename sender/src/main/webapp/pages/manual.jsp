@@ -9,7 +9,7 @@
 <a href="manual/random">Generate random order</a>
 <br/><br/>
 
-<sf:form action="${pageContext.request.contextPath}/send" method="post" modelAttribute="reservationRequest">
+<sf:form action="${pageContext.request.contextPath}/price" method="post" modelAttribute="reservationRequest">
     <table>
         <tr>
             <td colspan="2">Customer:</td>
@@ -42,11 +42,7 @@
             <td><sf:select path="vehicleType" items="${vehicleTypeValues}"/></td>
         </tr>
         <tr>
-            <td>Price:</td>
-            <td>|NOT CALCULATED|</td>
-        </tr>
-        <tr>
-            <td colspan="2"><sf:button>Send</sf:button></td>
+            <td colspan="2"><sf:button>Price an order</sf:button></td>
         </tr>
     </table>
 </sf:form>

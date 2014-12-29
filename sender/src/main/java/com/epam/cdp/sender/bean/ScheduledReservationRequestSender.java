@@ -90,10 +90,11 @@ public class ScheduledReservationRequestSender {
         return new Runnable() {
             public void run() {
                 ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
-                reservationService.sendReservationRequest(reservationRequest);
+                reservationService.sendToJms(reservationRequest);
                 messageCount.incrementAndGet();
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(String.format("Reservation request was sent[id:%s]", reservationRequest.getId()));
+                    LOG.debug(String.format("Reservation request was sent[requestId:%s]",
+                            reservationRequest.getRequestId()));
                 }
             }
         };

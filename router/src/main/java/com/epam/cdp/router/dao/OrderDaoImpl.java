@@ -29,7 +29,7 @@ public class OrderDaoImpl implements OrderDao {
             "(ord.orderStatus = 'NEW' OR ord.orderStatus = 'SENT' OR ord.orderStatus = 'DECLINED')";
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
 
     @Override
     public Order saveOrUpdate(Order order) {

@@ -12,6 +12,7 @@
         <class>com.epam.cdp.core.entity.Order</class>
         <class>com.epam.cdp.core.entity.ReservationRequest</class>
         <class>com.epam.cdp.core.entity.TaxiDispatcher</class>
+        <class>com.epam.cdp.core.entity.SourceSystem</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

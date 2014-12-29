@@ -16,7 +16,7 @@ public class TaxiDispatcherDaoImpl implements TaxiDispatcherDao {
             "SELECT td FROM TaxiDispatcher td WHERE td.disabled=false";
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
 
     @Override
     public TaxiDispatcher find(Long id) {

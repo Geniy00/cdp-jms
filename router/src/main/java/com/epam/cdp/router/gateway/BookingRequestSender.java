@@ -38,7 +38,7 @@ public class BookingRequestSender {
     TaxiDispatcherSelector taxiDispatcherSelector;
 
     @Autowired
-    CostService costService;
+    PriceService priceService;
 
     @Autowired
     XmlSerializer xmlSerializer;
@@ -111,7 +111,7 @@ public class BookingRequestSender {
     }
 
     private BookingRequest createBookingRequest(final Order order, final TaxiDispatcher taxiDispatcher) {
-        final Double payment = CostService.calculateTaxiServicePayment(order.getReservationRequest());
+        final Double payment = PriceService.calculateTaxiServicePayment(order.getReservationRequest());
 
         DateTime requestExpirationTime = TimeService.getCurrentTimestamp().plusMinutes(
                 BOOKING_REQUEST_MINUTES_EXPIRATION);

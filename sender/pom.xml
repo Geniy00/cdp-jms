@@ -41,6 +41,11 @@
             <artifactId>spring-jms</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
         <!-- Uploading file through MultipartFile -->
         <dependency>
             <groupId>commons-fileupload</groupId>
