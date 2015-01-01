@@ -20,7 +20,7 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
     private OrderDao orderDao;
 
     @Override
-    public BookingRequestEnum.Status handleAcceptCommand(final String orderId, final Long bookingRequestId)
+    public BookingRequest.Status handleAcceptCommand(final String orderId, final Long bookingRequestId)
             throws TsException {
         final BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
@@ -31,15 +31,15 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
             );
         }
 
-        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.ACCEPTED,
+        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.ACCEPTED,
                 TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(bookingRequest.getOrder());
-        return BookingRequestEnum.Status.ACCEPTED;
+        return BookingRequest.Status.ACCEPTED;
     }
 
     @Override
-    public BookingRequestEnum.Status handleRejectCommand(final String orderId, final Long bookingRequestId)
+    public BookingRequest.Status handleRejectCommand(final String orderId, final Long bookingRequestId)
             throws TsException {
         BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
@@ -50,15 +50,15 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
             );
         }
 
-        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.REJECTED,
+        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.REJECTED,
                 TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(bookingRequest.getOrder());
-        return BookingRequestEnum.Status.REJECTED;
+        return BookingRequest.Status.REJECTED;
     }
 
     @Override
-    public BookingRequestEnum.Status handleRefuseCommand(final String orderId, final Long bookingRequestId,
+    public BookingRequest.Status handleRefuseCommand(final String orderId, final Long bookingRequestId,
             final String reason) throws TsException {
         BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
@@ -69,11 +69,11 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
             );
         }
 
-        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequestEnum.Status.REFUSED,
+        final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.REFUSED,
                 reason, TimeService.getCurrentTimestamp());
         bookingRequest.applyBookingResponse(bookingResponse);
         orderDao.saveOrUpdate(bookingRequest.getOrder());
-        return BookingRequestEnum.Status.REFUSED;
+        return BookingRequest.Status.REFUSED;
     }
 
     @Override

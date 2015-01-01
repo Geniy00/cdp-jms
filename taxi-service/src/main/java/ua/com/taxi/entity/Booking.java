@@ -26,7 +26,7 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private BookingStatus status;
+    private Status status;
 
     @Column(name = "assignToExpiryTime")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -35,17 +35,17 @@ public class Booking {
     @Column(name = "reason")
     private String reason;
 
-    public enum BookingStatus {
+    public enum Status {
         NEW, ASSIGNED, REVOKED, ACCEPTED, REJECTED, REFUSED, EXPIRED
     }
 
     public Booking() {
-        status = BookingStatus.NEW;
+        status = Status.NEW;
     }
 
     public Booking(BookingRequestDetails bookingRequestDetails) {
         this.bookingRequest = bookingRequestDetails;
-        this.status = BookingStatus.NEW;
+        this.status = Status.NEW;
     }
 
     public Long getId() {
@@ -72,11 +72,11 @@ public class Booking {
         this.client = client;
     }
 
-    public BookingStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(BookingStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

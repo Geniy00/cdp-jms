@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @author Geniy00
  */
@@ -19,11 +22,16 @@ public class ReservationRequestHandlerImpl implements ReservationRequestHandler 
 
     private static final Logger LOG = Logger.getLogger(ReservationRequestHandlerImpl.class);
 
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+
     @Autowired
     private ReservationRequestDao requestDao;
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private BookingRequestHandler bookingRequestHandler;
 
     @Override
     public ReservationResponse handleIndicativeRequest(final ReservationRequest reservationRequest) {
@@ -46,7 +54,7 @@ public class ReservationRequestHandlerImpl implements ReservationRequestHandler 
             final Order order = orderService.createAndSaveNewOrder(persistedReservationRequest);
             LOG.info(String.format("Order[id: %s] was created successfully", order.getId()));
 
-            //TODO: run sending order to taxi service right here
+            asyncSendBookingRequest(order);
 
             return new ReservationResponse(reservationRequest.getRequestId(), ReservationRequest.Status.RECEIVED,
                     reservationRequest.getPrice());
@@ -55,6 +63,15 @@ public class ReservationRequestHandlerImpl implements ReservationRequestHandler 
             LOG.warn(message);
             return new ReservationResponse(reservationRequest.getRequestId(), true, message);
         }
+    }
+
+    private void asyncSendBookingRequest(final Order order) {
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                bookingRequestHandler.sendBookingRequest(order);
+            }
+        });
     }
 
     private ReservationRequest priceReservationRequest(final ReservationRequest reservationRequest) {

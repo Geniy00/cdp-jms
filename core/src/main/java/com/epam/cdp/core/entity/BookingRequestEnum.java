@@ -10,8 +10,4 @@ public class BookingRequestEnum {
         ACCEPT, REJECT, REFUSE, FAIL
     }
 
-    public enum Status {
-        ACCEPTED, REJECTED, REFUSED, EXPIRED, FAILED
-    }
-
 }

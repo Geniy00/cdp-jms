@@ -102,16 +102,22 @@
         loadUpdatedInfo();
     });
 
+    var MAX_TIMEOUT = 10000;
+    var currentTimeout = 1000;
+
     function loadUpdatedInfo() {
         $.ajax("${pageContext.request.contextPath}/getAjaxResponseObject?requestId=${reservationRequest.requestId}",
                 {
                     success: function (response) {
+                        if(currentTimeout < MAX_TIMEOUT) {
+                            currentTimeout += 1000
+                        }
                         if (response == "") {
-                            setTimeout(loadUpdatedInfo, 10000);
+                            setTimeout(loadUpdatedInfo, currentTimeout);
                             return;
                         } else if (response.status != "FAILURE"
                                 && response.status != "COMPLETED") {
-                            setTimeout(loadUpdatedInfo, 10000)
+                            setTimeout(loadUpdatedInfo, currentTimeout)
                         }
 
                         var status = response.status;

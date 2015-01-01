@@ -17,7 +17,9 @@ public class TsException extends Exception {
         SERIALIZATION_FAILURE(140, "Serialization failure during serializing %s class"),
         DESERIALIZATION_FAILURE(140, "Deserialization failure during deserializing [%s] message to %s class"),
 
-        ACTION_IS_UNAVAILABLE(150, "Can't execute an action %s");
+        ACTION_IS_UNAVAILABLE(150, "Can't execute an action %s"),
+
+        ENUM_CONVERTING_ERROR(160, "Can't convert %s.%s to %s enum value");
 
         private final int code;
 

@@ -26,7 +26,7 @@ public class BookingResponse implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private BookingRequestEnum.Status status;
+    private BookingRequest.Status status;
 
     @Column(name = "reason")
     private String reason;
@@ -39,12 +39,12 @@ public class BookingResponse implements Serializable {
     public BookingResponse() {
     }
 
-    public BookingResponse(final BookingRequest bookingRequest, final BookingRequestEnum.Status status,
+    public BookingResponse(final BookingRequest bookingRequest, final BookingRequest.Status status,
             final DateTime createdTimestamp) {
         this(bookingRequest, status, "", createdTimestamp);
     }
 
-    public BookingResponse(final BookingRequest bookingRequest, final BookingRequestEnum.Status status,
+    public BookingResponse(final BookingRequest bookingRequest, final BookingRequest.Status status,
             final String reason, final DateTime createdTimestamp) {
         this.bookingRequest = bookingRequest;
         this.status = status;
@@ -68,11 +68,11 @@ public class BookingResponse implements Serializable {
         this.bookingRequest = bookingRequest;
     }
 
-    public BookingRequestEnum.Status getStatus() {
+    public BookingRequest.Status getStatus() {
         return status;
     }
 
-    public void setStatus(final BookingRequestEnum.Status status) {
+    public void setStatus(final BookingRequest.Status status) {
         this.status = status;
     }
 

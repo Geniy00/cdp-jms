@@ -36,5 +36,5 @@ public interface BookingService {
 
     List<Booking> findBookings(int limit);
 
-    List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit);
+    List<Booking> findBookingByStatus(Booking.Status status, int limit);
 }

@@ -1,7 +1,6 @@
 package com.epam.cdp.router.service;
 
 import com.epam.cdp.core.entity.BookingRequest;
-import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.BookingResponse;
 import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.router.handler.BookingRequestHandler;
@@ -54,7 +53,7 @@ public class PeriodicTasks {
                 for (BookingRequest bookingRequest : expiredOrder.getBookingRequests()) {
                     if (bookingRequest.getBookingResponse() == null) {
                         final BookingResponse expiredBookingResponse = new BookingResponse(bookingRequest,
-                                BookingRequestEnum.Status.EXPIRED, TimeService.getCurrentTimestamp());
+                                BookingRequest.Status.EXPIRED, TimeService.getCurrentTimestamp());
                         bookingRequest.applyBookingResponse(expiredBookingResponse);
                     }
                 }

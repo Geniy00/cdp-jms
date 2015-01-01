@@ -1,5 +1,6 @@
 package ua.com.taxi.service;
 
+import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.TsException;
 import org.apache.log4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ua.com.taxi.entity.Booking;
 import ua.com.taxi.entity.ClientDetails;
+import ua.com.taxi.util.ConverterUtil;
 import ua.com.taxi.util.XstreamSerializer;
 
 import java.util.HashMap;
@@ -35,17 +37,18 @@ public class RouterRestClient {
     @Value("${router.rest.url}")
     private String ROUTER_REST_URL;
 
-    public Booking.BookingStatus executeActionRequest(final Booking booking, final BookingRequestEnum.Action action)
+    public Booking.Status executeActionRequest(final Booking booking, final BookingRequestEnum.Action action)
             throws TsException {
         return executeActionRequest(booking, action, "");
     }
 
-    public Booking.BookingStatus executeActionRequest(final Booking booking, final BookingRequestEnum.Action action,
+    public Booking.Status executeActionRequest(final Booking booking, final BookingRequestEnum.Action action,
             final String reason) throws TsException {
         final Map<String, String> mapVariables = createActionRequestParams(booking, action, reason);
         final String url = ROUTER_REST_URL + REST_ACTION_URL;
         final String response = sendRestRequest(url, mapVariables);
-        return parseResponse(response, Booking.BookingStatus.class);
+        final BookingRequest.Status status = parseResponse(response, BookingRequest.Status.class);
+        return ConverterUtil.convertBookingRequestStatusToBookingStatus(status);
     }
 
     public ClientDetails getClientDetails(final Booking booking) throws TsException {

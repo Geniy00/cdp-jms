@@ -42,7 +42,7 @@
             </tr>
             <tr>
                 <td>Payment:</td>
-                <td><b>$ ${booking.bookingRequest.payment}</b></td>
+                <td><b>${booking.bookingRequest.payment} uah</b></td>
             </tr>
             <tr>
                 <td>Expiry time:</td>
@@ -70,10 +70,10 @@
     </c:if>
 </c:if>
 
-<c:if test="${message != null}">
+<c:if test="${message != ''}">
     <span style="color: #ff4500; ">Message: ${message}</span>
 </c:if>
-
+<br/>
 <c:if test="${booking == null}">
     <span style="color: red; ">The queue is empty or all request are in processing</span>
 </c:if>

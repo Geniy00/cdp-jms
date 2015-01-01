@@ -99,8 +99,8 @@
                 <tr>
                     <td width="100px">
                         <form action="${pageContext.request.contextPath}/booking/${booking.id}/assigned" method="post">
-                            <input type="hidden" name="action" value="UNASSIGN"/>
-                            <input type="submit" value="Unassign"/>
+                            <input type="hidden" name="action" value="REVOKE"/>
+                            <input type="submit" value="Revoke"/>
                         </form>
                     </td>
                 </tr>

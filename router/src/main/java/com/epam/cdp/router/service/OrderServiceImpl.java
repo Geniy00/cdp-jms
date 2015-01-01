@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
         final List<BookingRequest> expiredBookingRequests = orderDao.findExpiredBookingRequests();
         for (final BookingRequest expiredBookingRequest : expiredBookingRequests) {
             final BookingResponse bookingResponse = new BookingResponse(expiredBookingRequest,
-                    BookingRequestEnum.Status.EXPIRED, "automatically expired", TimeService.getCurrentTimestamp());
+                    BookingRequest.Status.EXPIRED, "automatically expired", TimeService.getCurrentTimestamp());
             expiredBookingRequest.applyBookingResponse(bookingResponse);
 
             expiredBookingRequest.getOrder().setOrderStatus(Order.OrderStatus.DECLINED);
@@ -99,46 +99,32 @@ public class OrderServiceImpl implements OrderService {
 
     //TODO: add sending status to sender module
     @Override
-    public BookingRequestEnum.Status acceptOrder(final String orderId, final Long bookingRequestId) throws TsException {
-        final BookingRequestEnum.Status newStatus = bookingResponseHandler.handleAcceptCommand(orderId,
+    public BookingRequest.Status acceptOrder(final String orderId, final Long bookingRequestId) throws TsException {
+        final BookingRequest.Status newStatus = bookingResponseHandler.handleAcceptCommand(orderId,
                 bookingRequestId);
-        if (newStatus == BookingRequestEnum.Status.ACCEPTED) {
-            sendReservationResponseOnUpdate(orderId, ReservationRequest.Status.ASSIGNED, "");
-        }
-        return newStatus;
-    }
-
-    private void sendReservationResponseOnUpdate(final String orderId, final ReservationRequest.Status newStatus,
-            final String failureReason) {
-        final Order order = orderDao.find(orderId);
-        final ReservationRequest reservationRequest = order.getReservationRequest();
-        final ReservationResponse reservationResponse;
-        final Long requestId = reservationRequest.getRequestId();
-        if (newStatus != ReservationRequest.Status.FAILURE) {
-            reservationResponse = new ReservationResponse(requestId, newStatus, reservationRequest.getPrice());
-        } else {
-            reservationResponse = new ReservationResponse(requestId, true, failureReason);
-        }
-        reservationRequestGateway.send(reservationRequest.getSourceSystem().getJmsResponseQueue(), reservationResponse);
-    }
-
-    @Override
-    public BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId) throws TsException {
-        final BookingRequestEnum.Status newStatus = bookingResponseHandler.handleRejectCommand(orderId,
-                bookingRequestId);
-        if (newStatus == BookingRequestEnum.Status.REJECTED) {
-            sendReservationResponseOnUpdate(orderId, ReservationRequest.Status.ASSIGNING, "");
+        if (newStatus == BookingRequest.Status.ACCEPTED) {
+            sendReservationResponseOnOrderUpdate(orderId, ReservationRequest.Status.COMPLETED, "");
         }
         return newStatus;
     }
 
     @Override
-    public BookingRequestEnum.Status refuseOrder(final String orderId, final Long bookingRequestId,
+    public BookingRequest.Status rejectOrder(String orderId, Long bookingRequestId) throws TsException {
+        final BookingRequest.Status newStatus = bookingResponseHandler.handleRejectCommand(orderId,
+                bookingRequestId);
+        if (newStatus == BookingRequest.Status.REJECTED) {
+            sendReservationResponseOnOrderUpdate(orderId, ReservationRequest.Status.ASSIGNING, "");
+        }
+        return newStatus;
+    }
+
+    @Override
+    public BookingRequest.Status refuseOrder(final String orderId, final Long bookingRequestId,
             final String reason) throws TsException {
-        final BookingRequestEnum.Status newStatus = bookingResponseHandler.handleRefuseCommand(orderId,
+        final BookingRequest.Status newStatus = bookingResponseHandler.handleRefuseCommand(orderId,
                 bookingRequestId, reason);
-        if (newStatus == BookingRequestEnum.Status.REFUSED) {
-            sendReservationResponseOnUpdate(orderId, ReservationRequest.Status.ASSIGNING, "");
+        if (newStatus == BookingRequest.Status.REFUSED) {
+            sendReservationResponseOnOrderUpdate(orderId, ReservationRequest.Status.ASSIGNING, "");
         }
         return newStatus;
     }
@@ -152,6 +138,20 @@ public class OrderServiceImpl implements OrderService {
     public void persistFailQueueMessage(final FailQueueMessage failQueueMessage) {
         //TODO: move this method to right place
         orderDao.persistFailQueueMessage(failQueueMessage);
+    }
+
+    private void sendReservationResponseOnOrderUpdate(final String orderId, final ReservationRequest.Status newStatus,
+            final String failureReason) {
+        final Order order = orderDao.find(orderId);
+        final ReservationRequest reservationRequest = order.getReservationRequest();
+        final ReservationResponse reservationResponse;
+        final Long requestId = reservationRequest.getRequestId();
+        if (newStatus != ReservationRequest.Status.FAILURE) {
+            reservationResponse = new ReservationResponse(requestId, newStatus, reservationRequest.getPrice());
+        } else {
+            reservationResponse = new ReservationResponse(requestId, true, failureReason);
+        }
+        reservationRequestGateway.send(reservationRequest.getSourceSystem().getJmsResponseQueue(), reservationResponse);
     }
 
     private Customer getPersistedCustomer(final ReservationRequest reservationRequest) {

@@ -1,9 +1,8 @@
 package com.epam.cdp.router.handler;
 
-import com.epam.cdp.core.entity.BookingRequest;
-import com.epam.cdp.core.entity.Order;
-import com.epam.cdp.core.entity.TaxiDispatcher;
+import com.epam.cdp.core.entity.*;
 import com.epam.cdp.router.gateway.BookingRequestSender;
+import com.epam.cdp.router.gateway.ReservationRequestGateway;
 import com.epam.cdp.router.service.OrderService;
 import com.epam.cdp.router.service.PriceService;
 import com.epam.cdp.router.service.TaxiDispatcherSelector;
@@ -34,6 +33,9 @@ public class BookingRequestHandlerImpl implements BookingRequestHandler {
     @Autowired
     private BookingRequestSender requestSender;
 
+    @Autowired
+    private ReservationRequestGateway reservationRequestGateway;
+
     @Override
     public void sendBookingRequest(final Order order) {
         final TaxiDispatcher taxiDispatcher = taxiDispatcherSelector.selectTaxiDispatcher(order);
@@ -49,7 +51,17 @@ public class BookingRequestHandlerImpl implements BookingRequestHandler {
         requestSender.send(taxiDispatcher, persistedBookingRequest);
 
         order.applyBookingRequest(persistedBookingRequest);
-        orderService.update(order);
+        final Order persistedOrder = orderService.update(order);
+
+        sendReservationResponseOnOrderUpdate(persistedOrder);
+    }
+
+    private void sendReservationResponseOnOrderUpdate(final Order persistedOrder) {
+        final ReservationRequest reservationRequest = persistedOrder.getReservationRequest();
+        final String destination = reservationRequest.getSourceSystem().getJmsResponseQueue();
+        final ReservationResponse reservationResponse = new ReservationResponse(reservationRequest.getRequestId(),
+                ReservationRequest.Status.ASSIGNED, reservationRequest.getPrice());
+        reservationRequestGateway.send(destination, reservationResponse);
     }
 
     private BookingRequest createBookingRequest(final Order order, final TaxiDispatcher taxiDispatcher) {

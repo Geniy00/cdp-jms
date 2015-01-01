@@ -57,7 +57,7 @@ public class BookingDaoImpl implements BookingDao {
     }
 
     @Override
-    public List<Booking> findBookingByStatus(final Booking.BookingStatus status, final int limit) {
+    public List<Booking> findBookingByStatus(final Booking.Status status, final int limit) {
         final TypedQuery<Booking> query = em.createQuery(SELECT_BOOKING_BY_STATUS, Booking.class);
         query.setParameter("status", status);
         query.setMaxResults(limit);
@@ -65,7 +65,7 @@ public class BookingDaoImpl implements BookingDao {
     }
 
     @Override
-    public Long countBookingByStatus(final Booking.BookingStatus status) {
+    public Long countBookingByStatus(final Booking.Status status) {
         final TypedQuery<Long> query = em.createQuery(COUNT_BOOKING_BY_STATUS, Long.class);
         query.setParameter("status", status);
         return query.getSingleResult();

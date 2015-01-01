@@ -25,7 +25,7 @@ public class PeriodicTasks {
     public void moveBookingsToExpired() {
         final List<Booking> expiredBookings = bookingService.findExpiredBookings();
         for (final Booking expiredBooking : expiredBookings) {
-            expiredBooking.setStatus(Booking.BookingStatus.EXPIRED);
+            expiredBooking.setStatus(Booking.Status.EXPIRED);
             bookingService.saveOrUpdate(expiredBooking);
         }
 
@@ -40,7 +40,7 @@ public class PeriodicTasks {
     public void revokeBookingAutomatically() {
         final List<Booking> expiredAndAssignedBookings = bookingService.findExpiredAndAssignedBookings();
         for (Booking booking : expiredAndAssignedBookings) {
-            booking.setStatus(Booking.BookingStatus.REVOKED);
+            booking.setStatus(Booking.Status.REVOKED);
             booking.setAssignToExpiryTime(null);
             bookingService.saveOrUpdate(booking);
         }

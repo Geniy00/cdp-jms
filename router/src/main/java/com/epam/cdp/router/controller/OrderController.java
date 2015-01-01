@@ -1,5 +1,6 @@
 package com.epam.cdp.router.controller;
 
+import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.Customer;
 import com.epam.cdp.core.entity.TsException;
@@ -33,7 +34,7 @@ public class OrderController {
             @RequestParam Long bookingRequestId, @RequestParam(required = false) String reason) {
         try {
             //TODO: Can I just return a String without serailization?
-            final BookingRequestEnum.Status status;
+            final BookingRequest.Status status;
             switch (action) {
             case ACCEPT:
                 status = orderService.acceptOrder(orderId, bookingRequestId);
@@ -48,7 +49,7 @@ public class OrderController {
                 break;
 
             default:
-                status = BookingRequestEnum.Status.FAILED;
+                status = BookingRequest.Status.FAILED;
 
             }
             return xmlSerializer.serialize(status);

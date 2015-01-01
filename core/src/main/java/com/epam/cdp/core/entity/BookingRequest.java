@@ -78,7 +78,7 @@ public class BookingRequest implements Serializable {
     //TODO: refactor it
     public void applyBookingResponse(BookingResponse bookingResponse) {
         this.bookingResponse = bookingResponse;
-        final BookingRequestEnum.Status responseStatus = bookingResponse.getStatus();
+        final Status responseStatus = bookingResponse.getStatus();
         switch (responseStatus) {
         case ACCEPTED:
             order.setOrderStatus(Order.OrderStatus.PROCESSED);
@@ -206,5 +206,9 @@ public class BookingRequest implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, startPosition, finishPosition, deliveryTime, vehicleType);
+    }
+
+    public enum Status {
+        ACCEPTED, REJECTED, REFUSED, EXPIRED, FAILED
     }
 }

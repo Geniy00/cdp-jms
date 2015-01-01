@@ -15,8 +15,6 @@ import ua.com.taxi.entity.Booking;
 import java.util.List;
 import java.util.Random;
 
-import static ua.com.taxi.entity.Booking.BookingStatus;
-
 /**
  * @author Geniy00
  */
@@ -56,8 +54,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Optional<Booking> findFreeBooking() {
-        final List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW, MAX_BOOKING_SELECT_LIMIT);
-        bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.REVOKED, MAX_BOOKING_SELECT_LIMIT));
+        final List<Booking> bookings = bookingDao.findBookingByStatus(Booking.Status.NEW, MAX_BOOKING_SELECT_LIMIT);
+        bookings.addAll(bookingDao.findBookingByStatus(Booking.Status.REVOKED, MAX_BOOKING_SELECT_LIMIT));
 
         final int size = bookings.size();
         if (size > 0) {
@@ -78,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking assignBooking(final Long bookingId) throws TsException {
         final Booking booking = bookingDao.find(bookingId);
-        final BookingStatus newStatus = BookingStatus.ASSIGNED;
+        final Booking.Status newStatus = Booking.Status.ASSIGNED;
         validateApplyingNewStatus(booking, newStatus);
 
         booking.setStatus(newStatus);
@@ -89,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking revokeBooking(final Long bookingId) throws TsException {
         final Booking booking = bookingDao.find(bookingId);
-        final BookingStatus newStatus = BookingStatus.REVOKED;
+        final Booking.Status newStatus = Booking.Status.REVOKED;
         validateApplyingNewStatus(booking, newStatus);
 
         booking.setStatus(newStatus);
@@ -99,23 +97,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking acceptBooking(final Long bookingId) throws TsException {
-        return requestNewStatusForBooking(bookingId, BookingStatus.ACCEPTED, "");
+        return requestNewStatusForBooking(bookingId, Booking.Status.ACCEPTED, "");
     }
 
     @Override
     public Booking rejectBooking(final Long bookingId) throws TsException {
-        return requestNewStatusForBooking(bookingId, BookingStatus.REJECTED, "");
+        return requestNewStatusForBooking(bookingId, Booking.Status.REJECTED, "");
     }
 
     @Override
     public Booking refuseBooking(final Long bookingId, final String reason) throws TsException {
-        return requestNewStatusForBooking(bookingId, BookingStatus.REFUSED, reason);
+        return requestNewStatusForBooking(bookingId, Booking.Status.REFUSED, reason);
     }
 
     @Override
     public Long countActualBookings() {
-        final long newCount = bookingDao.countBookingByStatus(BookingStatus.NEW);
-        final long unassignedCount = bookingDao.countBookingByStatus(BookingStatus.REVOKED);
+        final long newCount = bookingDao.countBookingByStatus(Booking.Status.NEW);
+        final long unassignedCount = bookingDao.countBookingByStatus(Booking.Status.REVOKED);
         return newCount + unassignedCount;
     }
 
@@ -135,16 +133,18 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> findBookingByStatus(final BookingStatus status, final int limit) {
+    public List<Booking> findBookingByStatus(final Booking.Status status, final int limit) {
         return bookingDao.findBookingByStatus(status, limit);
     }
 
-    private Booking requestNewStatusForBooking(final Long bookingId, final BookingStatus newStatus,
+    private Booking requestNewStatusForBooking(final Long bookingId, final Booking.Status newStatus,
             final String reason) throws TsException {
         final Booking booking = bookingDao.find(bookingId);
         validateApplyingNewStatus(booking, newStatus);
 
-        final BookingStatus status = restClient.executeActionRequest(booking, BookingRequestEnum.Action.REFUSE, reason);
+        final BookingRequestEnum.Action action = getActionByStatus(newStatus);
+
+        final Booking.Status status = restClient.executeActionRequest(booking, action, reason);
 
         if (newStatus == status) {
             booking.setStatus(status);
@@ -154,7 +154,28 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
-    private void validateApplyingNewStatus(final Booking booking, final BookingStatus newStatus)
+    private BookingRequestEnum.Action getActionByStatus(final Booking.Status newStatus) throws TsException {
+        final BookingRequestEnum.Action action;
+        switch (newStatus){
+        //TODO: review it
+        case ACCEPTED:
+            action = BookingRequestEnum.Action.ACCEPT;
+            break;
+
+        case REJECTED:
+            action = BookingRequestEnum.Action.REJECT;
+            break;
+
+        case REFUSED:
+            action = BookingRequestEnum.Action.REFUSE;
+            break;
+        default:
+            throw new TsException(TsException.Reason.ACTION_IS_UNAVAILABLE, "for status " + newStatus);
+        }
+        return action;
+    }
+
+    private void validateApplyingNewStatus(final Booking booking, final Booking.Status newStatus)
             throws TsException {
         if (!canChangeStatusTo(booking, newStatus)) {
             final String message = String.format("Current booking state can't be changed from %s to %s",
@@ -164,22 +185,22 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private Boolean canChangeStatusTo(final Booking booking, final Booking.BookingStatus newStatus) {
-        final Booking.BookingStatus currentStatus = booking.getStatus();
+    private Boolean canChangeStatusTo(final Booking booking, final Booking.Status newStatus) {
+        final Booking.Status currentStatus = booking.getStatus();
         switch (newStatus) {
         case NEW:
             return isNotExpired(booking);
         case ASSIGNED:
-            return (currentStatus == BookingStatus.NEW || currentStatus == BookingStatus.REVOKED) && isNotExpired(
+            return (currentStatus == Booking.Status.NEW || currentStatus == Booking.Status.REVOKED) && isNotExpired(
                     booking);
 
         case REVOKED:
         case ACCEPTED:
         case REJECTED:
-            return currentStatus == BookingStatus.ASSIGNED && isNotExpired(booking);
+            return currentStatus == Booking.Status.ASSIGNED && isNotExpired(booking);
 
         case REFUSED:
-            return currentStatus == BookingStatus.ACCEPTED || currentStatus == BookingStatus.REJECTED;
+            return currentStatus == Booking.Status.ACCEPTED || currentStatus == Booking.Status.REJECTED;
 
         case EXPIRED:
             return !isNotExpired(booking);
