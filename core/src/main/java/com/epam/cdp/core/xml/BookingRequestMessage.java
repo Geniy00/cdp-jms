@@ -38,72 +38,42 @@ public class BookingRequestMessage {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getOrderId() {
         return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
     }
 
     public Integer getStartPosition() {
         return startPosition;
     }
 
-    public void setStartPosition(Integer startPosition) {
-        this.startPosition = startPosition;
-    }
-
     public Integer getFinishPosition() {
         return finishPosition;
-    }
-
-    public void setFinishPosition(Integer finishPosition) {
-        this.finishPosition = finishPosition;
     }
 
     public DateTime getDeliveryTime() {
         return deliveryTime;
     }
 
-    public void setDeliveryTime(DateTime deliveryTime) {
-        this.deliveryTime = deliveryTime;
-    }
-
     public VehicleType getVehicleType() {
         return vehicleType;
-    }
-
-    public void setVehicleType(VehicleType vehicleType) {
-        this.vehicleType = vehicleType;
     }
 
     public Double getPayment() {
         return payment;
     }
 
-    public void setPayment(Double payment) {
-        this.payment = payment;
-    }
-
     public DateTime getExpiryTime() {
         return expiryTime;
     }
 
-    public void setExpiryTime(DateTime expiryTime) {
-        this.expiryTime = expiryTime;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
-        BookingRequestMessage that = (BookingRequestMessage) obj;
+        final BookingRequestMessage that = (BookingRequestMessage) obj;
 
         return Objects.equals(this.id, that.id)
                 && Objects.equals(this.orderId, that.orderId)

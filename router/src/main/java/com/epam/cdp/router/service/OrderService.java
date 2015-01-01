@@ -23,15 +23,15 @@ public interface OrderService {
 
     void terminateExpiredBookingRequests();
 
-    void updateOrder(Order order);
-
     BookingRequest updateBookingRequest(BookingRequest bookingRequest);
 
-    Customer acceptOrder(String orderId, Long bookingRequestId);
+    Customer getCustomerInfo(String orderId, Long bookingRequestId) throws TsException;
 
-    BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId);
+    BookingRequestEnum.Status acceptOrder(String orderId, Long bookingRequestId) throws TsException;
 
-    BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason);
+    BookingRequestEnum.Status rejectOrder(String orderId, Long bookingRequestId) throws TsException;
+
+    BookingRequestEnum.Status refuseOrder(String orderId, Long bookingRequestId, String reason) throws TsException;
 
     Order loadOrderEager(String id);
 

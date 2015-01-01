@@ -83,6 +83,10 @@
 
         <!-- To save JodaTime objects to Database-->
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time-hibernate</artifactId>
         </dependency>

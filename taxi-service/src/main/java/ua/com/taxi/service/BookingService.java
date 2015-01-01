@@ -1,5 +1,6 @@
 package ua.com.taxi.service;
 
+import com.epam.cdp.core.entity.TsException;
 import ua.com.taxi.entity.Booking;
 
 import java.util.List;
@@ -15,27 +16,25 @@ public interface BookingService {
 
     Booking find(Long id);
 
-    Booking findFreeBooking();
+    com.google.common.base.Optional<Booking> findFreeBooking();
 
-    Booking assignBooking(Long bookingId);
+    Booking assignBooking(Long bookingId) throws TsException;
 
-    Booking revokeBooking(Long bookingId);
+    Booking revokeBooking(Long bookingId) throws TsException;
 
-    Booking acceptBooking(Long bookingId);
+    Booking acceptBooking(Long bookingId) throws TsException;
 
-    Booking rejectBooking(Long bookingId);
+    Booking rejectBooking(Long bookingId) throws TsException;
 
-    Booking refuseBooking(Long bookingId, String reason);
+    Booking refuseBooking(Long bookingId, String reason) throws TsException;
 
-    Boolean sendTextMessageToFailQueue(String xmlBookingRequestMessage);
+    Long countActualBookings();
 
-    public Long countActualBookings();
+    List<Booking> findExpiredBookings();
 
-    public List<Booking> findExpiredBookings();
+    List<Booking> findExpiredAndAssignedBookings();
 
-    public List<Booking> findBookingWithExpiredAssignedStatus();
+    List<Booking> findBookings(int limit);
 
-    public List<Booking> findBookings(int limit);
-
-    public List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit);
+    List<Booking> findBookingByStatus(Booking.BookingStatus status, int limit);
 }

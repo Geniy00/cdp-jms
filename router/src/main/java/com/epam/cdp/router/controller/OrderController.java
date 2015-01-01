@@ -2,8 +2,10 @@ package com.epam.cdp.router.controller;
 
 import com.epam.cdp.core.entity.BookingRequestEnum;
 import com.epam.cdp.core.entity.Customer;
+import com.epam.cdp.core.entity.TsException;
 import com.epam.cdp.router.service.OrderService;
 import com.epam.cdp.router.service.XmlSerializer;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,39 +19,58 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value = "/order")
 public class OrderController {
 
-    @Autowired
-    OrderService orderService;
+    private static final Logger LOG = Logger.getLogger(OrderController.class);
 
     @Autowired
-    XmlSerializer xmlSerializer;
+    private OrderService orderService;
+
+    @Autowired
+    private XmlSerializer xmlSerializer;
 
     @RequestMapping(value = "/execute")
     @ResponseBody
     public String execute(@RequestParam BookingRequestEnum.Action action, @RequestParam String orderId,
             @RequestParam Long bookingRequestId, @RequestParam(required = false) String reason) {
+        try {
+            //TODO: Can I just return a String without serailization?
+            final BookingRequestEnum.Status status;
+            switch (action) {
+            case ACCEPT:
+                status = orderService.acceptOrder(orderId, bookingRequestId);
+                break;
 
-        switch (action) {
-        case ACCEPT:
-                /*
-                TODO: May we need to split acceptance request onto two:
-                - accept (get error code in case of expired, wrong ids, ..)
-                - getCustomer info (get customer info by some tokens)
-                */
-            Customer customer = orderService.acceptOrder(orderId, bookingRequestId);
-            return xmlSerializer.serialize(customer);
+            case REJECT:
+                status = orderService.rejectOrder(orderId, bookingRequestId);
+                break;
 
-        case REJECT:
-            BookingRequestEnum.Status status = orderService.rejectOrder(orderId, bookingRequestId);
+            case REFUSE:
+                status = orderService.refuseOrder(orderId, bookingRequestId, reason);
+                break;
+
+            default:
+                status = BookingRequestEnum.Status.FAILED;
+
+            }
             return xmlSerializer.serialize(status);
+        } catch (final TsException ex) {
+            final String message = String.format("Can't execute an action %s for orderId=%s, bookingRequestId=%s",
+                    action, orderId, bookingRequestId);
+            LOG.error(message, ex);
+            return message;
+        }
+    }
 
-        case REFUSE:
-            //TODO: why should we use status1?
-            BookingRequestEnum.Status status1 = orderService.refuseOrder(orderId, bookingRequestId, reason);
-            return xmlSerializer.serialize(status1);
-
-        default:
-            return String.format("You can't execute [%s] action.", action);
-
+    @RequestMapping(value = "/getCustomerInfo")
+    @ResponseBody
+    public String getCustomerInfo(@RequestParam String orderId, @RequestParam Long bookingRequestId) {
+        try {
+            final Customer customer = orderService.getCustomerInfo(orderId, bookingRequestId);
+            return xmlSerializer.serialize(customer);
+        } catch (final TsException ex) {
+            final String message = String.format("Can't get customer info for orderId=%s, bookingRequestId=%s",
+                    orderId, bookingRequestId);
+            LOG.error(message, ex);
+            return message;
         }
     }
 

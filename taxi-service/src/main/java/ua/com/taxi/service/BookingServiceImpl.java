@@ -1,27 +1,18 @@
 package ua.com.taxi.service;
 
 import com.epam.cdp.core.entity.BookingRequestEnum;
+import com.epam.cdp.core.entity.TsException;
+import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import ua.com.taxi.dao.BookingDao;
 import ua.com.taxi.entity.Booking;
-import ua.com.taxi.entity.ClientDetails;
-import ua.com.taxi.util.XstreamSerializer;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static ua.com.taxi.entity.Booking.BookingStatus;
@@ -36,20 +27,13 @@ public class BookingServiceImpl implements BookingService {
     private static final Logger LOG = Logger.getLogger(BookingServiceImpl.class);
 
     private static final int MAX_BOOKING_SELECT_LIMIT = 100;
-    private static final String REST_URL_PARAMETERS =
-            "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
 
-    private final XstreamSerializer xstreamSerializer = new XstreamSerializer();
     @Autowired
-    BookingDao bookingDao;
+    private BookingDao bookingDao;
+
     @Autowired
-    JmsTemplate jmsTemplate;
-    @Autowired
-    RestTemplate restTemplate;
-    @Value("${router.rest.url}")
-    private String ROUTER_REST_URL;
-    @Value("${jms.fail.queue.name}")
-    private String JMS_FAIL_QUEUE_NAME;
+    private RouterRestClient restClient;
+
     @Value("${local.assign.expiry.time}")
     private Integer ASSIGN_EXPIRY_TIME;
 
@@ -70,145 +54,62 @@ public class BookingServiceImpl implements BookingService {
         return bookingDao.find(id);
     }
 
-    //TODO: check for null
     @Override
-    public Booking findFreeBooking() {
-        //TODO: fix this stub method
+    public Optional<Booking> findFreeBooking() {
         final List<Booking> bookings = bookingDao.findBookingByStatus(BookingStatus.NEW, MAX_BOOKING_SELECT_LIMIT);
         bookings.addAll(bookingDao.findBookingByStatus(BookingStatus.REVOKED, MAX_BOOKING_SELECT_LIMIT));
 
         final int size = bookings.size();
         if (size > 0) {
             final int index = random.nextInt(size);
-            return bookings.get(index);
+            return Optional.of(bookings.get(index));
         } else {
-            return null;
+            return Optional.absent();
         }
     }
 
     /**
      * Assign booking to an dispatcher to prevent possibility to process booking concurrently
+     *
      * @param bookingId
      * @return updated booking object from DB
-     *  null - action can't be executed
-     *
+     * @throws TsException - can't change current status
      */
     @Override
-    public Booking assignBooking(final Long bookingId) {
+    public Booking assignBooking(final Long bookingId) throws TsException {
         final Booking booking = bookingDao.find(bookingId);
+        final BookingStatus newStatus = BookingStatus.ASSIGNED;
+        validateApplyingNewStatus(booking, newStatus);
 
-        if(!canChangeStatusTo(booking, BookingStatus.ASSIGNED)){
-            LOG.warn(String.format("Current booking state can't be changed from %s to ASSIGNED", booking.getStatus()));
-            //return booking;
-            //TODO: null means that we can't execute assign action. It should be fixed to not null object
-            return null;
-        }
-
-        booking.setStatus(BookingStatus.ASSIGNED);
+        booking.setStatus(newStatus);
         booking.setAssignToExpiryTime(new DateTime().plusMinutes(ASSIGN_EXPIRY_TIME));
         return bookingDao.update(booking);
     }
 
     @Override
-    public Booking revokeBooking(final Long bookingId) {
+    public Booking revokeBooking(final Long bookingId) throws TsException {
         final Booking booking = bookingDao.find(bookingId);
+        final BookingStatus newStatus = BookingStatus.REVOKED;
+        validateApplyingNewStatus(booking, newStatus);
 
-        if (!canChangeStatusTo(booking, BookingStatus.REVOKED)) {
-            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to REVOKED");
-            return booking;
-        }
-
-        booking.setStatus(BookingStatus.REVOKED);
+        booking.setStatus(newStatus);
         booking.setAssignToExpiryTime(null);
         return bookingDao.update(booking);
     }
 
     @Override
-    public Booking acceptBooking(final Long bookingId) {
-        final Booking booking = bookingDao.find(bookingId);
-
-        if(!canChangeStatusTo(booking, BookingStatus.ACCEPTED)){
-            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to ACCEPTED");
-            return booking;
-        }
-
-        final Map<String, String> mapVariables = createRequestParams(booking, BookingRequestEnum.Action.ACCEPT, "");
-        final String response = executeRestRequest(mapVariables);
-        final ClientDetails clientDetails = parseResponse(response, ClientDetails.class);
-
-        if (clientDetails != null) {
-            booking.setClient(clientDetails);
-            booking.setStatus(BookingStatus.ACCEPTED);
-            bookingDao.update(booking);
-        }
-
-        return booking;
+    public Booking acceptBooking(final Long bookingId) throws TsException {
+        return requestNewStatusForBooking(bookingId, BookingStatus.ACCEPTED, "");
     }
 
     @Override
-    public Booking rejectBooking(final Long bookingId) {
-        final Booking booking = bookingDao.find(bookingId);
-
-        if(!canChangeStatusTo(booking, BookingStatus.REJECTED)){
-            LOG.warn(String.format("Current booking state can't be changed from %s  to REJECTED", booking.getStatus()));
-            return booking;
-        }
-
-        final Map<String, String> mapVariables = createRequestParams(booking, BookingRequestEnum.Action.REJECT, "");
-        final String response = executeRestRequest(mapVariables);
-        final BookingRequestEnum.Status status = parseResponse(response, BookingRequestEnum.Status.class);
-
-        switch (status) {
-            case REJECTED:
-                booking.setStatus(BookingStatus.REJECTED);
-                break;
-            case EXPIRED:
-                booking.setStatus(BookingStatus.EXPIRED);
-                break;
-            default:
-                LOG.error(String.format("Unexpected response status [%s] for reject request", status));
-                return null;
-        }
-
-        bookingDao.update(booking);
-        return booking;
+    public Booking rejectBooking(final Long bookingId) throws TsException {
+        return requestNewStatusForBooking(bookingId, BookingStatus.REJECTED, "");
     }
 
     @Override
-    public Booking refuseBooking(final Long bookingId, final String reason) {
-        final Booking booking = bookingDao.find(bookingId);
-
-        if(!canChangeStatusTo(booking, BookingStatus.REFUSED)){
-            LOG.warn("Current booking state can't be changed from " + booking.getStatus() + " to REFUSED");
-            return booking;
-        }
-
-        final Map<String, String> mapVariables = createRequestParams(booking, BookingRequestEnum.Action.REFUSE, reason);
-        final String response = executeRestRequest(mapVariables);
-        final BookingRequestEnum.Status status = parseResponse(response, BookingRequestEnum.Status.class);
-
-        if(status == BookingRequestEnum.Status.REFUSED) {
-            booking.setStatus(BookingStatus.REFUSED);
-        } else {
-            LOG.error(String.format("Unexpected response status [%s] for refuse request", status));
-            return null;
-        }
-
-        bookingDao.update(booking);
-        return booking;
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
-    @Override
-    public Boolean sendTextMessageToFailQueue(final String xmlBookingRequestMessage) {
-        jmsTemplate.send(JMS_FAIL_QUEUE_NAME, new MessageCreator() {
-            @Override
-            public Message createMessage(Session session) throws JMSException {
-                return session.createTextMessage(xmlBookingRequestMessage);
-            }
-        });
-        LOG.warn("Booking request  was sent to fail queue\n" + xmlBookingRequestMessage);
-        return true;
+    public Booking refuseBooking(final Long bookingId, final String reason) throws TsException {
+        return requestNewStatusForBooking(bookingId, BookingStatus.REFUSED, reason);
     }
 
     @Override
@@ -224,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> findBookingWithExpiredAssignedStatus() {
+    public List<Booking> findExpiredAndAssignedBookings() {
         return bookingDao.findBookingWithExpiredAssignedStatus();
     }
 
@@ -238,8 +139,29 @@ public class BookingServiceImpl implements BookingService {
         return bookingDao.findBookingByStatus(status, limit);
     }
 
-    private Boolean isNotExpired(final Booking booking) {
-        return booking.getBookingRequest().getExpiryTime().isAfter(new DateTime());
+    private Booking requestNewStatusForBooking(final Long bookingId, final BookingStatus newStatus,
+            final String reason) throws TsException {
+        final Booking booking = bookingDao.find(bookingId);
+        validateApplyingNewStatus(booking, newStatus);
+
+        final BookingStatus status = restClient.executeActionRequest(booking, BookingRequestEnum.Action.REFUSE, reason);
+
+        if (newStatus == status) {
+            booking.setStatus(status);
+            return bookingDao.update(booking);
+        }
+
+        return booking;
+    }
+
+    private void validateApplyingNewStatus(final Booking booking, final BookingStatus newStatus)
+            throws TsException {
+        if (!canChangeStatusTo(booking, newStatus)) {
+            final String message = String.format("Current booking state can't be changed from %s to %s",
+                    booking.getStatus(), newStatus);
+            LOG.error(message);
+            throw new TsException(TsException.Reason.PRE_CONDITION_CHECK_FAIL, message);
+        }
     }
 
     private Boolean canChangeStatusTo(final Booking booking, final Booking.BookingStatus newStatus) {
@@ -268,36 +190,9 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private Map<String, String> createRequestParams(final Booking booking, final BookingRequestEnum.Action action,
-            final String reason) {
-        final Map<String, String> mapVariables = new HashMap<>();
-        mapVariables.put("orderId", booking.getBookingRequest().getOrderId());
-        mapVariables.put("bookingRequestId", booking.getBookingRequest().getBookingRequestId().toString());
-        mapVariables.put("action", action.toString());
-        mapVariables.put("reason", reason);
-        return mapVariables;
+    private Boolean isNotExpired(final Booking booking) {
+        return booking.getBookingRequest().getExpiryTime().isAfter(new DateTime());
     }
 
-    private String executeRestRequest(final Map<String, String> mapVariables) {
-        final String response;
-        try {
-            response = restTemplate.getForObject(ROUTER_REST_URL + REST_URL_PARAMETERS, String.class, mapVariables);
-        } catch (final HttpClientErrorException ex) {
-            LOG.error("Can't execute GET request to router module", ex);
-            //TODO: custom exception
-            throw new RuntimeException(ex);
-        }
-        return response;
-    }
-
-    private <T> T parseResponse(final String response, final Class<T> deserializedClass) {
-        try {
-            return xstreamSerializer.deserialize(response, deserializedClass);
-        } catch (final Exception ex) {
-            LOG.error("Can't parse response:\n" + response, ex);
-            //            TODO: custom exception
-            throw new RuntimeException(ex);
-        }
-    }
 
 }

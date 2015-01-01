@@ -69,7 +69,8 @@ public class ReservationRequest implements Serializable {
         DRAFT,
         PRICED,
         RECEIVED,
-        PROCESSING,
+        ASSIGNING,
+        ASSIGNED,
         COMPLETED,
         CLOSED,
         FAILURE

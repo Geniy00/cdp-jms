@@ -23,8 +23,8 @@ public class PeriodicTasks {
      * and current booking was delegated to another taxi service by router module
      */
     public void moveBookingsToExpired() {
-        List<Booking> expiredBookings = bookingService.findExpiredBookings();
-        for (Booking expiredBooking : expiredBookings) {
+        final List<Booking> expiredBookings = bookingService.findExpiredBookings();
+        for (final Booking expiredBooking : expiredBookings) {
             expiredBooking.setStatus(Booking.BookingStatus.EXPIRED);
             bookingService.saveOrUpdate(expiredBooking);
         }
@@ -35,17 +35,17 @@ public class PeriodicTasks {
     }
 
     /**
-     * Unassign automatically when operator's assign time expired
+     * Revoked automatically when operator's assign time is expired
      */
-    public void unassignAutomatically() {
-        List<Booking> assignedStatusExpired = bookingService.findBookingWithExpiredAssignedStatus();
-        for (Booking booking : assignedStatusExpired) {
+    public void revokeBookingAutomatically() {
+        final List<Booking> expiredAndAssignedBookings = bookingService.findExpiredAndAssignedBookings();
+        for (Booking booking : expiredAndAssignedBookings) {
             booking.setStatus(Booking.BookingStatus.REVOKED);
             booking.setAssignToExpiryTime(null);
             bookingService.saveOrUpdate(booking);
         }
-        if (assignedStatusExpired.size() > 0) {
-            LOG.info("Automatically unassigned " + assignedStatusExpired.size() + " bookings");
+        if (expiredAndAssignedBookings.size() > 0) {
+            LOG.info(String.format("%d booking was revoked automatically", expiredAndAssignedBookings.size()));
         }
     }
 

@@ -1,6 +1,9 @@
 package ua.com.taxi.controller;
 
 import com.epam.cdp.core.entity.BookingRequestEnum;
+import com.epam.cdp.core.entity.TsException;
+import com.google.common.base.Optional;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,8 @@ import java.util.List;
 @Controller
 public class BookingController {
 
+    private static final Logger LOG = Logger.getLogger(BookingController.class);
+
     private static final String DEFAULT_REFUSE_REASON = "DEFAULT REFUSE REASON";
     private static final int BOOKINGS_COUNT_LIMIT = 100;
 
@@ -29,8 +34,10 @@ public class BookingController {
 
     @RequestMapping(value = "/bookings")
     public String getRandomBooking(final Model model) {
-        final Booking booking = bookingService.findFreeBooking();
-        model.addAttribute("booking", booking);
+        final Optional<Booking> bookingOptional = bookingService.findFreeBooking();
+        if (bookingOptional.isPresent()) {
+            model.addAttribute("booking", bookingOptional.get());
+        }
         model.addAttribute("bookingCount", bookingService.countActualBookings());
         return "bookings";
     }
@@ -47,39 +54,33 @@ public class BookingController {
             @RequestParam final BookingRequestEnum.Action action, @RequestParam(required = false) final String reason,
             final Model model) {
 
-        Booking booking = null;
-        switch (action) {
-        case ACCEPT:
-            booking = bookingService.acceptBooking(id);
-            break;
-
-        case REJECT:
-            booking = bookingService.rejectBooking(id);
-            if (booking != null) {
-                return "redirect:/bookings";
-            } else {
+        final Booking booking;
+        try {
+            switch (action) {
+            case ACCEPT:
+                booking = bookingService.acceptBooking(id);
                 break;
+
+            case REJECT:
+                bookingService.rejectBooking(id);
+                return "redirect:/bookings";
+
+            case REFUSE:
+                final String refuseReason = (reason == null) ? DEFAULT_REFUSE_REASON : reason;
+                booking = bookingService.refuseBooking(id, refuseReason);
+                break;
+
+            default:
+                throw new TsException(TsException.Reason.ACTION_IS_UNAVAILABLE, action.name());
             }
 
-        case REFUSE:
-            final String refuseReason = (reason == null) ? DEFAULT_REFUSE_REASON : reason;
-            booking = bookingService.refuseBooking(id, refuseReason);
-            break;
-
-        default:
-            throw new RuntimeException("Can't execute action" + action);
+            model.addAttribute("booking", booking);
+        } catch (final TsException ex) {
+            LOG.error(ex);
+            final String failureMessage = String.format("Action %s can't be executed", action.name());
+            model.addAttribute("message", failureMessage);
+            model.addAttribute("booking", bookingService.find(id));
         }
-
-        //TODO: Check this code
-        final String message = booking == null ? "Router module is unavailable that's why action can't be executed"
-                : "booking[id:" + booking.getId() + "] is " + booking.getStatus();
-
-        if (booking == null) {
-            booking = bookingService.find(id);
-        }
-
-        model.addAttribute("booking", booking);
-        model.addAttribute("message", message);
         return "bookingDetails";
     }
 
@@ -88,29 +89,35 @@ public class BookingController {
             @RequestParam(required = false) final String action, final Model model) {
 
         final Booking booking;
-        switch (action) {
-        case "ASSIGN_TO_ME":
-            booking = bookingService.assignBooking(id);
-            if (booking == null) {
-                return "redirect:/bookings";
-            }
-            break;
+        try {
+            switch (action) {
+            case "ASSIGN_TO_ME":
+                booking = bookingService.assignBooking(id);
+                if (booking == null) {
+                    return "redirect:/bookings";
+                }
+                break;
 
-        //TODO: rename to Revoke
-        case "REVOKE":
-            booking = bookingService.revokeBooking(id);
-            if (booking.getStatus() == Booking.BookingStatus.REVOKED) {
-                return "redirect:/bookings";
+            case "REVOKE":
+                booking = bookingService.revokeBooking(id);
+                if (booking.getStatus() == Booking.BookingStatus.REVOKED) {
+                    return "redirect:/bookings";
+                }
+                break;
+            default:
+                throw new TsException(TsException.Reason.ACTION_IS_UNAVAILABLE, action);
             }
-            break;
-        default:
-            booking = bookingService.find(id);
-            break;
+
+            model.addAttribute("booking", booking);
+            final String message = String.format("booking[id: %s] is %s", booking.getId(), action);
+            model.addAttribute("message", message);
+        } catch (final TsException ex) {
+            LOG.error(ex);
+            final String failureMessage = String.format("Action %s can't be executed", action);
+            model.addAttribute("message", failureMessage);
+            model.addAttribute("booking", bookingService.find(id));
         }
 
-        final String message = String.format("booking[id: %s] is %s", booking.getId(), action);
-        model.addAttribute("message", message);
-        model.addAttribute("booking", booking);
         return "bookingDetails";
     }
 

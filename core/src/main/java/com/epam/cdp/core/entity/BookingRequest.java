@@ -56,9 +56,6 @@ public class BookingRequest implements Serializable {
     private DateTime created;
 
     @ManyToOne
-    private Customer customer;
-
-    @ManyToOne
     private Order order;
 
     public BookingRequest() {
@@ -75,15 +72,14 @@ public class BookingRequest implements Serializable {
         this.expiryTime = expiryTime;
         this.taxiDispatcher = taxiDispatcher;
         this.order = order;
-        this.customer = order.getCustomer();
         this.created = createdTimestamp;
     }
 
     //TODO: refactor it
     public void applyBookingResponse(BookingResponse bookingResponse) {
         this.bookingResponse = bookingResponse;
-        final BookingRequestEnum.Status status = bookingResponse.getStatus();
-        switch (status) {
+        final BookingRequestEnum.Status responseStatus = bookingResponse.getStatus();
+        switch (responseStatus) {
         case ACCEPTED:
             order.setOrderStatus(Order.OrderStatus.PROCESSED);
             break;
@@ -100,7 +96,7 @@ public class BookingRequest implements Serializable {
             order.setOrderStatus(Order.OrderStatus.FAILED);
             break;
         default:
-            throw new RuntimeException("Unknown bookingResponse status");
+            throw new RuntimeException("Unknown responseStatus status " + responseStatus);
         }
         this.bookingResponse = bookingResponse;
     }
@@ -183,14 +179,6 @@ public class BookingRequest implements Serializable {
 
     public void setCreated(final DateTime created) {
         this.created = created;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(final Customer customer) {
-        this.customer = customer;
     }
 
     public Order getOrder() {

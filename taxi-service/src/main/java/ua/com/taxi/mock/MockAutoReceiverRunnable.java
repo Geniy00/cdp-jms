@@ -1,5 +1,7 @@
 package ua.com.taxi.mock;
 
+import com.epam.cdp.core.entity.TsException;
+import com.google.common.base.Optional;
 import org.apache.log4j.Logger;
 import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
@@ -35,29 +37,39 @@ public class MockAutoReceiverRunnable implements Runnable {
                 LOG.error(ex.getMessage(), ex);
             }
 
-            final Booking booking = bookingService.findFreeBooking();
-            if (booking == null) {
+            final Optional<Booking> bookingOptional = bookingService.findFreeBooking();
+            if (!bookingOptional.isPresent()) {
                 continue;
             }
+            final Booking booking = bookingOptional.get();
 
             currentNumberOfOrder++;
             //Accept booking
             final Long bookingId = booking.getId();
             final String orderId = booking.getBookingRequest().getOrderId();
-            if (shouldBeAccepted(currentNumberOfOrder)) {
-                //TODO: do we need the status "assign"?
-                bookingService.assignBooking(bookingId);
-                bookingService.acceptBooking(bookingId);
-                LOG.info(String.format("Booking[id:%d] for orderId[%s] was automatically accepted", bookingId,
-                        orderId));
-            } else {
-                currentNumberOfOrder = 0;
-                bookingService.assignBooking(bookingId);
-                bookingService.rejectBooking(bookingId);
-                LOG.info(String.format("Booking[id:%d] for orderId[%s] was automatically rejected", bookingId,
-                        orderId));
+            try {
+                processOrder(orderId, bookingId, currentNumberOfOrder);
+            } catch (final TsException ex) {
+                LOG.error("Can't process an order", ex);
+                enabled.set(false);
+                LOG.warn("Auto receiver mock is stopped");
             }
         } while (enabled.get());
+    }
+
+    private void processOrder(final String orderId, final Long bookingId, final int currentNumberOfOrder)
+            throws TsException {
+        bookingService.assignBooking(bookingId);
+        final String action;
+        if (shouldBeAccepted(currentNumberOfOrder)) {
+            bookingService.acceptBooking(bookingId);
+            action = "accepted";
+        } else {
+            bookingService.rejectBooking(bookingId);
+            action = "rejected";
+        }
+        LOG.info(String.format("Booking[id:%d] for orderId[%s] was %s automatically", bookingId,
+                orderId, action));
     }
 
     public int getDelayBetweenReceiving() {
@@ -77,6 +89,6 @@ public class MockAutoReceiverRunnable implements Runnable {
     }
 
     private boolean shouldBeAccepted(final int currentNumberOfOrder) {
-        return currentNumberOfOrder < rejectEveryNthOrder;
+        return currentNumberOfOrder % rejectEveryNthOrder != 0;
     }
 }
