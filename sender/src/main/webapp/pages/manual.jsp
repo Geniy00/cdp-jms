@@ -3,10 +3,10 @@
 
 <html>
 <head>
-    <title>>New reservation request</title>
+    <title>New reservation request</title>
 </head>
 <body>
-<a href="manual/random">Generate random order</a>
+<a href="${pageContext.request.contextPath}/manual/random">Generate random order</a>
 <br/><br/>
 
 <sf:form action="${pageContext.request.contextPath}/price" method="post" modelAttribute="reservationRequest">
@@ -49,12 +49,12 @@
 <br/>
 <br/>
 <br/>
-<c:if test="${sentReservationRequest.id != null}">
-    <span style="color: green; ">Reservation request with id <b>${sentReservationRequest.id}</b> was sent successfully</span>
+<c:if test="${sentReservationRequest.customerName != null}">
+    <span style="color: green; ">ReservationRequest with name <b>${sentReservationRequest.customerName}</b>
+        and from <b>${sentReservationRequest.startPosition} to ${sentReservationRequest.finishPosition}</b> was sent successfully</span>
 </c:if>
 
-
-<br/><br/><br/>
+<br/>
 <a href="${pageContext.request.contextPath}">Back</a>
 </body>
 </html>

@@ -4,6 +4,7 @@ import com.epam.cdp.core.entity.*;
 import com.epam.cdp.router.dao.CustomerDao;
 import com.epam.cdp.router.dao.OrderDao;
 import com.epam.cdp.router.gateway.ReservationRequestGateway;
+import com.epam.cdp.router.handler.BookingRequestHandler;
 import com.epam.cdp.router.handler.BookingResponseHandler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderDao orderDao;
+
+    @Autowired
+    private BookingRequestHandler bookingRequestHandler;
 
     @Autowired
     private BookingResponseHandler bookingResponseHandler;
@@ -97,7 +101,6 @@ public class OrderServiceImpl implements OrderService {
         return bookingResponseHandler.getCustomerInfo(orderId, bookingRequestId);
     }
 
-    //TODO: add sending status to sender module
     @Override
     public BookingRequest.Status acceptOrder(final String orderId, final Long bookingRequestId) throws TsException {
         final BookingRequest.Status newStatus = bookingResponseHandler.handleAcceptCommand(orderId,
@@ -114,6 +117,8 @@ public class OrderServiceImpl implements OrderService {
                 bookingRequestId);
         if (newStatus == BookingRequest.Status.REJECTED) {
             sendReservationResponseOnOrderUpdate(orderId, ReservationRequest.Status.ASSIGNING, "");
+            final Order order = orderDao.find(orderId);
+            bookingRequestHandler.sendBookingRequest(order);
         }
         return newStatus;
     }

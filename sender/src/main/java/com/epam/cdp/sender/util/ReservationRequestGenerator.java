@@ -15,7 +15,7 @@ public class ReservationRequestGenerator {
     private static final Random random = new Random();
 
     private static final int MINUTES_TO_PROCESS_ORDER = 20;
-    private static final int ROUTE_DISTANCE = 100;
+    private static final int ROUTE_DISTANCE = 99;
     private static final String JMS_RESPONSE_QUEUE = "reservation.request.queue.response";
 
     private static String generate(final int size, final String symbols) {
@@ -29,8 +29,8 @@ public class ReservationRequestGenerator {
     public static ReservationRequest generateRandomReservationRequest() {
         final String customerName = generate(7, SYMBOL_SET);
         final String customerPhone = "+38063" + generate(7, NUMBER_SET);
-        final int startPosition = random.nextInt(ROUTE_DISTANCE);
-        final int finishPosition = random.nextInt(ROUTE_DISTANCE);
+        final int startPosition = random.nextInt(ROUTE_DISTANCE) + 1;    // range [1; 99]
+        final int finishPosition = random.nextInt(ROUTE_DISTANCE) + 1;
         final DateTime deliveryTime = new DateTime().plusMinutes(MINUTES_TO_PROCESS_ORDER);
 
         final int randomIndex = random.nextInt(VehicleType.values().length);
@@ -38,7 +38,7 @@ public class ReservationRequestGenerator {
 
         final SourceSystem sourceSystem = new SourceSystem(SourceSystem.SystemId.WEB,
                 JMS_RESPONSE_QUEUE);
-        return new ReservationRequest(random.nextLong(), customerName, customerPhone, startPosition, finishPosition,
+        return new ReservationRequest(null, customerName, customerPhone, startPosition, finishPosition,
                 deliveryTime, vehicleType, new DateTime(), sourceSystem);
     }
 

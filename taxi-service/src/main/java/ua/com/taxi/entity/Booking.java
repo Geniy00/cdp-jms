@@ -35,6 +35,10 @@ public class Booking {
     @Column(name = "reason")
     private String reason;
 
+    @Version
+    @Column(name = "lockVersion")
+    private Long version;
+
     public enum Status {
         NEW, ASSIGNED, REVOKED, ACCEPTED, REJECTED, REFUSED, EXPIRED
     }
@@ -94,6 +98,14 @@ public class Booking {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Long version) {
+        this.version = version;
     }
 
     @Override

@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.com.taxi.service.BookingService;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @ThreadSafe
 @Component
 public class AutoReceiverBean {
@@ -19,10 +22,12 @@ public class AutoReceiverBean {
     @CheckForNull
     private MockAutoReceiverRunnable mockAutoReceiverRunnable;
 
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     public synchronized void start(final int delay, final int rejectEveryNthOrder) {
         if (mockAutoReceiverRunnable == null) {
             mockAutoReceiverRunnable = new MockAutoReceiverRunnable(bookingService, delay, rejectEveryNthOrder);
-            new Thread(mockAutoReceiverRunnable).start();
+            executorService.submit(mockAutoReceiverRunnable);
             LOG.info("Auto receiver bean was started");
         } else {
             LOG.info("AutoReceiverBean is already started.");

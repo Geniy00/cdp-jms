@@ -7,6 +7,7 @@ import ua.com.taxi.entity.Booking;
 import ua.com.taxi.service.BookingService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MockAutoReceiverRunnable implements Runnable {
 
@@ -17,6 +18,7 @@ public class MockAutoReceiverRunnable implements Runnable {
     private final int delayBetweenReceiving;
     private final int rejectEveryNthOrder;
     private final AtomicBoolean enabled = new AtomicBoolean(false);
+    private final AtomicInteger safeFailureCount = new AtomicInteger(10);
 
     public MockAutoReceiverRunnable(final BookingService bookingService, final int delayBetweenReceiving,
             final int rejectEveryNthOrder) {
@@ -50,9 +52,11 @@ public class MockAutoReceiverRunnable implements Runnable {
             try {
                 processOrder(orderId, bookingId, currentNumberOfOrder);
             } catch (final TsException ex) {
-                LOG.error("Can't process an order", ex);
-                enabled.set(false);
-                LOG.warn("Auto receiver mock is stopped");
+                LOG.warn("Can't process an order", ex);
+                if(safeFailureCount.decrementAndGet() <= 0) {
+                    enabled.set(false);
+                    LOG.warn("Auto receiver mock is stopped");
+                }
             }
         } while (enabled.get());
     }
@@ -60,6 +64,7 @@ public class MockAutoReceiverRunnable implements Runnable {
     private void processOrder(final String orderId, final Long bookingId, final int currentNumberOfOrder)
             throws TsException {
         bookingService.assignBooking(bookingId);
+        LOG.debug(String.format("Booking[%s] is assigned", bookingId));
         final String action;
         if (shouldBeAccepted(currentNumberOfOrder)) {
             bookingService.acceptBooking(bookingId);

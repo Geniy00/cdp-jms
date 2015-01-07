@@ -14,24 +14,23 @@ import java.lang.reflect.Type;
 public class JsonGenerator {
 
     public ReservationRequest[] parseJson(String jsonString) {
-        Gson gson = new GsonBuilder().setDateFormat("dd/MMM/yyyy HH:mm:ss").registerTypeAdapter(DateTime.class,
+        final Gson gson = new GsonBuilder().setDateFormat("dd/MMM/yyyy HH:mm:ss").registerTypeAdapter(DateTime.class,
                 new DateTimeSerialization()).setPrettyPrinting().create();
 
-        ReservationRequest[] reservationRequests = gson.fromJson(jsonString, ReservationRequest[].class);
-        return reservationRequests;
+        return gson.fromJson(jsonString, ReservationRequest[].class);
     }
 
     public static class DateTimeSerialization implements JsonSerializer<DateTime>, JsonDeserializer<DateTime> {
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MMM/yyyy HH:mm:ss");
+        private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("dd/MMM/yyyy HH:mm:ss");
 
         public JsonElement serialize(DateTime src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.toString(formatter));
+            return new JsonPrimitive(src.toString(DATE_TIME_FORMATTER));
         }
 
         public DateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
-            return new DateTime(formatter.parseDateTime(json.getAsJsonPrimitive().getAsString()));
+            return new DateTime(DATE_TIME_FORMATTER.parseDateTime(json.getAsJsonPrimitive().getAsString()));
         }
     }
 }

@@ -16,9 +16,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class TaxiReservationController {
@@ -46,12 +49,12 @@ public class TaxiReservationController {
         ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
         model.addAttribute("reservationRequest", reservationRequest);
         model.addAttribute("vehicleTypeValues", VehicleType.values());
-        return "manualRandom";
+        return "manual";
     }
 
     @RequestMapping(value = "/price", method = RequestMethod.POST)
     public String priceReservationRequest(@ModelAttribute final ReservationRequest reservationRequest) {
-        final Long requestId = reservationService.priceRequest(reservationRequest, this);
+        final Long requestId = reservationService.priceRequest(reservationRequest);
         return "redirect:priced?requestId=" + requestId;
     }
 
@@ -73,7 +76,6 @@ public class TaxiReservationController {
     public String displayOrderedReservationRequest(@RequestParam final Long requestId, final Model model) {
         final ReservationRequest request = reservationService.getRequestById(requestId);
         model.addAttribute("reservationRequest", request);
-        //TODO: remove
         model.addAttribute("reservationResponse", reservationService.getResponseById(requestId));
         return "ordered";
     }
@@ -85,12 +87,14 @@ public class TaxiReservationController {
     }
 
     @RequestMapping(value = "/file")
-    public String fileSending() {
+    public String fileSending(@ModelAttribute("message") final String message, final Model model) {
+        model.addAttribute("message", message);
         return "file";
     }
 
     @RequestMapping(value = "/file/send", method = RequestMethod.POST)
-    public String uploadFile(@RequestParam(value = "file") final MultipartFile file, final Model model)
+    public String uploadFile(@RequestParam(value = "file") final MultipartFile file,
+            final RedirectAttributes redirectAttributes, final Model model)
             throws IOException {
 
         if (file == null) {
@@ -98,9 +102,7 @@ public class TaxiReservationController {
             return "file";
         }
 
-        final StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(file.getInputStream(), stringWriter);
-        final String json = stringWriter.toString();
+        final String json = readFile(file);
 
         final ReservationRequest[] reservationRequests;
         try {
@@ -113,18 +115,22 @@ public class TaxiReservationController {
         if (reservationRequests == null || reservationRequests.length == 0) {
             model.addAttribute("message", "File can't be read");
         } else {
+            final Set<Long> pricedRequestIdSet = new HashSet<>();
             for (ReservationRequest reservationRequest : reservationRequests) {
-                reservationService.sendToJms(reservationRequest);
+                pricedRequestIdSet.add(reservationService.priceRequest(reservationRequest));
             }
-            model.addAttribute("message", reservationRequests.length + " requests were sent");
+            for (Long requestId : pricedRequestIdSet) {
+                reservationService.orderRequest(requestId);
+            }
+            redirectAttributes.addAttribute("message", reservationRequests.length + " requests were priced");
 
         }
-        return "file";
+        return "redirect:/file";
     }
 
     @RequestMapping(value = "/automatic")
     public String automaticSending(final Model model) {
-        boolean isSending = scheduledOrderSender.isSending();
+        boolean isSending = scheduledOrderSender.isEnabled();
         model.addAttribute("status", isSending ? "SENDING" : "STOPPED");
         model.addAttribute("messageCount", scheduledOrderSender.getMessageCount());
         model.addAttribute("delay", scheduledOrderSender.getDelay());
@@ -134,15 +140,24 @@ public class TaxiReservationController {
 
     @RequestMapping(value = "/automatic/toggle", method = RequestMethod.POST)
     public String toggleSending(@RequestParam(value = "delay", required = false) final Long delay) {
-        if (!scheduledOrderSender.isSending() && delay == null) {
+        if (!scheduledOrderSender.isEnabled() && delay == null) {
             return "redirect:";
         }
 
-        if (scheduledOrderSender.isSending()) {
+        if (scheduledOrderSender.isEnabled()) {
             scheduledOrderSender.stopSending();
         } else {
             scheduledOrderSender.startSending(delay);
         }
         return "redirect:";
+    }
+
+    private String readFile(final MultipartFile file) throws IOException {
+        final String json;
+        try(final StringWriter stringWriter = new StringWriter()){
+            IOUtils.copy(file.getInputStream(), stringWriter);
+            json = stringWriter.toString();
+        }
+        return json;
     }
 }

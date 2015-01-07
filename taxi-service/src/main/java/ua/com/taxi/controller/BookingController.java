@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ua.com.taxi.entity.Booking;
+import ua.com.taxi.entity.ClientDetails;
 import ua.com.taxi.service.BookingService;
 
 import java.util.List;
@@ -42,6 +43,10 @@ public class BookingController {
                 }
             }
             throw new TsException(TsException.Reason.ACTION_IS_UNAVAILABLE, command);
+        }
+
+        public String getValue() {
+            return value;
         }
     }
 
@@ -81,6 +86,8 @@ public class BookingController {
             switch (action) {
             case ACCEPT:
                 booking = bookingService.acceptBooking(id);
+                final ClientDetails clientDetails = bookingService.getClientDetails(id);
+                booking.setClient(clientDetails);
                 break;
 
             case REJECT:

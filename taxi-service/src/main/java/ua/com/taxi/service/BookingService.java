@@ -2,6 +2,7 @@ package ua.com.taxi.service;
 
 import com.epam.cdp.core.entity.TsException;
 import ua.com.taxi.entity.Booking;
+import ua.com.taxi.entity.ClientDetails;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ public interface BookingService {
     Booking revokeBooking(Long bookingId) throws TsException;
 
     Booking acceptBooking(Long bookingId) throws TsException;
+
+    ClientDetails getClientDetails(Long bookingId) throws TsException;
 
     Booking rejectBooking(Long bookingId) throws TsException;
 

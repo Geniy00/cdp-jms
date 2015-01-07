@@ -2,8 +2,10 @@ package com.epam.cdp.router.gateway;
 
 import com.epam.cdp.core.entity.BookingRequest;
 import com.epam.cdp.core.entity.TaxiDispatcher;
+import com.epam.cdp.core.utils.LoggingUtils;
 import com.epam.cdp.core.xml.BookingRequestMessage;
 import com.epam.cdp.router.service.XmlSerializer;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -18,6 +20,8 @@ import javax.jms.Session;
  */
 @Component
 public class BookingRequestSender {
+
+    private static final Logger LOG = Logger.getLogger(BookingRequestSender.class);
 
     @Autowired
     private JmsTemplate jmsTemplate;
@@ -35,6 +39,9 @@ public class BookingRequestSender {
                 return session.createTextMessage(xmlMessage);
             }
         });
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("BookingRequest >>> " + LoggingUtils.toOneLine(xmlMessage));
+        }
     }
 
     private String serializeBookingRequest(final BookingRequest persistedBookingRequest) {

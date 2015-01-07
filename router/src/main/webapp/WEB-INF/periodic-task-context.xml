@@ -9,7 +9,6 @@
     <task:scheduler id="scheduler" pool-size="5"/>
 
     <task:scheduled-tasks scheduler="scheduler">
-        <task:scheduled ref="periodicTasks" method="sendBookingRequests" fixed-delay="10000"/>
         <task:scheduled ref="periodicTasks" method="terminateExpiredBookingRequests" fixed-delay="10000"/>
         <task:scheduled ref="periodicTasks" method="terminateExpiredOrders" fixed-delay="10000"/>
     </task:scheduled-tasks>

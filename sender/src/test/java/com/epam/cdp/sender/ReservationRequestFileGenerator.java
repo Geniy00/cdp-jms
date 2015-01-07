@@ -19,8 +19,8 @@ import java.io.IOException;
  */
 public class ReservationRequestFileGenerator {
 
-    public static final String PATH_TO_FOLDER = "c:\\orders.txt";
-    public static final int MESSAGE_COUNT = 10;
+    private static final String PATH_TO_FOLDER = "c:\\orders.txt";
+    private static final int MESSAGE_COUNT = 100;
 
     public static void main(String[] args) throws IOException {
 

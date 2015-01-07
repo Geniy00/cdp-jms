@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.taxi.dao.BookingDao;
 import ua.com.taxi.entity.Booking;
+import ua.com.taxi.entity.ClientDetails;
 
 import java.util.List;
 import java.util.Random;
@@ -81,6 +82,9 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(newStatus);
         booking.setAssignToExpiryTime(new DateTime().plusMinutes(ASSIGN_EXPIRY_TIME));
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Booking[%s] is assigned", bookingId));
+        }
         return bookingDao.update(booking);
     }
 
@@ -92,12 +96,26 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(newStatus);
         booking.setAssignToExpiryTime(null);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Booking[%s] is revoked", bookingId));
+        }
         return bookingDao.update(booking);
     }
 
     @Override
     public Booking acceptBooking(final Long bookingId) throws TsException {
         return requestNewStatusForBooking(bookingId, Booking.Status.ACCEPTED, "");
+    }
+
+    @Override
+    public ClientDetails getClientDetails(final Long bookingId) throws TsException {
+        final Booking booking = bookingDao.find(bookingId);
+        final ClientDetails clientDetails = restClient.getClientDetails(booking);
+        if (clientDetails != null) {
+            booking.setClient(clientDetails);
+            bookingDao.update(booking);
+        }
+        return clientDetails;
     }
 
     @Override
@@ -148,6 +166,9 @@ public class BookingServiceImpl implements BookingService {
 
         if (newStatus == status) {
             booking.setStatus(status);
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Booking[%s] is %s", bookingId, newStatus.name()));
+            }
             return bookingDao.update(booking);
         }
 

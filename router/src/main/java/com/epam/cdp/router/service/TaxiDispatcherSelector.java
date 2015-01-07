@@ -28,8 +28,7 @@ public class TaxiDispatcherSelector {
             return null;
         }
 
-        final Integer startPosition = order.getReservationRequest().getStartPosition();
-        final int index = random.nextInt(dispatcherCount % startPosition);
+        final int index = random.nextInt(dispatcherCount);
         return activeDispatchers.get(index);
     }
 

@@ -32,8 +32,9 @@ public class OrderController {
     @ResponseBody
     public String execute(@RequestParam BookingRequestEnum.Action action, @RequestParam String orderId,
             @RequestParam Long bookingRequestId, @RequestParam(required = false) String reason) {
+        LOG.debug(String.format("%s command for orderId[%s] and bookingRequestId[%s]", action.name(), orderId,
+                bookingRequestId));
         try {
-            //TODO: Can I just return a String without serailization?
             final BookingRequest.Status status;
             switch (action) {
             case ACCEPT:

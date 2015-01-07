@@ -6,22 +6,25 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class MockController {
 
-    private static final int DEFAULT_DELAY = 1000;
-    private static final int DEFAULT_ORDER_NUMBER_TO_BE_REJECTED = 5;
+    private static final int DEFAULT_DELAY = 500;
+    private static final int DEFAULT_ORDER_NUMBER_TO_BE_REJECTED = 8;
 
     @Autowired
     AutoReceiverBean autoReceiverBean;
 
     @RequestMapping(value = "/mock", method = RequestMethod.GET)
-    public String mock(Model model) {
+    public String mock(@RequestParam(required = false) Integer delay,
+            @RequestParam(required = false) Integer rejectEveryNthOrder, Model model) {
         final String status = autoReceiverBean.isEnabled() ? "enabled" : "disabled";
 
-        model.addAttribute("delay", DEFAULT_DELAY);
-        model.addAttribute("rejectEveryNthOrder", DEFAULT_ORDER_NUMBER_TO_BE_REJECTED);
+        model.addAttribute("delay", delay == null ? DEFAULT_DELAY : delay);
+        model.addAttribute("rejectEveryNthOrder",
+                rejectEveryNthOrder == null ? DEFAULT_ORDER_NUMBER_TO_BE_REJECTED : rejectEveryNthOrder);
         model.addAttribute("status", status);
         return "mock";
     }
@@ -29,7 +32,7 @@ public class MockController {
 
     @RequestMapping(value = "/mock", method = RequestMethod.POST)
     public String mockAction(@RequestParam String action, @RequestParam(required = false) Integer delay,
-            @RequestParam(required = false) Integer rejectEveryNthOrder) {
+            @RequestParam(required = false) Integer rejectEveryNthOrder, final RedirectAttributes redirectAttributes) {
 
         switch (ActionEnum.from(action)) {
         case ENABLE:
@@ -39,6 +42,8 @@ public class MockController {
             autoReceiverBean.stop();
             break;
         }
+        redirectAttributes.addAttribute("delay", delay);
+        redirectAttributes.addAttribute("rejectEveryNthOrder", rejectEveryNthOrder);
         return "redirect:/mock";
     }
 

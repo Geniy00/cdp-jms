@@ -51,6 +51,7 @@ public class ReservationRequest implements Serializable {
     @Column(name = "price", nullable = false)
     private Double price;
 
+    @Transient
     private Boolean indicative;
 
     @Enumerated(EnumType.STRING)
@@ -64,6 +65,11 @@ public class ReservationRequest implements Serializable {
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, optional = false)
     @JoinColumn(name = "sourceSystem")
     private SourceSystem sourceSystem;
+
+    @Version
+    @Column(name = "lockVersion")
+    private Long version;
+
 
     public enum Status {
         DRAFT,
@@ -87,7 +93,7 @@ public class ReservationRequest implements Serializable {
         this.customerPhone = customerPhone;
         this.startPosition = startPosition;
         this.finishPosition = finishPosition;
-        this.deliveryTime = deliveryTime;
+        this.deliveryTime = deliveryTime.minuteOfDay().roundFloorCopy();
         this.vehicleType = vehicleType;
         this.createdTimestamp = createdTimestamp;
         this.indicative = true;
@@ -167,7 +173,7 @@ public class ReservationRequest implements Serializable {
     }
 
     public void setDeliveryTime(final DateTime deliveryTime) {
-        this.deliveryTime = deliveryTime;
+        this.deliveryTime = deliveryTime.minuteOfDay().roundFloorCopy();
     }
 
     public VehicleType getVehicleType() {
@@ -218,6 +224,14 @@ public class ReservationRequest implements Serializable {
         this.sourceSystem = sourceSystem;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (this == obj)
@@ -226,7 +240,6 @@ public class ReservationRequest implements Serializable {
             return false;
 
         final ReservationRequest that = (ReservationRequest) obj;
-
         return Objects.equals(this.customerName, that.customerName)
                 && Objects.equals(this.customerPhone, that.customerPhone)
                 && Objects.equals(this.startPosition, that.startPosition)

@@ -26,6 +26,9 @@ public class ReservationRequestGateway implements MessageListener {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     public void send(final String destination, final ReservationResponse reservationResponse) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ReservationResponse >>> " + reservationResponse);
+        }
         jmsTemplate.send(destination, new MessageCreator() {
             public Message createMessage(final Session session) throws JMSException {
                 return session.createObjectMessage(reservationResponse);
@@ -37,6 +40,9 @@ public class ReservationRequestGateway implements MessageListener {
     public void onMessage(final Message message) {
         try {
             final ReservationRequest reservationRequest = extractObject(message, ReservationRequest.class);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ReservationRequest <<< " + reservationRequest);
+            }
             handleReservationRequest(reservationRequest);
         } catch (final TsException ex) {
             LOG.error(ex);

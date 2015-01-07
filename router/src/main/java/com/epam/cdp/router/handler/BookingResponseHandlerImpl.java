@@ -25,10 +25,8 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
         final BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
         if (!canExecuteAction(bookingRequest, BookingRequestEnum.Action.ACCEPT)) {
-            throw new TsException(TsException.Reason.PRE_CONDITION_CHECK_FAIL, String.format(
-                    "Can't change bookingRequest[bookingRequestId: %s, orderId: %s] status to %s", bookingRequestId,
-                    orderId, BookingRequestEnum.Action.ACCEPT.name())
-            );
+            throw createPreConditionException(orderId, bookingRequestId, BookingRequestEnum.Action.ACCEPT.name(),
+                    bookingRequest.getOrder().getOrderStatus());
         }
 
         final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.ACCEPTED,
@@ -44,10 +42,8 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
         BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
         if (!canExecuteAction(bookingRequest, BookingRequestEnum.Action.REJECT)) {
-            throw new TsException(TsException.Reason.PRE_CONDITION_CHECK_FAIL, String.format(
-                    "Can't change bookingRequest[bookingRequestId: %s, orderId: %s] status to %s", bookingRequestId,
-                    orderId, BookingRequestEnum.Action.REJECT.name())
-            );
+            throw createPreConditionException(orderId, bookingRequestId, BookingRequestEnum.Action.REJECT.name(),
+                    bookingRequest.getOrder().getOrderStatus());
         }
 
         final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.REJECTED,
@@ -63,10 +59,8 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
         BookingRequest bookingRequest = findBookingRequestByCriteria(bookingRequestId, orderId);
 
         if (!canExecuteAction(bookingRequest, BookingRequestEnum.Action.REFUSE)) {
-            throw new TsException(TsException.Reason.PRE_CONDITION_CHECK_FAIL, String.format(
-                    "Can't change bookingRequest[bookingRequestId: %s, orderId: %s] status to %s", bookingRequestId,
-                    orderId, BookingRequestEnum.Action.REFUSE.name())
-            );
+            throw createPreConditionException(orderId, bookingRequestId, BookingRequestEnum.Action.REFUSE.name(),
+                    bookingRequest.getOrder().getOrderStatus());
         }
 
         final BookingResponse bookingResponse = new BookingResponse(bookingRequest, BookingRequest.Status.REFUSED,
@@ -134,5 +128,13 @@ public class BookingResponseHandlerImpl implements BookingResponseHandler {
         final DateTime taxiDeliveryTime = bookingRequest.getOrder().getReservationRequest().getDeliveryTime();
         final DateTime currentTime = TimeService.getCurrentTimestamp();
         return bookingRequest.getExpiryTime().isAfter(currentTime) && taxiDeliveryTime.isAfter(currentTime);
+    }
+
+    private TsException createPreConditionException(final String orderId, final Long bookingRequestId,
+            final String action, final Order.OrderStatus orderStatus) {
+        return new TsException(TsException.Reason.PRE_CONDITION_CHECK_FAIL, String.format(
+                "Can't apply %s action for bookingRequest[bookingRequestId: %s, orderId: %s, status %s]",
+                action, bookingRequestId, orderId, orderStatus)
+        );
     }
 }

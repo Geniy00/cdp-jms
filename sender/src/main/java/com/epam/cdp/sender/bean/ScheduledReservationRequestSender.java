@@ -45,8 +45,9 @@ public class ScheduledReservationRequestSender {
     public void startSending(final long delay) {
         lock.lock();
         try {
-            if (isSenderScheduled())
+            if (isEnabled()) {
                 return;
+            }
 
             this.delay.set(delay);
             this.messageCount.set(0);
@@ -62,11 +63,13 @@ public class ScheduledReservationRequestSender {
     public void stopSending() {
         lock.lock();
         try {
-            if (!isSenderScheduled())
+            if (!isEnabled()) {
                 return;
+            }
 
             assert scheduledFuture != null;
             scheduledFuture.cancel(false);
+            scheduledFuture = null;
 
             LOG.info("Scheduled reservation request sender was stopped");
         } finally {
@@ -74,8 +77,13 @@ public class ScheduledReservationRequestSender {
         }
     }
 
-    public boolean isSending() {
-        return isSenderScheduled();
+    public boolean isEnabled() {
+        lock.lock();
+        try {
+            return scheduledFuture != null;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public long getDelay() {
@@ -90,18 +98,16 @@ public class ScheduledReservationRequestSender {
         return new Runnable() {
             public void run() {
                 ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
-                reservationService.sendToJms(reservationRequest);
+                final Long requestId = reservationService.priceRequest(reservationRequest);
+                reservationService.orderRequest(requestId);
                 messageCount.incrementAndGet();
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(String.format("Reservation request was sent[requestId:%s]",
+                    LOG.debug(String.format(
+                            "Reservation request was sent[requestId:%s] on pricing and to AutoOrderBean",
                             reservationRequest.getRequestId()));
                 }
             }
         };
-    }
-
-    private boolean isSenderScheduled() {
-        return scheduledFuture != null;
     }
 
 }

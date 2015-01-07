@@ -26,8 +26,9 @@ public class RouterRestClient {
     private static final Logger LOG = Logger.getLogger(RouterRestClient.class);
 
     private static final String REST_ACTION_URL =
-            "?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
-    private static final String REST_GET_CUSTOMER_INFO_URL = "?orderId={orderId}&bookingRequestId={bookingRequestId}";
+            "execute?orderId={orderId}&bookingRequestId={bookingRequestId}&action={action}&reason={reason}";
+    private static final String REST_GET_CUSTOMER_INFO_URL =
+            "getCustomerInfo?orderId={orderId}&bookingRequestId={bookingRequestId}";
 
     private final XstreamSerializer xstreamSerializer = new XstreamSerializer();
 
@@ -88,7 +89,7 @@ public class RouterRestClient {
         try {
             return xstreamSerializer.deserialize(response, deserializedClass);
         } catch (final Exception ex) {
-            LOG.error("Can't parse response:\n" + response, ex);
+            LOG.error("Can't parse response>>>\n" + response, ex);
             throw new TsException(TsException.Reason.RESPONSE_PARSING_FAILURE, response);
         }
     }

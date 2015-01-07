@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author Geniy00
  */
 @Entity
-@Table(name = "ord")
+@Table(name = "\"order\"")
 public class Order implements Serializable {
     //TODO: add @Version annotation
     private static final long serialVersionUID = 1820235678421505291L;
@@ -32,6 +32,10 @@ public class Order implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "orderStatus", nullable = false)
     private OrderStatus orderStatus;
+
+    @Version
+    @Column(name = "lockVersion")
+    private Long version;
 
     //TODO: maybe extract from this class
     public enum OrderStatus {
@@ -107,6 +111,14 @@ public class Order implements Serializable {
 
     public void setOrderStatus(final OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(final Long version) {
+        this.version = version;
     }
 
     @Override

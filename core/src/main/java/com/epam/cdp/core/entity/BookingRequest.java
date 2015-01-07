@@ -58,6 +58,10 @@ public class BookingRequest implements Serializable {
     @ManyToOne
     private Order order;
 
+    public enum Status {
+        ACCEPTED, REJECTED, REFUSED, EXPIRED, FAILED
+    }
+
     public BookingRequest() {
     }
 
@@ -208,7 +212,5 @@ public class BookingRequest implements Serializable {
         return Objects.hash(id, startPosition, finishPosition, deliveryTime, vehicleType);
     }
 
-    public enum Status {
-        ACCEPTED, REJECTED, REFUSED, EXPIRED, FAILED
-    }
+
 }
