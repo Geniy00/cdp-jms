@@ -3,12 +3,15 @@ package com.epam.cdp.router.service;
 import com.epam.cdp.core.entity.*;
 import com.epam.cdp.router.dao.CustomerDao;
 import com.epam.cdp.router.dao.OrderDao;
+import com.epam.cdp.router.dao.ReservationRequestDao;
 import com.epam.cdp.router.gateway.ReservationRequestGateway;
 import com.epam.cdp.router.handler.BookingRequestHandler;
 import com.epam.cdp.router.handler.BookingResponseHandler;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,12 +25,16 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
     private static final Logger LOG = Logger.getLogger(OrderServiceImpl.class);
+    public static final int PRICED_REQUEST_IS_EXPIRED_IN_MINS = 5;
 
     @Autowired
     private CustomerDao customerDao;
 
     @Autowired
     private OrderDao orderDao;
+
+    @Autowired
+    private ReservationRequestDao reservationRequestDao;
 
     @Autowired
     private BookingRequestHandler bookingRequestHandler;
@@ -39,9 +46,11 @@ public class OrderServiceImpl implements OrderService {
     private ReservationRequestGateway reservationRequestGateway;
 
     @Override
-    public Order createAndSaveNewOrder(final ReservationRequest reservationRequest) {
+    public Order createAndSaveNewOrder(final Long requestId) {
+        final ReservationRequest reservationRequest = reservationRequestDao.findByRequestId(requestId);
         final Customer customer = getPersistedCustomer(reservationRequest);
         final String id = UUID.randomUUID().toString();
+        reservationRequest.setStatus(ReservationRequest.Status.RECEIVED);
         final Order order = new Order(id, customer, reservationRequest);
         return orderDao.saveOrUpdate(order);
     }
@@ -49,6 +58,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order update(final Order order) {
         return orderDao.saveOrUpdate(order);
+    }
+
+    @Override
+    public ReservationRequest update(final ReservationRequest reservationRequest) {
+        return reservationRequestDao.saveOrUpdate(reservationRequest);
     }
 
     @Override
@@ -88,6 +102,20 @@ public class OrderServiceImpl implements OrderService {
 
             orderDao.updateBookingRequest(expiredBookingRequest);
             LOG.info(String.format("BookingRequest[id:%d] is expired", expiredBookingRequest.getId()));
+        }
+    }
+
+    @Override
+    public void terminateExpiredPricedRequests() {
+        final DateTime expiredBefore = TimeService.getCurrentTimestamp().minusMinutes(
+                PRICED_REQUEST_IS_EXPIRED_IN_MINS);
+        final List<ReservationRequest> expiredPricedRequests = reservationRequestDao.findExpiredPricedRequests(
+                expiredBefore);
+        for (ReservationRequest pricedRequest : expiredPricedRequests) {
+            reservationRequestDao.delete(pricedRequest.getId());
+        }
+        if (expiredPricedRequests.size() > 0) {
+            LOG.info(String.format("Removed %s expired priced requests", expiredPricedRequests.size()));
         }
     }
 
@@ -159,6 +187,7 @@ public class OrderServiceImpl implements OrderService {
         reservationRequestGateway.send(reservationRequest.getSourceSystem().getJmsResponseQueue(), reservationResponse);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private Customer getPersistedCustomer(final ReservationRequest reservationRequest) {
         final Customer persistedCustomer = customerDao.findCustomerByPhoneNumber(reservationRequest.getCustomerPhone());
         if (persistedCustomer == null) {

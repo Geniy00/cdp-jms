@@ -8,9 +8,16 @@ public class PriceService {
 
     private static final double TAX_PERCENTS = 0.15;
 
+    private static final double minPrice = 5;
+
     public static Double calculateClientPrice(ReservationRequest reservationRequest) {
         final double length = calculateLength(reservationRequest);
-        return roundToTwoDigits(length);
+        final double price = roundToTwoDigits(length);
+        if (price < minPrice) {
+            return price + minPrice;
+        } else {
+            return price;
+        }
     }
 
     public static Double calculateTaxiServicePayment(ReservationRequest reservationRequest) {

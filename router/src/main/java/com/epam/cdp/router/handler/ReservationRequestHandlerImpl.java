@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,13 +36,14 @@ public class ReservationRequestHandlerImpl implements ReservationRequestHandler 
     @Autowired
     private BookingRequestHandler bookingRequestHandler;
 
+    @Transactional
     @Override
     public ReservationResponse handleIndicativeRequest(final ReservationRequest reservationRequest) {
         try {
             validateIndicativeRequest(reservationRequest);
 
             final ReservationRequest pricedReservationRequest = priceReservationRequest(reservationRequest);
-            requestDao.saveOrUpdate(pricedReservationRequest);
+            orderService.update(pricedReservationRequest);
             return new ReservationResponse(pricedReservationRequest.getRequestId(),
                     pricedReservationRequest.getStatus(), pricedReservationRequest.getPrice());
         } catch (final TsException ex) {
@@ -50,16 +52,16 @@ public class ReservationRequestHandlerImpl implements ReservationRequestHandler 
         }
     }
 
+    @Transactional
     @Override
     public ReservationResponse handleOrderingRequest(final ReservationRequest reservationRequest) {
         try {
             validateOrderingRequest(reservationRequest);
 
-            final ReservationRequest persistedReservationRequest = requestDao.findByRequestId(
-                    reservationRequest.getRequestId());
-            final Order order = orderService.createAndSaveNewOrder(persistedReservationRequest);
+
+            final Order order = orderService.createAndSaveNewOrder(reservationRequest.getRequestId());
             LOG.info(String.format("Order %s on requestId %s was created successfully", order.getId(),
-                    persistedReservationRequest.getRequestId()));
+                    order.getReservationRequest().getRequestId()));
 
             asyncSendBookingRequest(order);
 

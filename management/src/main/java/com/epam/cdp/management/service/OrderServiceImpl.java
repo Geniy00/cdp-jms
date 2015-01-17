@@ -14,7 +14,7 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    OrderDao orderDao;
+    private OrderDao orderDao;
 
     @Override
     public Order find(final String id) {

@@ -22,7 +22,7 @@ public class Order implements Serializable {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, optional = false)
     private Customer customer;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = { CascadeType.REMOVE }, optional = false, orphanRemoval = true)
     private ReservationRequest reservationRequest;
 
     // TODO: check orphanRemoval = true!!!
@@ -62,8 +62,8 @@ public class Order implements Serializable {
         this.id = id;
         this.customer = customer;
         this.reservationRequest = reservationRequest;
-        bookingRequests = new LinkedList<>();
-        orderStatus = OrderStatus.NEW;
+        this.bookingRequests = new LinkedList<>();
+        this.orderStatus = OrderStatus.NEW;
     }
 
     //TODO: check if I can use some external class to change status

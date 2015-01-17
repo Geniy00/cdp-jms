@@ -68,6 +68,7 @@ public class MockAutoReceiverRunnable implements Runnable {
         final String action;
         if (shouldBeAccepted(currentNumberOfOrder)) {
             bookingService.acceptBooking(bookingId);
+            bookingService.getClientDetails(bookingId);
             action = "accepted";
         } else {
             bookingService.rejectBooking(bookingId);

@@ -6,15 +6,20 @@ import com.epam.cdp.core.entity.Order;
 import com.epam.cdp.router.service.TimeService;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
+import static com.epam.cdp.core.entity.Order.OrderStatus.*;
+
 /**
  * @author Geniy00
  */
+@Transactional(propagation = Propagation.MANDATORY)
 @Repository
 public class OrderDaoImpl implements OrderDao {
 
@@ -23,10 +28,10 @@ public class OrderDaoImpl implements OrderDao {
     private static final String SELECT_EXPIRED_BOOKING_REQUEST =
             "SELECT br FROM BookingRequest br WHERE br.expiryTime < :currentTime AND br.bookingResponse = null";
 
-    //TODO: rewrite SQL query without NEW, SENT, DECLINED strings. Use Enum Name
-    private static final String SELECT_EXPIRED_ORDER = "SELECT ord FROM Order ord " +
+    private static final String SELECT_EXPIRED_ORDER = String.format("SELECT ord FROM Order ord " +
             "WHERE ord.reservationRequest.deliveryTime < :dateTime AND " +
-            "(ord.orderStatus = 'NEW' OR ord.orderStatus = 'SENT' OR ord.orderStatus = 'DECLINED')";
+            "(ord.orderStatus = '%s' OR ord.orderStatus = '%s' OR ord.orderStatus = '%s')",
+            NEW.name(), SENT.name(), DECLINED.name());
 
     @PersistenceContext
     private EntityManager em;

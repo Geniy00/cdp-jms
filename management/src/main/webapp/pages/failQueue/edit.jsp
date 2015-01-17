@@ -7,15 +7,13 @@
 
 <html>
 <head>
-    <title>Fail queue messages</title>
-
+    <title>Edit fail queue messages</title>
 </head>
 <body>
 <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <br/><br/>
 <br/><br/>
 
-<c:forEach var="message" items="${messages}">
     <hr/>
     <table width="80%">
         <tr>
@@ -24,23 +22,28 @@
         </tr>
         <tr>
             <td colspan="2">
-                <pre class="prettyprint lang-html"><c:out value="${message.message}"/></pre>
+                <pre class="prettyprint lang-html">
+                    <c:out value="${message.message}"/>
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label>
+                    <sf:textarea rows="15" cols="150" path="message.message" form="editForm" />
+                </label>
             </td>
         </tr>
         <tr>
             <td colspan="2">
 
-                <form action="${pageContext.request.contextPath}/failQueue/edit/${message.id}" method="GET">
-                    <input type="submit" value="Edit" style="float: left"/>
-                </form>
-                <form action="${pageContext.request.contextPath}/failQueue/remove/${message.id}" method="POST">
-                    <input type="submit" value="Remove" style="float: left"/>
-                </form>
-            </td>
+                <sf:form action="${pageContext.request.contextPath}/failQueue/edit/${message.id}" method="POST"
+                         id="editForm" modelAttribute="message">
+                    <input type="submit" value="Save and Send" style="float: left"/>
+                </sf:form>
         </tr>
     </table>
     <br/><br/>
-</c:forEach>
 <br/>
 
 

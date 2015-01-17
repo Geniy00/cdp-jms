@@ -13,10 +13,10 @@ import java.util.List;
 @Component
 public class PeriodicTasks {
 
-    public static final Logger LOG = Logger.getLogger(PeriodicTasks.class);
+    private static final Logger LOG = Logger.getLogger(PeriodicTasks.class);
 
     @Autowired
-    BookingService bookingService;
+    private BookingService bookingService;
 
     /**
      * Move booking to expired time when current taxi service can't execute any actions on the booking,

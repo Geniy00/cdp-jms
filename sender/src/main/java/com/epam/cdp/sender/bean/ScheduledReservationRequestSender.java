@@ -26,7 +26,7 @@ public class ScheduledReservationRequestSender {
     private final ReservationService reservationService;
 
     private final AtomicLong messageCount = new AtomicLong();
-    private final AtomicLong delay = new AtomicLong();
+    private final AtomicLong delay = new AtomicLong(1000);
 
     private final ScheduledExecutorService service;
     private final Runnable runnableSender;
@@ -97,7 +97,8 @@ public class ScheduledReservationRequestSender {
     private Runnable createRunnableSender() {
         return new Runnable() {
             public void run() {
-                ReservationRequest reservationRequest = ReservationRequestGenerator.generateRandomReservationRequest();
+                final ReservationRequest reservationRequest =
+                        ReservationRequestGenerator.generateRandomReservationRequest();
                 final Long requestId = reservationService.priceRequest(reservationRequest);
                 reservationService.orderRequest(requestId);
                 messageCount.incrementAndGet();

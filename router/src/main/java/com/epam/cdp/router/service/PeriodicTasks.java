@@ -12,6 +12,10 @@ public class PeriodicTasks {
     @Autowired
     private OrderService orderService;
 
+    public void terminateExpiredPricedReservationRequests(){
+        orderService.terminateExpiredPricedRequests();
+    }
+
     public void terminateExpiredBookingRequests() {
         orderService.terminateExpiredBookingRequests();
     }

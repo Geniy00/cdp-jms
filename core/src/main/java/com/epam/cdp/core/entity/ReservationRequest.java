@@ -1,6 +1,5 @@
 package com.epam.cdp.core.entity;
 
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -15,7 +14,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "reservation_request")
-@Immutable
 public class ReservationRequest implements Serializable {
 
     private static final long serialVersionUID = 1820235672221505291L;
@@ -62,14 +60,13 @@ public class ReservationRequest implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdTimestamp;
 
-    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, optional = false)
+    @ManyToOne(cascade = { CascadeType.MERGE }, optional = false)
     @JoinColumn(name = "sourceSystem")
     private SourceSystem sourceSystem;
 
     @Version
     @Column(name = "lockVersion")
     private Long version;
-
 
     public enum Status {
         DRAFT,

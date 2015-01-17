@@ -45,7 +45,7 @@ public class BookingRequestGateway implements MessageListener {
             return;
         }
 
-        BookingRequestMessage bookingRequestMessage = null;
+        final BookingRequestMessage bookingRequestMessage;
         try {
             bookingRequestMessage = deserializeBookingRequestMessage(xmlMessage);
             if (bookingRequestMessage == null) {
@@ -55,6 +55,7 @@ public class BookingRequestGateway implements MessageListener {
         } catch (final TsException ex) {
             LOG.error(ex);
             sendTextMessageToFailQueue(xmlMessage);
+            return;
         }
 
         final BookingRequestDetails bookingRequestDetails = new BookingRequestDetails(bookingRequestMessage);
@@ -83,7 +84,6 @@ public class BookingRequestGateway implements MessageListener {
             return xstreamSerializer.deserialize(xmlMessage, BookingRequestMessage.class);
         } catch (final Exception ex) {
             LOG.error("Can't deserialize BookingRequestMessage.", ex);
-            sendTextMessageToFailQueue(xmlMessage);
             throw new TsException(ex, TsException.Reason.RESPONSE_PARSING_FAILURE, xmlMessage);
         }
     }

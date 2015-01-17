@@ -17,11 +17,11 @@
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
+    <context:component-scan base-package="com.epam.cdp.router.controller"/>
     <context:component-scan base-package="com.epam.cdp.router.dao"/>
+    <context:component-scan base-package="com.epam.cdp.router.gateway"/>
     <context:component-scan base-package="com.epam.cdp.router.handler"/>
     <context:component-scan base-package="com.epam.cdp.router.service"/>
-    <context:component-scan base-package="com.epam.cdp.router.controller"/>
-    <context:component-scan base-package="com.epam.cdp.router.gateway"/>
 
     <import resource="periodic-task-context.xml"/>
 
@@ -52,9 +52,9 @@
     <!-- Receiving JMS messages -->
     <jms:listener-container acknowledge="transacted" connection-factory="connectionFactory">
         <jms:listener destination="${reservation.request.queue.name.request}" ref="reservationRequestGateway"/>
-        <!--<jms:listener destination="${jms.fail.queue.name}" ref="failQueueListener"/>-->
-        <!-- Default ActiveMQ fail queue -->
-        <!--<jms:listener destination="ActiveMQ.DLQ" ref="failQueueListener"/>-->
+        <jms:listener destination="${jms.fail.queue.name}" ref="failQueueListener"/>
+         <!--Default ActiveMQ fail queue -->
+        <jms:listener destination="ActiveMQ.DLQ" ref="failQueueListener"/>
     </jms:listener-container>
 
     <!-- Jms Template-->

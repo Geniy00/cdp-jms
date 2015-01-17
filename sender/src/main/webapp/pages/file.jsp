@@ -22,7 +22,7 @@
 <br/>
 <br/>
 <br/>
-<c:if test="${message != null}">
+<c:if test="${message != null && message != ''}">
     <span style="color: green; ">Message: ${message}</span>
 </c:if>
 

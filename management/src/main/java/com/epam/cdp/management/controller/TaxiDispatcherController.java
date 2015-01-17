@@ -19,7 +19,7 @@ import java.util.List;
 public class TaxiDispatcherController {
 
     @Autowired
-    TaxiDispatcherService taxiDispatcherService;
+    private TaxiDispatcherService taxiDispatcherService;
 
     @RequestMapping("/dispatchers")
     public String list(final Model model) {

@@ -16,7 +16,7 @@ import java.util.List;
 public class FailQueueServiceImpl implements FailQueueService {
 
     @Autowired
-    FailQueueDao failQueueDao;
+    private FailQueueDao failQueueDao;
 
     @Override
     public FailQueueMessage update(final FailQueueMessage failQueueMessage) {

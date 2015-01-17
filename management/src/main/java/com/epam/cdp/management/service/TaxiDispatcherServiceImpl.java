@@ -16,7 +16,7 @@ import java.util.List;
 public class TaxiDispatcherServiceImpl implements TaxiDispatcherService {
 
     @Autowired
-    TaxiDispatcherDao taxiDispatcherDao;
+    private TaxiDispatcherDao taxiDispatcherDao;
 
     @Override
     public TaxiDispatcher update(final TaxiDispatcher taxiDispatcher) {
@@ -25,7 +25,7 @@ public class TaxiDispatcherServiceImpl implements TaxiDispatcherService {
 
     @Override
     public void delete(final Long id) {
-        TaxiDispatcher taxiDispatcher = taxiDispatcherDao.find(id);
+        final TaxiDispatcher taxiDispatcher = taxiDispatcherDao.find(id);
         taxiDispatcherDao.delete(taxiDispatcher);
     }
 

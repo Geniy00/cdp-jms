@@ -17,9 +17,10 @@ import java.util.List;
 @Controller
 public class OrderController {
 
-    public static final int ORDER_COUNT_LIMIT = 400;
+    private static final int ORDER_COUNT_LIMIT = 400;
+
     @Autowired
-    OrderService orderService;
+    private OrderService orderService;
 
     @RequestMapping(value = "/")
     public String index() {

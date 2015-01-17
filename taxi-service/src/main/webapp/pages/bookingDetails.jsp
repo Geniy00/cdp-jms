@@ -10,22 +10,18 @@
 <br/>
 
 <div>
-    Booking id: <strong>${booking.id}</strong> </br>
+    Booking id: <strong>${booking.id}</strong> <br/>
     Status: <strong>${booking.status}</strong>
 </div>
-</br>
+<br/>
 
 <c:if test="${message != null}">
     <span style="color: #ff4500;">Message: ${message}</span>
 </c:if>
-</br>
+<br/>
 
 <div style="border: solid 1px green; margin: 15px; display:inline-block; text-align: left">
     <table>
-        <tr>
-            <td>BookingRequest id:</td>
-            <td>${booking.bookingRequest.bookingRequestId }</td>
-        </tr>
         <c:if test="${booking.client != null}">
             <tr>
                 <td><b>Customer:</b></td>

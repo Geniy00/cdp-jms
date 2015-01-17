@@ -9,9 +9,11 @@ import java.util.List;
  */
 public interface OrderService {
 
-    Order createAndSaveNewOrder(ReservationRequest reservationRequest);
+    Order createAndSaveNewOrder(Long requestId);
 
     Order update(Order order);
+
+    ReservationRequest update(ReservationRequest reservationRequest);
 
     void delete(Order order);
 
@@ -22,6 +24,8 @@ public interface OrderService {
     void terminateExpiredOrders();
 
     void terminateExpiredBookingRequests();
+
+    void terminateExpiredPricedRequests();
 
     BookingRequest updateBookingRequest(BookingRequest bookingRequest);
 

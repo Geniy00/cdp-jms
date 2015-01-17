@@ -1,2 +1,5 @@
 <FindBugsFilter>
+    <Class name="com.epam.cdp.router.handler.ReservationRequestHandlerImpl"/>
+    <Method name="asyncSendBookingRequest"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
 </FindBugsFilter>

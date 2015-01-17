@@ -2,6 +2,8 @@ package com.epam.cdp.router.dao;
 
 import com.epam.cdp.core.entity.Customer;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
@@ -12,6 +14,7 @@ import java.util.List;
 /**
  * @author Geniy00
  */
+@Transactional(propagation = Propagation.MANDATORY)
 @Repository
 public class CustomerDaoImpl implements CustomerDao {
 

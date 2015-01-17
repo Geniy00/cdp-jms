@@ -1,2 +1,5 @@
 <FindBugsFilter>
+    <Class name="ua.com.taxi.mock.AutoReceiverBean"/>
+    <Method name="start"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
 </FindBugsFilter>

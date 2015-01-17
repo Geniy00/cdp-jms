@@ -5,6 +5,7 @@ import com.epam.cdp.core.entity.TaxiDispatcher;
 import com.epam.cdp.router.dao.TaxiDispatcherDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
@@ -18,8 +19,9 @@ public class TaxiDispatcherSelector {
     private final Random random = new Random();
 
     @Autowired
-    TaxiDispatcherDao taxiDispatcherDao;
+    private TaxiDispatcherDao taxiDispatcherDao;
 
+    @Transactional
     public TaxiDispatcher selectTaxiDispatcher(final Order order) {
         final List<TaxiDispatcher> activeDispatchers = taxiDispatcherDao.findActiveTaxiDispatchers();
         final int dispatcherCount = activeDispatchers.size();

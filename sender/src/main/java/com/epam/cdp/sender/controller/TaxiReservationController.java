@@ -27,10 +27,10 @@ import java.util.Set;
 public class TaxiReservationController {
 
     @Autowired
-    ReservationService reservationService;
+    private ReservationService reservationService;
 
     @Autowired
-    ScheduledReservationRequestSender scheduledOrderSender;
+    private ScheduledReservationRequestSender scheduledOrderSender;
 
     @RequestMapping(value = "/")
     public String index() {
